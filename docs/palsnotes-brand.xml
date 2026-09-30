@@ -1,0 +1,277 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+  PALS's Notes brand kit for scene-render 1.1.
+
+  Episodes carry the prologue sections of this document (styles, the font asset, safeAreas,
+  layouts and symbols) verbatim, because rules R22 and R25 resolve style and token references
+  only inside the document that uses them. The composition is a specimen sheet: rendering this
+  file shows every component once, in the order an episode uses them, and serves as the golden
+  reference for the kit.
+
+  Measured facts behind the numbers:
+    Archivo cap height = 686/1000 em (OS/2 sCapHeight, unitsPerEm 1000).
+    WCAG contrast on pn-ink: cream 14.97, cream-muted 8.34, orange 4.94, data-cool 6.79.
+    WCAG contrast on pn-ink-raised: cream 12.93, cream-muted 7.20, orange 4.27 (below 4.5,
+    so orange text never sits on a raised panel; orange there is a bar, never type).
+-->
+<scene version="1.1">
+  <project width="1920" height="1080" fps="30" duration="21" seed="20260929"
+           background="var(--pn-ink)" safeArea="pn-title-safe"/>
+
+  <metadata title="PALS's Notes brand kit" author="PALS's Notes" revision="1"
+            description="Palette, type, safe areas, layouts and reusable components for PALS's Notes explainers, Shorts and thumbnails.">
+    <meta name="pn:motion-in" value="0.40 s, cubic-out"/>
+    <meta name="pn:motion-out" value="0.30 s, cubic-in"/>
+    <meta name="pn:thumbnail-cap-height" value="137 px at 1920x1080, which is 91 px on the 1280x720 upload"/>
+    <meta name="pn:short-cover-cap-height" value="121 px at 1080x1920"/>
+    <accessibility flashCheck="error" contrastCheck="error" minContrast="4.5" requireCaptions="true"/>
+  </metadata>
+
+  <!-- Specimen text. Episodes set these per video; variants hold the two channel languages. -->
+  <parameters>
+    <param id="pn-kicker" type="string" default="ASTRONOMY" maxLength="24" label="Topic label above the title"/>
+    <param id="pn-title" type="string" default="Radio waves from an exoplanet" maxLength="60" label="Episode title"/>
+    <param id="pn-chapter-number" type="string" default="01" pattern="[0-9]{2}" label="Chapter number"/>
+    <param id="pn-chapter-title" type="string" default="What MeerKAT heard" maxLength="40" label="Chapter title"/>
+    <param id="pn-name" type="string" default="Beta Pictoris b" maxLength="32" label="Lower-third name"/>
+    <param id="pn-role" type="string" default="Gas giant, 63 light-years away" maxLength="48" label="Lower-third role"/>
+    <param id="pn-source" type="string" default="Source: preprint, September 2026" maxLength="96" label="Citation line"/>
+    <param id="pn-headline-before" type="string" default="RADIO FROM AN " label="Headline words before the accent word"/>
+    <param id="pn-headline-accent" type="string" default="EXOPLANET?" label="Headline accent word (orange)"/>
+    <param id="pn-headline-after" type="string" default="" label="Headline words after the accent word"/>
+    <param id="pn-next" type="string" default="NEXT ON PALS'S NOTES" maxLength="32" label="End-card label"/>
+    <variant id="pn-en-US" label="English">
+      <set param="pn-kicker" value="ASTRONOMY"/>
+      <set param="pn-chapter-title" value="What MeerKAT heard"/>
+      <set param="pn-next" value="NEXT ON PALS'S NOTES"/>
+    </variant>
+    <variant id="pn-pt-BR" label="Português (Brasil)">
+      <set param="pn-kicker" value="ASTRONOMIA"/>
+      <set param="pn-title" value="Ondas de rádio de um exoplaneta"/>
+      <set param="pn-chapter-title" value="O que o MeerKAT ouviu"/>
+      <set param="pn-role" value="Gigante gasoso a 63 anos-luz"/>
+      <set param="pn-source" value="Fonte: preprint, setembro de 2026"/>
+      <set param="pn-headline-before" value="RÁDIO DE UM "/>
+      <set param="pn-headline-accent" value="PLANETA?"/>
+      <set param="pn-next" value="A SEGUIR NO PALS'S NOTES"/>
+    </variant>
+  </parameters>
+
+  <styles>
+    <!-- Palette: ink, cream and signal orange come from the channel logo. -->
+    <token name="pn-ink" value="#16181D"/>
+    <token name="pn-ink-raised" value="#22252C"/>
+    <token name="pn-cream" value="#F2EBDD"/>
+    <token name="pn-cream-muted" value="#B8B1A4"/>
+    <token name="pn-orange" value="#E8581C"/>
+    <!-- Non-text only: grid lines, axes, dividers (contrast 1.66 on ink). -->
+    <token name="pn-rule" value="#3A3E47"/>
+    <!-- Data series, in this order: accent, neutral, cool. -->
+    <token name="pn-data-1" value="var(--pn-orange)"/>
+    <token name="pn-data-2" value="var(--pn-cream)"/>
+    <token name="pn-data-3" value="#5FA8D3"/>
+
+    <!-- Type: one variable family, Archivo (wght 100-900, wdth 62-125). -->
+    <textStyle id="pn-base" fontAsset="pn-archivo" fallback="Archivo, Barlow Condensed, sans-serif"
+               size="40" weight="400" variation="wght 400, wdth 100" color="var(--pn-cream)" lineHeight="1.3"/>
+    <textStyle id="pn-display" basedOn="pn-base" size="120" weight="900" variation="wght 900, wdth 62"
+               textTransform="uppercase" lineHeight="0.95" tracking="0"/>
+    <textStyle id="pn-display-accent" basedOn="pn-display" color="var(--pn-orange)"/>
+    <textStyle id="pn-heading" basedOn="pn-base" size="64" weight="800" variation="wght 800, wdth 75" lineHeight="1.05"/>
+    <textStyle id="pn-body" basedOn="pn-base"/>
+    <textStyle id="pn-label" basedOn="pn-base" size="28" weight="600" variation="wght 600, wdth 100"
+               color="var(--pn-cream-muted)" textTransform="uppercase" tracking="80"/>
+    <textStyle id="pn-number" basedOn="pn-display" size="160" color="var(--pn-orange)" features="tnum"/>
+    <textStyle id="pn-cite" basedOn="pn-base" size="24" color="var(--pn-cream-muted)" lineHeight="1.25"/>
+    <textStyle id="pn-data" basedOn="pn-base" size="28" weight="500" variation="wght 500, wdth 100"
+               color="var(--pn-cream-muted)" features="tnum"/>
+    <textStyle id="pn-caption" basedOn="pn-base" size="44" weight="700" variation="wght 700, wdth 90" lineHeight="1.2"/>
+    <textStyle id="pn-caption-active" basedOn="pn-caption" color="var(--pn-orange)"/>
+    <!-- Thumbnails and Shorts covers: cap height 137 px and 121 px from the 0.686 em cap ratio.
+         The thumbnail may shrink a word that is wider than its column, but never below 197 px
+         (cap 135 px here, 90 px on the 1280x720 upload); a word that still does not fit is replaced
+         by a shorter one (EXOPLANETA? needs 182 px). -->
+    <textStyle id="pn-thumb-headline" basedOn="pn-display" size="200" lineHeight="0.92"/>
+    <textStyle id="pn-thumb-accent" basedOn="pn-thumb-headline" color="var(--pn-orange)"/>
+    <textStyle id="pn-cover-headline" basedOn="pn-display" size="176" lineHeight="0.92"/>
+    <textStyle id="pn-cover-accent" basedOn="pn-cover-headline" color="var(--pn-orange)"/>
+  </styles>
+
+  <output id="pn-specimen" path="out/palsnotes-brand-specimen.mp4" codec="h264" container="mp4"
+          colorSpace="rec709" burnCaptions="pn-specimen-captions">
+    <poster path="out/palsnotes-brand-specimen.png" format="png" marker="pn-m-title"/>
+    <thumbnail path="out/palsnotes-thumbnail.jpg" format="jpeg" marker="pn-m-thumb" width="1280" quality="0.92"/>
+  </output>
+
+  <layouts>
+    <layout id="pn-shorts" width="1080" height="1920" aspect="9:16" safeArea="pn-shorts-safe" reframe="reflow"/>
+  </layouts>
+
+  <safeAreas>
+    <safeArea id="pn-title-safe" preset="title-safe" enforce="error"/>
+    <safeArea id="pn-shorts-safe" preset="youtube-shorts" enforce="error"/>
+  </safeAreas>
+
+  <assets>
+    <font id="pn-archivo" src="fonts/Archivo-wdth-wght.ttf" family="Archivo" weight="400"
+          sha256="0e094a7d3c7c4c25cf1310c4b30014f1dae9332220b1c2c88f4fa996f0b05053"
+          license="OFL-1.1" credit="The Archivo Project Authors (github.com/Omnibus-Type/Archivo)"/>
+
+    <text id="pn-t-kicker" text="{{pn-kicker}}" width="1200" height="48" size="28" style="pn-label"/>
+    <text id="pn-t-title" text="{{pn-title}}" width="1400" height="360" size="120" style="pn-display"
+          wrap="balance" maxLines="3" overflow="ellipsis"/>
+    <text id="pn-t-chapter-number" text="{{pn-chapter-number}}" width="400" height="180" size="160" style="pn-number"/>
+    <text id="pn-t-chapter-title" text="{{pn-chapter-title}}" width="1300" height="160" size="64" style="pn-heading"
+          wrap="balance" maxLines="2"/>
+    <text id="pn-t-name" text="{{pn-name}}" width="820" height="84" size="64" style="pn-heading" maxLines="1" overflow="ellipsis"/>
+    <text id="pn-t-role" text="{{pn-role}}" width="820" height="40" size="28" style="pn-label" maxLines="1" overflow="ellipsis"/>
+    <text id="pn-t-source" text="{{pn-source}}" width="1100" height="64" size="24" style="pn-cite" maxLines="2"/>
+    <text id="pn-t-next" text="{{pn-next}}" width="1200" height="48" size="28" style="pn-label"/>
+    <text id="pn-t-thumb" width="960" height="888" size="200" style="pn-thumb-headline"
+          verticalAlign="middle" wrap="balance" maxLines="3" autoFit="shrink" minSize="197">
+      <span style="pn-thumb-headline">{{pn-headline-before}}</span>
+      <span style="pn-thumb-accent" role="accent">{{pn-headline-accent}}</span>
+      <span style="pn-thumb-headline">{{pn-headline-after}}</span>
+    </text>
+    <text id="pn-t-cover" width="920" height="460" size="176" style="pn-cover-headline"
+          verticalAlign="bottom" wrap="balance" maxLines="3">
+      <span style="pn-cover-headline">{{pn-headline-before}}</span>
+      <span style="pn-cover-accent" role="accent">{{pn-headline-accent}}</span>
+      <span style="pn-cover-headline">{{pn-headline-after}}</span>
+    </text>
+  </assets>
+
+  <symbols>
+    <!-- The brand mark: the orange right triangle of the logo, right angle at bottom-left. -->
+    <symbol id="pn-notch" name="Notch" width="64" height="64" duration="1">
+      <shape id="pn-notch-shape" shape="path" width="64" height="64" path="M0 0 L0 64 L64 64 Z"
+             fill="var(--pn-orange)" tags="logo"/>
+    </symbol>
+
+    <!-- Opening title, 4 s: kicker, title, notch, on ink. -->
+    <symbol id="pn-title-card" name="Title card" width="1920" height="1080" duration="4">
+      <shape id="pn-tc-bg" shape="rect" width="1920" height="1080" fill="var(--pn-ink)"/>
+      <layer id="pn-tc-kicker" asset="pn-t-kicker" x="192" y="300">
+        <animate property="opacity" timeBase="local">
+          <key time="0" value="0" interpolation="cubic-out"/><key time="0.4" value="1"/>
+          <key time="3.7" value="1" interpolation="cubic-in"/><key time="4" value="0"/>
+        </animate>
+      </layer>
+      <layer id="pn-tc-title" asset="pn-t-title" x="192" y="360">
+        <animate property="opacity" timeBase="local">
+          <key time="0.1" value="0" interpolation="cubic-out"/><key time="0.5" value="1"/>
+          <key time="3.7" value="1" interpolation="cubic-in"/><key time="4" value="0"/>
+        </animate>
+        <animate property="y" timeBase="local">
+          <key time="0.1" value="392" interpolation="cubic-out"/><key time="0.5" value="360"/>
+        </animate>
+      </layer>
+      <instance id="pn-tc-notch" symbol="pn-notch" x="0" y="1016"/>
+    </symbol>
+
+    <!-- Chapter divider, 3 s: orange number, cream title. -->
+    <symbol id="pn-chapter-card" name="Chapter card" width="1920" height="1080" duration="3">
+      <shape id="pn-cc-bg" shape="rect" width="1920" height="1080" fill="var(--pn-ink)"/>
+      <layer id="pn-cc-number" asset="pn-t-chapter-number" x="192" y="340">
+        <animate property="opacity" timeBase="local">
+          <key time="0" value="0" interpolation="cubic-out"/><key time="0.4" value="1"/>
+          <key time="2.7" value="1" interpolation="cubic-in"/><key time="3" value="0"/>
+        </animate>
+      </layer>
+      <layer id="pn-cc-title" asset="pn-t-chapter-title" x="192" y="540">
+        <animate property="opacity" timeBase="local">
+          <key time="0.15" value="0" interpolation="cubic-out"/><key time="0.55" value="1"/>
+          <key time="2.7" value="1" interpolation="cubic-in"/><key time="3" value="0"/>
+        </animate>
+      </layer>
+      <shape id="pn-cc-rule" shape="rect" width="1536" height="2" x="192" y="520" fill="var(--pn-rule)"/>
+    </symbol>
+
+    <!-- Lower third, 5 s, transparent: panel at y 680-832 leaves the caption band (centred at 85%) clear.
+         Raised panel with an orange bar; orange is never type here. -->
+    <symbol id="pn-lower-third" name="Lower third" width="1920" height="1080" duration="5">
+      <group id="pn-lt" x="192" y="680" width="900" height="152">
+        <animate property="opacity" timeBase="local">
+          <key time="0" value="0" interpolation="cubic-out"/><key time="0.4" value="1"/>
+          <key time="4.7" value="1" interpolation="cubic-in"/><key time="5" value="0"/>
+        </animate>
+        <animate property="x" timeBase="local">
+          <key time="0" value="160" interpolation="cubic-out"/><key time="0.4" value="192"/>
+        </animate>
+        <shape id="pn-lt-panel" shape="rect" width="900" height="152" fill="var(--pn-ink-raised)"/>
+        <shape id="pn-lt-bar" shape="rect" width="8" height="152" fill="var(--pn-orange)"/>
+        <layer id="pn-lt-name" asset="pn-t-name" x="40" y="22"/>
+        <layer id="pn-lt-role" asset="pn-t-role" x="40" y="98"/>
+      </group>
+    </symbol>
+
+    <!-- Citation line, 5 s, top-left inside title safe, clear of the lower third and captions. -->
+    <symbol id="pn-source-line" name="Source line" width="1920" height="1080" duration="5">
+      <layer id="pn-sl-text" asset="pn-t-source" x="192" y="108">
+        <animate property="opacity" timeBase="local">
+          <key time="0" value="0" interpolation="cubic-out"/><key time="0.4" value="1"/>
+          <key time="4.7" value="1" interpolation="cubic-in"/><key time="5" value="0"/>
+        </animate>
+      </layer>
+    </symbol>
+
+    <!-- Long-form thumbnail at 1920x1080 (scaled 1.5x from the 1280x720 guideline grid).
+         Headline column 96,96 960x888; subject column from x=1056; duration-badge zone
+         1590,945 330x135 stays empty; notch 0,984 96x96. The subject is added per episode
+         as a layer in pn-thumb-subject. -->
+    <symbol id="pn-thumbnail" name="Thumbnail" width="1920" height="1080" duration="1">
+      <shape id="pn-th-bg" shape="rect" width="1920" height="1080" fill="var(--pn-ink)"/>
+      <group id="pn-thumb-subject" x="1056" y="0" width="864" height="1080" clip="false"/>
+      <layer id="pn-th-headline" asset="pn-t-thumb" x="96" y="96"/>
+      <instance id="pn-th-notch" symbol="pn-notch" x="0" y="984" scaleX="1.5" scaleY="1.5"/>
+    </symbol>
+
+    <!-- Shorts cover card at 1080x1920: first 0.5-1 s of every Short. The channel's Shorts grid shows
+         only the centre 1080x1620 (y 150-1770), so the headline band is 80,220 920x460 and nothing
+         essential sits above y 220; subject band 80,680 840x720; notch 80,1336; player overlay from
+         y=1440 and action rail 940,800 140x640 stay empty. (thumbnail.md, revised 2026-09-30) -->
+    <symbol id="pn-short-cover" name="Shorts cover" width="1080" height="1920" duration="1">
+      <shape id="pn-sc-bg" shape="rect" width="1080" height="1920" fill="var(--pn-ink)"/>
+      <layer id="pn-sc-headline" asset="pn-t-cover" x="80" y="220"/>
+      <group id="pn-cover-subject" x="80" y="680" width="840" height="720"/>
+      <instance id="pn-sc-notch" symbol="pn-notch" x="80" y="1336"/>
+    </symbol>
+
+    <!-- End card, 8 s: leaves the right two thirds free for the platform's end-screen elements. -->
+    <symbol id="pn-end-card" name="End card" width="1920" height="1080" duration="8">
+      <shape id="pn-ec-bg" shape="rect" width="1920" height="1080" fill="var(--pn-ink)"/>
+      <layer id="pn-ec-next" asset="pn-t-next" x="192" y="480">
+        <animate property="opacity" timeBase="local">
+          <key time="0" value="0" interpolation="cubic-out"/><key time="0.4" value="1"/>
+        </animate>
+      </layer>
+      <instance id="pn-ec-notch" symbol="pn-notch" x="0" y="1016"/>
+    </symbol>
+  </symbols>
+
+  <markers>
+    <marker id="pn-m-title" time="0" kind="section" label="Title card" color="var(--pn-orange)"/>
+    <marker id="pn-m-chapter" time="4" kind="chapter" label="Chapter card"/>
+    <marker id="pn-m-lower" time="7" kind="section" label="Lower third and source line"/>
+    <marker id="pn-m-thumb" time="12.5" kind="section" label="Thumbnail"/>
+    <marker id="pn-m-end" time="13" kind="section" label="End card"/>
+  </markers>
+
+  <composition>
+    <instance id="pn-spec-title" symbol="pn-title-card" start="0"/>
+    <instance id="pn-spec-chapter" symbol="pn-chapter-card" start="4"/>
+    <instance id="pn-spec-lower" symbol="pn-lower-third" start="7"/>
+    <instance id="pn-spec-source" symbol="pn-source-line" start="7"/>
+    <instance id="pn-spec-thumb" symbol="pn-thumbnail" start="12"/>
+    <instance id="pn-spec-end" symbol="pn-end-card" start="13"/>
+  </composition>
+
+  <captions>
+    <captionTrack id="pn-specimen-captions" language="en-US" label="Specimen" mode="burn" preset="highlight"
+                  style="pn-caption" activeStyle="pn-caption-active" maxCharsPerLine="32" maxLines="2"
+                  y="85%" safeArea="pn-title-safe">
+      <cue start="7.2" end="9.6" text="A radio signal traced to a planet."/>
+      <cue start="9.6" end="11.8" text="Every claim on screen carries its source."/>
+    </captionTrack>
+  </captions>
+</scene>

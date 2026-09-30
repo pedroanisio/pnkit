@@ -8,7 +8,7 @@ the brand kit's prologue and components, captions, the Shorts overlay and spans,
 It is a Python package with no dependencies outside the standard library. It writes inline XML. It does not use
 `<include>` or symbol instances, because neither can carry per-use text: an included document resolves with its
 own parameter defaults, and `encode` drops `<override>` on instances after the first frame (guide §6, Avoid 1).
-The brand kit, `~/videos/docs/palsnotes-brand.xml`, stays the source of truth for tokens and styles. pnkit reads
+The brand kit, `docs/palsnotes-brand.xml` in this repository (also reachable as `~/videos/docs/palsnotes-brand.xml`, a symlink kept for older projects), stays the source of truth for tokens and styles. `docs/` also holds the thumbnail and cover guide (`thumbnail.md`) and the kit's fonts with their licence. pnkit reads
 the copy each project pins, and `pnkit.palette.check()` compares pnkit's hex constants with the kit.
 
 Version 0.1.0 was extracted from v013 "How Jev works". Rebuilding v013 with it gives a byte-identical
