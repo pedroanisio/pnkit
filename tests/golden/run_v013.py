@@ -1,12 +1,18 @@
 #!/usr/bin/env python3
 """run_v013.py — the golden test: v013's film.scene.xml, rebuilt with the vendored pnkit, is byte-identical.
 
-    python3 tests/golden/run_v013.py [--project DIR] [--work DIR] [--patch FILE] [--validate] [--keep]
+    python3 tests/golden/run_v013.py [--ab] [--draft] [--expect FILE] [--validate] [--project DIR] [--work DIR] [--keep]
 
 1. Copy the project to a work directory (out/ and qa/ left out; large read-only inputs linked, not copied).
 2. Vendor this library into it (tools/sync.py). If the project does not use pnkit yet (no film/vendor/pnkit.lock),
    apply the project-side patch (default: v013-to-pnkit.diff next to this script).
-3. Run `python3 film/build.py` in the copy and compare its film.scene.xml with the project's, byte for byte.
+3. Run `python3 film/build.py` in the copy (--draft: with JEV_DRAFT=1, v013's fast-still build without the
+   backdrop) and compare its film.scene.xml byte for byte with:
+     --ab       the same project copied again and built with its own generators, from the same inputs, in the
+                same mode (the strict A/B: it holds however the project's inputs or its own scene have moved on);
+     --expect   a given file (e.g. a pinned copy of the delivered scene);
+     default    the project's film.scene.xml (valid only while it was built from the current inputs, in the
+                same mode).
 4. --validate: also run `scene-render validate` on the rebuilt scene (CPU only).
 The project itself is only read. Exit status 0 when the files are identical (and valid, with --validate).
 """
@@ -41,6 +47,9 @@ def main():
     ap.add_argument("--project", default=os.path.expanduser("~/videos/v013-jev-decisions"))
     ap.add_argument("--work", help="work directory (default: a new temporary one)")
     ap.add_argument("--patch", default=os.path.join(HERE, "v013-to-pnkit.diff"))
+    ap.add_argument("--draft", action="store_true", help="build with JEV_DRAFT=1 (no backdrop)")
+    ap.add_argument("--expect", help="the scene to compare with (default: the project's film.scene.xml)")
+    ap.add_argument("--ab", action="store_true", help="compare with the project's own generators run on the same inputs")
     ap.add_argument("--validate", action="store_true")
     ap.add_argument("--engine", default=os.environ.get("SCENE_RENDER") or os.path.expanduser("~/.local/share/scene-render/v013/engine/target/release/scene-render"))
     ap.add_argument("--keep", action="store_true", help="keep the work directory")
@@ -57,9 +66,20 @@ def main():
     if not adopted:
         run(["patch", "-p1", "--no-backup-if-mismatch", "-s", "-i", os.path.abspath(args.patch)], cwd=dst)
     os.remove(os.path.join(dst, "film.scene.xml"))
-    run([sys.executable, "-B", "film/build.py"], cwd=dst)
-    same = filecmp.cmp(os.path.join(dst, "film.scene.xml"), os.path.join(project, "film.scene.xml"), shallow=False)
-    r = subprocess.run(["cmp", os.path.join(dst, "film.scene.xml"), os.path.join(project, "film.scene.xml")], capture_output=True, text=True)
+    env = dict(os.environ, **({"JEV_DRAFT": "1"} if args.draft else {}))
+    env.pop("JEV_DRAFT", None) if not args.draft else None
+    run([sys.executable, "-B", "film/build.py"], cwd=dst, env=env)
+    expect = os.path.abspath(args.expect) if args.expect else os.path.join(project, "film.scene.xml")
+    if args.ab:
+        ref = os.path.join(work, "reference", os.path.basename(project))
+        if os.path.exists(ref):
+            shutil.rmtree(ref)
+        copy_project(project, ref)
+        os.remove(os.path.join(ref, "film.scene.xml"))
+        run([sys.executable, "-B", "film/build.py"], cwd=ref, env=env, stdout=subprocess.DEVNULL)
+        expect = os.path.join(ref, "film.scene.xml")
+    same = filecmp.cmp(os.path.join(dst, "film.scene.xml"), expect, shallow=False)
+    r = subprocess.run(["cmp", os.path.join(dst, "film.scene.xml"), expect], capture_output=True, text=True)
     print(f"cmp: {'identical' if same else r.stdout.strip() or r.stderr.strip()}")
     ok = same
     if args.validate:

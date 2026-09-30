@@ -7,8 +7,12 @@ to alter output, it must say so in the CHANGELOG and bump the version as a break
 ## v013 "How Jev works" (`~/videos/v013-jev-decisions`)
 
 ```bash
-python3 tests/golden/run_v013.py --validate          # add --work DIR --keep to inspect the rebuilt copy
+python3 tests/golden/run_v013.py --ab --validate          # the strict A/B (use this)
+python3 tests/golden/run_v013.py --ab --draft --validate  # the same for JEV_DRAFT=1 builds
+python3 tests/golden/run_v013.py --expect PINNED.xml      # against a pinned delivered scene
 ```
+
+Add `--work DIR --keep` to inspect the copies.
 
 1. The project is copied to a work directory. `out/` and `qa/` are left out, and the large read-only inputs are
    symlinked: `vo/*.wav`, `vo/cache`, `sfx/`, `music/score.wav`, `music/af`, `assets/`, `fonts/`, `film/tex/`
@@ -24,12 +28,27 @@ python3 tests/golden/run_v013.py --validate          # add --work DIR --keep to 
 
    The rest stays in the project: `objects.py`, `timeline.py`, `backdrop.py`, `sfx.py`, `textures.py` and the
    acts. Once the patch is applied to the project itself, step 3 is skipped.
-4. `python3 film/build.py` runs in the copy. Its `film.scene.xml` must be identical to the project's, as `cmp`
-   checks it (sha256 `a628b2c2…` at 0.1.0). `--validate` also runs `scene-render validate`, which is CPU-only.
+4. `python3 film/build.py` runs in the copy, with `JEV_DRAFT=1` when `--draft` is given. `cmp` compares its
+   `film.scene.xml` with one of three references:
+   - with `--ab`, a second copy of the project built by its own generators from the same inputs;
+   - with `--expect`, the file given;
+   - otherwise, the project's own `film.scene.xml`.
 
-Result at 0.1.0 (2026-09-30): `cmp` identical. `scene-render validate --deny-warnings`: 0 errors, 0 warnings.
-`tools/gate.py`: PASS. The evaluations at 0 s, per layout and per variant report no E05/E06, and the flash check
-is on (`warn`). The eight marker probes also pass but take about 8 CPU-minutes.
+   `--validate` also runs `scene-render validate`, which is CPU-only.
+
+`--ab` is the strict test. The project's own scene goes stale whenever its inputs change or it is rebuilt in
+another mode. On 2026-09-30 both happened while this test was being written: the physics cache was regenerated,
+which adds `cache=` to `<physics>`, and the scene was rebuilt as a draft.
+
+Results at 0.1.0 (2026-09-30):
+
+- Full build against the delivered `film.scene.xml` of 22:08 (sha256 `a628b2c2…`, before the physics cache was
+  regenerated): identical.
+- `--ab` full build and `--ab --draft`: identical.
+- `--draft` against the project's scene as rebuilt at 22:40: identical.
+- `scene-render validate --deny-warnings`: 0 errors, 0 warnings.
+- `tools/gate.py`: PASS. The evaluations at 0 s, per layout and per variant report no E05/E06, and the flash check
+  is on (`warn`). The eight marker probes also pass, but take about 8 CPU-minutes.
 
 The v013 build also registers one 176 px cover-headline text per Short (`hl-s1` … `hl-s6`) that no layer places.
 The project, not pnkit, keeps registering it so that the document stays identical.

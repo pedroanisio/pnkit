@@ -105,7 +105,8 @@ tests/            unit tests (python3 -m unittest discover -s tests) and the gol
 ## Changing the library
 
 1. Edit `pnkit/` and add or adjust tests: `python3 -m unittest discover -s tests`.
-2. Run the golden tests: `python3 tests/golden/run_v013.py` (see `tests/golden/README.md`).
+2. Run the golden tests: `python3 tests/golden/run_v013.py --ab --validate` and the same with `--draft`
+   (see `tests/golden/README.md`).
 3. Bump `__version__` in `pnkit/__init__.py` and `version` in `kit.json` together (`tests/test_tools.py`
    checks that they agree). Add a CHANGELOG entry. Commit.
 4. Sync each project that should move to the new version, and rebuild it.

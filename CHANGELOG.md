@@ -7,8 +7,9 @@ to hide it. Each release names the golden projects it was checked against.
 
 ## 0.1.0 — 2026-09-30
 
-First release, extracted from v013 "How Jev works" (`~/videos/v013-jev-decisions/film/`). Golden: v013's
-`film.scene.xml` rebuilt with the vendored package is byte-identical to the delivered one (`tests/golden/`).
+First release, extracted from v013 "How Jev works" (`~/videos/v013-jev-decisions/film/`). Golden (`tests/golden/`):
+v013's `film.scene.xml` rebuilt with the vendored package is byte-identical to the delivered one, and to the
+project's own generators on the same inputs, both as a full build and as a draft (`JEV_DRAFT=1`).
 
 Added
 - `pnkit.xml`: `f`, `esc`, `Ids`, `opacity`, `keys`, `path_d`, `hash01`, `HASH_EXPR`, `fmt` (v013 `lib.py`).
