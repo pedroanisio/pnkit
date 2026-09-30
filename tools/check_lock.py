@@ -37,9 +37,12 @@ def check(project):
         elif sha256(p) != want:
             problems.append(f"modified: {rel} (sha256 {sha256(p)[:12]}, lock {want[:12]})")
     if os.path.isdir(dest):
-        for n in sorted(os.listdir(dest)):
-            if n != "__pycache__" and n not in lock.get("files", {}):
-                problems.append(f"not in the lock: {n}")
+        for root, dirs, names in os.walk(dest):
+            dirs[:] = sorted(d for d in dirs if d != "__pycache__")
+            for n in sorted(names):
+                rel = os.path.relpath(os.path.join(root, n), dest).replace(os.sep, "/")
+                if rel not in lock.get("files", {}):
+                    problems.append(f"not in the lock: {rel}")
     init = os.path.join(dest, "__init__.py")
     if os.path.exists(init) and read_version(init) != lock.get("version"):
         problems.append(f"version: the copy says {read_version(init)}, the lock {lock.get('version')}")

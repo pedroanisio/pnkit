@@ -1,7 +1,7 @@
 {
  "id": "pnkit",
  "name": "PALS's Notes component kit",
- "version": "0.1.0",
+ "version": "0.2.0",
  "summary": "Python generators for PALS's Notes scenes (scene-render 1.1/1.2): helpers and components that write inline XML, vendored into each project with a lock file.",
  "requires": {"python": ">=3.8", "dependencies": [], "brand_kit": "palsnotes-brand.xml (passed in by the project; the source of truth for tokens and styles)"},
  "source": "~/videos/lib",
@@ -59,11 +59,15 @@
   {"name": "shorts.span_times / segments / output_xml / build", "module": "pnkit.shorts", "summary": "Film spans that start and end in narration pauses, output segments with 0.3 s crossfades, the Short <output> with its burned caption track, and the whole set with the feather paints and the 9:16 fit layout.",
    "params": ["beats [(key, start, end)]", "segs_of(spans)", "cues_of(maps)", "overlay_of(sid, T, head)", "caption_style", "active_style"], "rules": ["Shorts are output segments of the film's document (SREP 13)"]},
   {"name": "physics.signature / physics.block", "module": "pnkit.physics", "summary": "The <physics> block, pointing at a simulation cache only when the cache was made for this document's rigid bodies and fields.",
-   "params": ["bodies", "fields", "sig", "cache_path", "meta_path", "cache_ref"], "rules": []}
+   "params": ["bodies", "fields", "sig", "cache_path", "meta_path", "cache_ref"], "rules": []},
+  {"name": "vo.speak / vo.hazards / vo.rules / vo.entries / vo.asr_aliases / vo.asr_normalise / vo.lexicon", "module": "pnkit.vo", "summary": "The narration dictionary by language (pnkit/data/vo_lexicon.json: respellings, rules, Whisper aliases, each with its source). speak() applies the respellings; hazards() lists what a TTS engine is likely to misread before synthesis (a period that splits a word, digits, symbols, untested acronyms, over-long sentences); asr_normalise() makes known mis-hearings compare equal in the word-error check.",
+   "params": ["speak(text, lang, engine=kokoro)", "hazards(spoken, lang, known_acronyms=())", "asr_normalise(text, lang)", "lang: BCP 47 as the projects use it (en, pt-br); a base language falls back (en-us -> en)"],
+   "rules": ["abbreviations without periods in the spoken text: AI, not A.I. (guide §12 step 3, observed in v013)", "numbers written as words in the spoken text; the screen and captions keep digits (guide §5)", "a bad Kokoro reading is fixed by changing the text, never by re-rolling (guide §14)", "test a new term with tools/vo_probe.py before adding it"]}
  ],
  "tools": {
   "tools/sync.py PROJECT_DIR": "vendor pnkit into PROJECT_DIR/film/vendor/pnkit and write film/vendor/pnkit.lock",
   "tools/check_lock.py PROJECT_DIR": "verify the vendored copy against its lock",
-  "tools/gate.py SCENE [--probe T ...] [--markers]": "validate --deny-warnings, eval at probe times (default 0 s) and once per layout and variant (E05/E06 override/target errors), flash-check state"
+  "tools/gate.py SCENE [--probe T ...] [--markers]": "validate --deny-warnings, eval at probe times (default 0 s) and once per layout and variant (E05/E06 override/target errors), flash-check state",
+  "tools/vo_probe.py LINE|FILE ... [--lang L] [--voice V]": "Kokoro reads each line, Whisper large-v3 hears it back, internal pauses over 0.25 s are listed (run in the voice venv); test a term before adding it to the VO dictionary"
  }
 }

@@ -26,13 +26,17 @@ class Lock(unittest.TestCase):
         self.assertEqual(r.returncode, 0, r.stderr)
         lock = json.load(open(os.path.join(self.tmp, "film", "vendor", "pnkit.lock")))
         self.assertEqual(lock["version"], pnkit.__version__)
-        self.assertIn("camera.py", lock["files"]); self.assertIn("kit.json", lock["files"])
+        self.assertIn("camera.py", lock["files"]); self.assertIn("kit.json", lock["files"]); self.assertIn("data/vo_lexicon.json", lock["files"])
         self.assertTrue(os.path.exists(os.path.join(self.tmp, "film", "vendor", "__init__.py")))
         self.assertEqual(self.run_tool("check_lock.py", self.tmp).returncode, 0)
         # the vendored copy imports as vendor.pnkit
         r = subprocess.run([sys.executable, "-c", "from vendor import pnkit; print(pnkit.__version__)"], cwd=os.path.join(self.tmp, "film"),
                            capture_output=True, text=True)
         self.assertEqual(r.stdout.strip(), pnkit.__version__, r.stderr)
+        # the vendored vo reads its own copy of the dictionary
+        r = subprocess.run([sys.executable, "-c", "from vendor.pnkit import vo; print(vo.speak('an A.I. model', 'en'), vo._DATA)"],
+                           cwd=os.path.join(self.tmp, "film"), capture_output=True, text=True)
+        self.assertTrue(r.stdout.startswith("an AI model " + os.path.join(self.tmp, "film")), r.stdout + r.stderr)
 
     def test_check_catches_edits_and_strays(self):
         self.run_tool("sync.py", self.tmp)
@@ -40,9 +44,11 @@ class Lock(unittest.TestCase):
         with open(os.path.join(dest, "text.py"), "a") as fh:
             fh.write("# local edit\n")
         open(os.path.join(dest, "extra.py"), "w").write("")
+        open(os.path.join(dest, "data", "extra.json"), "w").write("{}")
         r = self.run_tool("check_lock.py", self.tmp)
         self.assertEqual(r.returncode, 1)
         self.assertIn("modified: text.py", r.stdout); self.assertIn("not in the lock: extra.py", r.stdout)
+        self.assertIn("not in the lock: data/extra.json", r.stdout)
 
     def test_no_lock(self):
         self.assertEqual(self.run_tool("check_lock.py", self.tmp).returncode, 1)

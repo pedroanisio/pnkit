@@ -29,10 +29,13 @@ pnkit/            the package; vendored into projects as film/vendor/pnkit/
   captions.py     split_cues, two_lines, timed, cue_xml, sidecar, short_cues, stats
   shorts.py       span_times, segments, overlay, output_xml, build
   physics.py      signature, block
+  vo.py           the narration dictionary: speak, hazards, rules, entries, asr_aliases, asr_normalise
+  data/vo_lexicon.json   its data by language (en, pt-br): respellings, rules, Whisper aliases, each with a source
 kit.json          the catalog: every component, its parameters and the guide rules it satisfies
 tools/sync.py     vendor pnkit into a project and write its lock
 tools/check_lock.py   verify a project's vendored copy against its lock
 tools/gate.py     validate --deny-warnings, eval at probe times (E05/E06), flash-check state
+tools/vo_probe.py how Kokoro reads a line, heard back by Whisper, with internal pauses (voice venv)
 tests/            unit tests (python3 -m unittest discover -s tests) and the golden test (tests/golden/)
 ```
 
@@ -70,6 +73,10 @@ tests/            unit tests (python3 -m unittest discover -s tests) and the gol
    `pnkit.captions.sidecar(words)`. Shorts: `pnkit.shorts.build(DOC, SHORTS, segs_of, cues_of, overlay_of, ...)`,
    where `overlay_of` calls `pnkit.shorts.overlay(..., subject=<the episode's drawing>, hook_title=...)`.
    `~/videos/v013-jev-decisions/film/` is the worked example once `tests/golden/v013-to-pnkit.diff` is applied.
+   Narration: `from vendor.pnkit import vo`, then `say = vo.speak(text, "en")` (numbers in words by the project),
+   `vo.hazards(say, "en")` before synthesis, and `vo.asr_normalise` on both sides of the Whisper check. Test a new term
+   with `~/.venvs/voice/bin/python ~/videos/lib/tools/vo_probe.py --lang en "bare." "respelled."` and add it to
+   `pnkit/data/vo_lexicon.json` with its source (guide §12 step 3).
 3. Keep episode code in the project: the timeline, acts, subjects and emblems, effects and sound. Pass them in
    where pnkit takes a callable or a parameter.
 4. Before delivery, run `python3 ~/videos/lib/tools/check_lock.py PROJECT_DIR`, which checks that the copy is

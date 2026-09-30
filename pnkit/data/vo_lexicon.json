@@ -1,0 +1,1038 @@
+{
+ "_meta": {
+  "about": "The narration dictionary: how written script text becomes the text a TTS engine is given, by language. Read by pnkit.vo.",
+  "fields": {
+   "entries": "written -> spoken respellings, applied as whole tokens by vo.speak (engine: any | kokoro | chatterbox | piper)",
+   "rules": "conventions for the spoken text that a lookup cannot apply (numbers, dates, pauses, names)",
+   "asr_aliases": "Whisper QA only: map both the reference and the transcript through these before the word-error rate; never used to write spoken text"
+  },
+  "sources": "each item names where it was observed: a project (file:line where known), the guide, or the probe (tools/vo_probe.py). The 2026-09-30 survey covered 13 projects and 497 spoken lines. Engine: the engine the item was observed with; kokoro is the channel's primary (guide §5), and an item for another engine is a lead to test, not a rule"
+ },
+ "en": {
+  "entries": [
+   {
+    "written": "A.I.",
+    "spoken": "AI",
+    "engine": "any",
+    "why": "Kokoro pauses about 0.3 s at the periods even in one call, and a sentence splitter cuts there too ('an A... I model'); bare AI is read as the two letters",
+    "source": "v013; probe 2026-09-30 (kokoro-onnx v1.0, af_heart, Whisper large-v3)"
+   },
+   {
+    "written": "arXiv",
+    "spoken": "archive",
+    "engine": "any",
+    "why": "the name is said 'archive'; Kokoro reads the spelling (Whisper heard 'R-Ziv')",
+    "source": "v013; probe 2026-09-30 (kokoro-onnx v1.0, af_heart, Whisper large-v3)"
+   },
+   {
+    "written": "e.g.",
+    "spoken": "for example",
+    "engine": "any",
+    "why": "a period followed by a space ends the sentence for the splitter",
+    "source": "guide"
+   },
+   {
+    "written": "i.e.",
+    "spoken": "that is",
+    "engine": "any",
+    "why": "a period followed by a space ends the sentence for the splitter",
+    "source": "guide"
+   },
+   {
+    "written": "vs.",
+    "spoken": "versus",
+    "engine": "any",
+    "why": "a period followed by a space ends the sentence for the splitter",
+    "source": "guide"
+   },
+   {
+    "written": "etc.",
+    "spoken": "and so on",
+    "engine": "any",
+    "why": "a period followed by a space ends the sentence for the splitter",
+    "source": "guide"
+   },
+   {
+    "written": "Dr.",
+    "spoken": "Doctor",
+    "engine": "any",
+    "why": "Kokoro pauses about 0.3 s after it in one call; the splitter would end the sentence there",
+    "source": "probe 2026-09-30 (kokoro-onnx v1.0, af_heart, Whisper large-v3)"
+   },
+   {
+    "written": "AI",
+    "spoken": "AI",
+    "engine": "kokoro",
+    "why": "read correctly as written (letters); spacing the letters (R L H F) is not needed",
+    "source": "probe 2026-09-30 (kokoro-onnx v1.0, af_heart, Whisper large-v3)"
+   },
+   {
+    "written": "LLM",
+    "spoken": "LLM",
+    "engine": "kokoro",
+    "why": "read correctly as written (letters); spacing the letters (R L H F) is not needed",
+    "source": "probe 2026-09-30 (kokoro-onnx v1.0, af_heart, Whisper large-v3)"
+   },
+   {
+    "written": "LLMs",
+    "spoken": "LLMs",
+    "engine": "kokoro",
+    "why": "read correctly as written (letters, plural s attached); spacing the letters (R L H F) is not needed",
+    "source": "probe 2026-09-30 (kokoro-onnx v1.0, af_heart, Whisper large-v3)"
+   },
+   {
+    "written": "RLHF",
+    "spoken": "RLHF",
+    "engine": "kokoro",
+    "why": "read correctly as written (letters); spacing the letters (R L H F) is not needed",
+    "source": "probe 2026-09-30 (kokoro-onnx v1.0, af_heart, Whisper large-v3)"
+   },
+   {
+    "written": "RLCD",
+    "spoken": "RLCD",
+    "engine": "kokoro",
+    "why": "read correctly as written (letters); spacing the letters (R L H F) is not needed",
+    "source": "probe 2026-09-30 (kokoro-onnx v1.0, af_heart, Whisper large-v3)"
+   },
+   {
+    "written": "GPT",
+    "spoken": "GPT",
+    "engine": "kokoro",
+    "why": "read correctly as written (letters; its version must still be written in words (GPT-5.6 paused 0.3 s and was heard 'GPT-5, 6')); spacing the letters (R L H F) is not needed",
+    "source": "probe 2026-09-30 (kokoro-onnx v1.0, af_heart, Whisper large-v3)"
+   },
+   {
+    "written": "API",
+    "spoken": "API",
+    "engine": "kokoro",
+    "why": "read correctly as written (letters); spacing the letters (R L H F) is not needed",
+    "source": "probe 2026-09-30 (kokoro-onnx v1.0, af_heart, Whisper large-v3)"
+   },
+   {
+    "written": "JSON",
+    "spoken": "JSON",
+    "engine": "kokoro",
+    "why": "read correctly as written (the word 'jay-son'); spacing the letters (R L H F) is not needed",
+    "source": "probe 2026-09-30 (kokoro-onnx v1.0, af_heart, Whisper large-v3)"
+   },
+   {
+    "written": "HTTP",
+    "spoken": "HTTP",
+    "engine": "kokoro",
+    "why": "read correctly as written (letters); spacing the letters (R L H F) is not needed",
+    "source": "probe 2026-09-30 (kokoro-onnx v1.0, af_heart, Whisper large-v3)"
+   },
+   {
+    "written": "CUDA",
+    "spoken": "CUDA",
+    "engine": "kokoro",
+    "why": "read correctly as written (the word); spacing the letters (R L H F) is not needed",
+    "source": "probe 2026-09-30 (kokoro-onnx v1.0, af_heart, Whisper large-v3)"
+   },
+   {
+    "written": "NVIDIA",
+    "spoken": "NVIDIA",
+    "engine": "kokoro",
+    "why": "read correctly as written (the word); spacing the letters (R L H F) is not needed",
+    "source": "probe 2026-09-30 (kokoro-onnx v1.0, af_heart, Whisper large-v3)"
+   },
+   {
+    "written": "FAQ",
+    "spoken": "FAQ",
+    "engine": "kokoro",
+    "why": "read correctly as written (letters); spacing the letters (R L H F) is not needed",
+    "source": "probe 2026-09-30 (kokoro-onnx v1.0, af_heart, Whisper large-v3)"
+   },
+   {
+    "written": "SQL",
+    "spoken": "SQL",
+    "engine": "kokoro",
+    "why": "read correctly as written (as heard by Whisper; 'sequel' vs letters not distinguished); spacing the letters (R L H F) is not needed",
+    "source": "probe 2026-09-30 (kokoro-onnx v1.0, af_heart, Whisper large-v3)"
+   },
+   {
+    "written": "GRPO",
+    "spoken": "G R P O",
+    "engine": "kokoro",
+    "why": "Initialism spelled as spaced letters.",
+    "source": "flexibility-trap/prod/script.json:152 (s25)"
+   },
+   {
+    "written": "MBPP",
+    "spoken": "M B P P",
+    "engine": "kokoro",
+    "why": "Initialism spelled as spaced letters.",
+    "source": "flexibility-trap/prod/script.json:166,173 (s27,s28)"
+   },
+   {
+    "written": "HumanEval",
+    "spoken": "Human Eval",
+    "engine": "kokoro",
+    "why": "CamelCase name split into words.",
+    "source": "flexibility-trap/prod/script.json:65,166 (s11,s27)"
+   },
+   {
+    "written": "LLaDA",
+    "spoken": "Lada",
+    "engine": "kokoro",
+    "why": "Mixed-case model name read as a word.",
+    "source": "flexibility-trap/prod/script.json:52 (s09)"
+   },
+   {
+    "written": "pass@k",
+    "spoken": "pass at k",
+    "engine": "kokoro",
+    "why": "Symbol '@' written out; the script's written form already says 'pass at k' (written form pass@k from PRODUCTION.md:144).",
+    "source": "flexibility-trap/prod/script.json:59 (s10); flexibility-trap/prod/PRODUCTION.md:144"
+   },
+   {
+    "written": "mi3",
+    "spoken": "M I three",
+    "engine": "kokoro",
+    "why": "Particle name: letters spelled, digit as a word.",
+    "source": "v010-one-piece-at-a-time/script.json:21 (s04)"
+   },
+   {
+    "written": "HIV",
+    "spoken": "H I V",
+    "engine": "kokoro",
+    "why": "Initialism spelled as spaced letters.",
+    "source": "v010-one-piece-at-a-time/script.json:124 (s21)"
+   },
+   {
+    "written": "TBD",
+    "spoken": "T B D",
+    "engine": "piper",
+    "why": "Initialism spelled for Piper; the Chatterbox pass keeps 'TBD' and Whisper heard it correctly.",
+    "source": "beta-pic-b-radio/make_audio.py:58; beta-pic-b-radio/publish/vo.json L31"
+   },
+   {
+    "written": "LOFAR",
+    "spoken": "Low-far",
+    "engine": "chatterbox",
+    "why": "Acronym read as a word, hyphenated respelling.",
+    "source": "beta-pic-b-radio/publish/make_vo_en.py:61; beta-pic-b-radio/publish/vo.json L23"
+   },
+   {
+    "written": "MeerKAT",
+    "spoken": "Meer-Kat",
+    "engine": "chatterbox",
+    "why": "Mixed-case telescope name respelled; Whisper hears 'Meerkat'.",
+    "source": "beta-pic-b-radio/publish/make_vo_en.py:61; beta-pic-b-radio/publish/README.md:20"
+   },
+   {
+    "written": "YZ Ceti",
+    "spoken": "Y Z Ceti",
+    "engine": "chatterbox",
+    "why": "Letters spelled; Chatterbox reads 'Ceti' unaided (Whisper hears 'YZ SETI').",
+    "source": "beta-pic-b-radio/publish/make_vo_en.py:61; beta-pic-b-radio/publish/vo.json L24"
+   },
+   {
+    "written": "RAIBO2",
+    "spoken": "RAIBO two",
+    "engine": "chatterbox",
+    "why": "Digit suffix of the robot name spoken as a word; Whisper still hears 'Revo'/'Raybo 2' (residual WER accepted).",
+    "source": "raibo2-marathon/tools/script.py:40-41; raibo2-marathon/README.md:65"
+   },
+   {
+    "written": "KAIST",
+    "spoken": "KAIST",
+    "engine": "chatterbox",
+    "why": "Not respelled; heard as 'Keist' and accepted as a residual difference.",
+    "source": "raibo2-marathon/tools/script.py:40; raibo2-marathon/PRODUCTION.md:151-152"
+   },
+   {
+    "written": "Tsinghua",
+    "spoken": "Ching-hwa",
+    "engine": "kokoro",
+    "why": "Chinese university name respelled phonetically.",
+    "source": "flexibility-trap/prod/script.json:52 (s09)"
+   },
+   {
+    "written": "Noether",
+    "spoken": "Nerter",
+    "engine": "chatterbox",
+    "why": "Respelled (word-level SPOKEN map, also used by the Piper synth.py); Whisper hears 'Nerder'.",
+    "source": "v900-qft/v3/narration.py:98-99; v900-qft/v3/vo/report_cb.json noether"
+   },
+   {
+    "written": "Faraday's",
+    "spoken": "Fara-day's",
+    "engine": "chatterbox",
+    "why": "Respelled (only the possessive is mapped).",
+    "source": "v900-qft/v3/narration.py:99"
+   },
+   {
+    "written": "Minnaert",
+    "spoken": "Minnart",
+    "engine": "piper",
+    "why": "Dutch name respelled; caption keeps 'Minnaert'.",
+    "source": "v008-bubble-sound/tools/script.py:48-49"
+   },
+   {
+    "written": "Gourmandie",
+    "spoken": "Goormahndee",
+    "engine": "piper",
+    "why": "French surname respelled; caption keeps 'Gourmandie'.",
+    "source": "v008-bubble-sound/tools/script.py:76-77"
+   },
+   {
+    "written": "Cendes",
+    "spoken": "Sendes",
+    "engine": "chatterbox",
+    "why": "Surname respelled (soft C); Whisper hears 'Sendis'.",
+    "source": "beta-pic-b-radio/publish/make_vo_en.py:62; beta-pic-b-radio/publish/vo.json L04"
+   },
+   {
+    "written": "Boötis",
+    "spoken": "Bo-oh-tis",
+    "engine": "chatterbox",
+    "why": "Diaeresis name respelled; Whisper hears 'Taubo Otiz' for 'Tau Bo-oh-tis'.",
+    "source": "beta-pic-b-radio/publish/make_vo_en.py:61; beta-pic-b-radio/publish/vo.json L23"
+   },
+   {
+    "written": "arcsecond",
+    "spoken": "arc second",
+    "engine": "chatterbox",
+    "why": "Compound unit split into two words.",
+    "source": "beta-pic-b-radio/publish/make_vo_en.py:49; beta-pic-b-radio/publish/README.md:20"
+   },
+   {
+    "written": "JustGRPO",
+    "spoken": "Just G R P O",
+    "engine": "kokoro",
+    "why": "CamelCase product name split, initialism spelled; comma before it ('They call it, Just G R P O').",
+    "source": "flexibility-trap/prod/script.json:159 (s26)"
+   },
+   {
+    "written": "GSM8K",
+    "spoken": "G S M eight K",
+    "engine": "kokoro",
+    "why": "benchmark name spelled letter by letter (flexibility-trap wrote the 8 as a digit)",
+    "source": "flexibility-trap/prod/script.json:159 (s26); flexibility-trap/prod/short/make_short_vo.py:27"
+   },
+   {
+    "written": "MATH-500",
+    "spoken": "Math five hundred",
+    "engine": "kokoro",
+    "why": "all-caps benchmark name as a plain word, hyphen dropped, number in words",
+    "source": "flexibility-trap/prod/script.json:166 (s27)"
+   },
+   {
+    "written": "Dirac",
+    "spoken": "Dih-rack",
+    "engine": "chatterbox",
+    "why": "respelled; every inflected form needs its own key (whole-token map)",
+    "source": "v900-qft/v3/narration.py:98"
+   },
+   {
+    "written": "Dirac's",
+    "spoken": "Dih-rack's",
+    "engine": "chatterbox",
+    "why": "respelled possessive",
+    "source": "v900-qft/v3/narration.py:98"
+   },
+   {
+    "written": "gluon",
+    "spoken": "glue-on",
+    "engine": "chatterbox",
+    "why": "respelled; add gluon -> glue-on to the word-error aliases or the check scores the respelling as an error",
+    "source": "v900-qft/v3/narration.py:98; v900-qft/v3/vo/report_cb.json gluons"
+   },
+   {
+    "written": "gluons",
+    "spoken": "glue-ons",
+    "engine": "chatterbox",
+    "why": "respelled plural",
+    "source": "v900-qft/v3/narration.py:98; v900-qft/v3/vo/report_cb.json gluons"
+   },
+   {
+    "written": "antimatter",
+    "spoken": "anti-matter",
+    "engine": "chatterbox",
+    "why": "prefix split so 'anti' is stressed as its own part",
+    "source": "v900-qft/v3/narration.py:98-99"
+   },
+   {
+    "written": "antiquark",
+    "spoken": "anti-quark",
+    "engine": "chatterbox",
+    "why": "prefix split so 'anti' is stressed as its own part",
+    "source": "v900-qft/v3/narration.py:98-99"
+   },
+   {
+    "written": "antimuon",
+    "spoken": "anti-muon",
+    "engine": "chatterbox",
+    "why": "prefix split so 'anti' is stressed as its own part",
+    "source": "v900-qft/v3/narration.py:98-99"
+   },
+   {
+    "written": "Harvard–Smithsonian",
+    "spoken": "Harvard-Smithsonian",
+    "engine": "any",
+    "why": "an en dash inside a name is a hyphen, not 'to': beta-pic's Chatterbox pass turned every en dash into ' to ' and shipped 'the Harvard to Smithsonian Center' (the word-error check passed it at 0.04)",
+    "source": "beta-pic-b-radio/publish/make_vo_en.py:73; beta-pic-b-radio/publish/vo.json L07"
+   },
+   {
+    "written": "Boeing 737",
+    "spoken": "Boeing seven thirty-seven",
+    "engine": "any",
+    "why": "aircraft type said in pairs",
+    "source": "v003-jet-engine/publish/make_audio.py:27"
+   },
+   {
+    "written": "CFM56-7B",
+    "spoken": "C F M fifty-six seven B",
+    "engine": "any",
+    "why": "engine designation: letters, then the numbers grouped as said",
+    "source": "v003-jet-engine/publish/make_audio.py:27; v003-jet-engine/README.md:1"
+   },
+   {
+    "written": "δ",
+    "spoken": "delta",
+    "engine": "any",
+    "why": "Greek letters are written as their names",
+    "source": "v900-qft/v3/narration.py:21; v900-qft/qa/vo_qa.py:17"
+   }
+  ],
+  "rules": [
+   {
+    "rule": "Write abbreviations without periods in the spoken text, and scan the spoken text for a single letter followed by '. ' before synthesis.",
+    "example": "'A.I.' -> 'AI'",
+    "why": "Kokoro pauses about 0.3 s at the periods of 'A.I.' even in one call, and a splitter at '. ' cuts the sentence there too; Whisper on the mix heard 'an A model' and passed it",
+    "source": "v013-jev-decisions/plan/plan.md:313-317; v013-jev-decisions/tools/synth_kokoro.py:110; v012-black-hole-jets/tools/synth_kokoro.py:61; v900-qft/v3/synth_cb.py:76; raibo2-marathon/tools/make_vo.py:57; RS-ENGINE-PRODUCTION-GUIDE.md:580; probe 2026-09-30 (kokoro-onnx v1.0, af_heart, Whisper large-v3)"
+   },
+   {
+    "rule": "Replace an en dash with 'to' only between numbers; elsewhere use a hyphen or a space.",
+    "example": "'40–70 percent' -> 'forty to seventy percent', but 'Harvard–Smithsonian' -> 'Harvard-Smithsonian'",
+    "why": "make_vo_en.spoken() replaces every '–' with ' to '. The published narration therefore says 'Harvard to Smithsonian'. v900 synth_cb.spoken() has the same blanket replace. It is latent there, because the current v900 script has no en dash. Piper make_audio.py mapped it to a space and re-hyphenated the name.",
+    "source": "beta-pic-b-radio/publish/make_vo_en.py:73; beta-pic-b-radio/publish/vo.json L07; v900-qft/v3/synth_cb.py:34; beta-pic-b-radio/make_audio.py:60"
+   },
+   {
+    "rule": "Replace an em dash with a comma pause.",
+    "example": "'—' -> ', '",
+    "why": "Both Chatterbox pipelines do this before synthesis.",
+    "source": "beta-pic-b-radio/publish/make_vo_en.py:73; v900-qft/v3/synth_cb.py:34"
+   },
+   {
+    "rule": "Strip curly quotes and quote marks around a mentioned word; say the word plain.",
+    "example": "“plink” -> plink; ‘wind’ -> wind",
+    "why": "Piper's spoken() strips them. The Chatterbox pass left curly quotes in, and Whisper still heard the lines (WER 0.03-0.05 came from names).",
+    "source": "beta-pic-b-radio/make_audio.py:57; v008-bubble-sound/tools/make_short_audio.py:28; beta-pic-b-radio/publish/vo.json L04,L29"
+   },
+   {
+    "rule": "Turn a colon into a full stop in the spoken text where a real pause is wanted; the caption keeps the colon.",
+    "example": "'Four steps, nonstop:' -> 'Four steps, nonstop.'; 'free order is ahead: forty-one percent' -> 'free order is ahead. Forty-one percent, against thirty-five.'",
+    "why": "The pause comes from the sentence break (Piper's sentence-silence, Kokoro's per-sentence takes).",
+    "source": "v003-jet-engine/publish/make_short_audio.py:27; flexibility-trap/prod/script.json:65 (s11); v008-bubble-sound/tools/make_short_audio.py:29-30"
+   },
+   {
+    "rule": "Add commas for prosody: around a word that is mentioned rather than used, before a coined term, and after a long numeric subject.",
+    "example": "'Words like, therefore, thus, and since, are forks'; 'The authors call this, entropy degradation.'; 'Zero point zero two, means two percent'",
+    "why": "Kokoro otherwise runs the mention into the sentence. The written text keeps normal punctuation.",
+    "source": "flexibility-trap/prod/script.json:90,109 (s15,s18); v012-black-hole-jets/script/narration.py:81"
+   },
+   {
+    "rule": "Do not put a parenthetical acronym after its expansion in the spoken text.",
+    "example": "'Organização das Nações Unidas (ONU)' -> spoken without '(ONU)'",
+    "why": "The caption keeps it (pt-BR case; the rule is language-neutral).",
+    "source": "v007-ww2/publish/README.md:24; v007-ww2/publish/vo.json 29"
+   },
+   {
+    "rule": "Give a single capital letter a noun, or spell its letter name, so that it is not read as a word or joined to its neighbour.",
+    "example": "'from A to B' -> 'from point ay, to point bee'; 'A' -> 'the potential A'",
+    "why": "Bare letters are ambiguous. 'queue A or queue B' is still heard 'QA/QO or QB' (v013 text.value 0.13, the only beat over the gate).",
+    "source": "v900-qft/v3/narration.py:103-106; v013-jev-decisions/qa/vo_qa.txt:2"
+   },
+   {
+    "rule": "Kokoro reads common initialisms as letters, and acronyms that are words as words, without help: test a new one with tools/vo_probe.py and record it here (spoken = written when it reads correctly). Spell letters with spaces (R L H F) only where a test shows a wrong reading, and for Piper; keep a pronounceable acronym as a word, with a hyphenated respelling if needed (Low-far).",
+    "example": "RLHF, LLMs, GPT, JSON, HTTP, FAQ, CUDA, NVIDIA: read correctly as written by af_heart",
+    "why": "v013 and flexibility-trap spaced initialisms as a precaution; the probe shows it is not needed for Kokoro",
+    "source": "v013-jev-decisions/script/narration.py:105-112; v013-jev-decisions/tools/synth_kokoro.py:58-63; flexibility-trap/prod/script.json:152-173; beta-pic-b-radio/publish/make_vo_en.py:61; probe 2026-09-30 (kokoro-onnx v1.0, af_heart, Whisper large-v3)"
+   },
+   {
+    "rule": "Split CamelCase and hyphenated product names into words.",
+    "example": "HumanEval -> Human Eval; JustGRPO -> Just G R P O; jev-latest -> Jev latest; MATH-500 -> Math 500",
+    "why": "Kokoro reads run-together names unpredictably (inferred from the respellings chosen).",
+    "source": "flexibility-trap/prod/script.json:159,166; v013-jev-decisions/script/narration.py:115"
+   },
+   {
+    "rule": "A respelling lives in the spoken form only (SPOKEN / SPOKEN_BEAT / tts / spoken field). The caption keeps the written form.",
+    "example": "SPOKEN_BEAT['launch'] vs ACTS text",
+    "why": "A single source of truth drives voice, captions and scene. Word timings are mapped back to the written words.",
+    "source": "v013-jev-decisions/script/narration.py:94-95; v013-jev-decisions/tools/synth_kokoro.py:86-98; raibo2-marathon/tools/script.py:3-4; v008-bubble-sound/tools/script.py:3-4"
+   },
+   {
+    "rule": "Word-level respelling maps must list every inflected form and are case-sensitive.",
+    "example": "'Dirac' and 'Dirac's' both mapped; 'Faraday's' mapped but not 'Faraday'",
+    "why": "v900 spoken() replaces whole [A-Za-z']+ tokens by exact dictionary lookup. A capitalised sentence-initial 'Gluons' would not match (inferred).",
+    "source": "v900-qft/v3/synth.py:13; v900-qft/v3/synth_cb.py:32; v900-qft/v3/narration.py:98-99"
+   },
+   {
+    "rule": "Key spoken-form overrides by act and beat, or keep beat ids unique across acts.",
+    "example": "v013 has beat 'state' in both 'inout' and 'limits'",
+    "why": "SPOKEN_BEAT is keyed by beat id alone, so a respelling for one 'state' would silently apply to the other (inferred). The synthesis report already collided on this id.",
+    "source": "v013-jev-decisions/script/narration.py:30,76,95; v013-jev-decisions/vo/report.json inout.state note"
+   },
+   {
+    "rule": "Years: use the year form. Put years and dense numbers on screen rather than speaking them in full where the shot is short.",
+    "example": "2024 -> twenty twenty-four; 1933 -> nineteen thirty-three",
+    "why": "num2words(to='year'). The default num2words(2024) gives 'two thousand and twenty-four', a residual WER source in raibo2's gate (tested on a copy of the function).",
+    "source": "beta-pic-b-radio/publish/make_vo_en.py:71; v900-qft/v3/synth_cb.py:33; v013-jev-decisions/tools/synth_kokoro.py:40-41; raibo2-marathon/PRODUCTION.md:151-152; RS-ENGINE-PRODUCTION-GUIDE.md:194,576"
+   },
+   {
+    "rule": "Dates: the day is an ordinal.",
+    "example": "September 15 -> September fifteenth",
+    "why": "A cardinal day would be read 'September fifteen'.",
+    "source": "beta-pic-b-radio/publish/make_vo_en.py:45; v013-jev-decisions/script/narration.py:96"
+   },
+   {
+    "rule": "Decimals: say 'point', then each digit. Say 'zero' before a leading decimal point. Say a round fraction as a word where natural.",
+    "example": "0.25 -> zero point two five; 45.5 -> forty-five point five; 0.5 -> half; 0.3 mm -> a third of a millimetre",
+    "why": "Matches the v013 gate normaliser, which reads fractional digits one by one.",
+    "source": "raibo2-marathon/tools/script.py:38-41; v013-jev-decisions/tools/synth_kokoro.py:44-46; v008-bubble-sound/tools/script.py:58"
+   },
+   {
+    "rule": "Versions: each dot is 'point' and each part is a whole number.",
+    "example": "1.13.0 -> one point thirteen point zero; GPT-5.6 -> G P T five point six",
+    "why": "Only multi-dot numbers get this treatment in the normaliser.",
+    "source": "v013-jev-decisions/tools/synth_kokoro.py:42-43; v013-jev-decisions/script/narration.py:111,115"
+   },
+   {
+    "rule": "Four-digit quantities are read in hundreds. Drop the thousands separator.",
+    "example": "1,250 -> twelve hundred and fifty; 1,280 -> twelve hundred and eighty; 10,000 -> ten thousand",
+    "why": "The generic digit regexes break on ',' (see the next rule).",
+    "source": "beta-pic-b-radio/publish/make_vo_en.py:63; raibo2-marathon/tools/script.py:74-75; v013-jev-decisions/script/narration.py:109"
+   },
+   {
+    "rule": "Never feed digits with separators to a number regex that does not know the locale. Pre-spell them in the spoken text.",
+    "example": "EN port of the pt words(): '1,250' -> 'one,two hundred and fifty', '0.250' -> 'two hundred and fifty', '2.5' -> 'two.five'; beta-pic generic pass: '1,250' -> 'one,two hundred and fifty' unless NAMES catches it",
+    "why": "Tested on copies of the functions in the scratchpad. v010's short make_vo_chatterbox.py is the pt-BR script with lang='en', and it keeps '.' as the thousands separator. It is latent there, because the Short's lines have no digits.",
+    "source": "v010-one-piece-at-a-time/short/make_vo_chatterbox.py:50-56; beta-pic-b-radio/publish/make_vo_en.py:72"
+   },
+   {
+    "rule": "Say percent as 'percent'. Say a numeric range as 'X to Y'. In a pair of percentages the second may drop 'percent'.",
+    "example": "40 % -> forty percent; 40–70 % -> forty to seventy percent; 83% ... 67% -> eighty-three percent ... sixty-seven",
+    "why": "Gate normalisers map '%' to 'percent'.",
+    "source": "raibo2-marathon/tools/script.py:45-46; beta-pic-b-radio/publish/make_vo_en.py:48; flexibility-trap/prod/short/make_short_vo.py:21; v012-black-hole-jets/tools/synth_kokoro.py:34"
+   },
+   {
+    "rule": "Say multipliers as 'N times'. The gate maps '×' to 'times'.",
+    "example": "3× -> three times; 193.6 times",
+    "why": "",
+    "source": "v013-jev-decisions/tools/synth_kokoro.py:51; v003-jet-engine/publish/make_short_audio.py:31"
+   },
+   {
+    "rule": "Expand units and symbols to words. A unit may be simplified to its meaning.",
+    "example": "m/s -> metres per second; km -> kilometres; ° -> degrees; °C -> degrees; lbf -> pounds of thrust; kHz -> kilohertz; mm -> millimetre; δ -> delta",
+    "why": "Engines read symbols and unit abbreviations unreliably (inferred from every project spelling them out).",
+    "source": "raibo2-marathon/tools/script.py:43-44,70-73; v003-jet-engine/publish/make_short_audio.py:33,35; v008-bubble-sound/tools/script.py:54-55; v900-qft/qa/vo_qa.py:17"
+   },
+   {
+    "rule": "Spell out numbers in the spoken form for every engine. Captions keep digits.",
+    "example": "'Numbers are spelled for the voice and written in the captions.'",
+    "why": "Kokoro misreads digit decimals and versions and pauses inside them (67.8% heard as '67, 8%', 1.13.0 left a 0.49 s pause)",
+    "source": "raibo2-marathon/tools/script.py:4; v003-jet-engine/publish/make_audio.py:8; v008-bubble-sound/tools/script.py:4; v012-black-hole-jets/script/narration.py:4; beta-pic-b-radio/publish/make_vo_en.py:42; probe 2026-09-30 (kokoro-onnx v1.0, af_heart, Whisper large-v3)"
+   },
+   {
+    "rule": "Numbers on screen only when spoken, and on the word that names them.",
+    "example": "counter keyed to the spoken number's word",
+    "why": "Guide density rule.",
+    "source": "RS-ENGINE-PRODUCTION-GUIDE.md:122,510"
+   },
+   {
+    "rule": "Kokoro: one sentence per call, one take per sentence. Fix a bad reading by changing the text (respelling, punctuation, splitting), never by re-rolling.",
+    "example": "WER_MAX fail -> edit SPOKEN_BEAT",
+    "why": "Kokoro is deterministic.",
+    "source": "RS-ENGINE-PRODUCTION-GUIDE.md:579,654; v013-jev-decisions/tools/synth_kokoro.py:6-7,15; v012-black-hole-jets/tools/synth_kokoro.py:6,10-11"
+   },
+   {
+    "rule": "Chatterbox: never synthesise a sentence under 7 words alone. Merge it with its neighbour, and cut the take at the script's last word (not Whisper's last word).",
+    "example": "'This is the principle of equivalence.' then babble",
+    "why": "Chatterbox babbles after short standalone sentences. raibo2's make_vo.py splits at [.?!:] and voices pieces as short as 2-3 words ('Without that reward:', 'Passed twice.', 'Back to Sangju.') cut at Whisper's last word. That is the risk pattern, though raibo2 passed its gate (inferred latent).",
+    "source": "RS-ENGINE-PRODUCTION-GUIDE.md:659; v900-qft/v3/synth_cb.py:77-83,96-108; raibo2-marathon/tools/make_vo.py:57,70"
+   },
+   {
+    "rule": "Voice a list of single words as one connected take, not one take per word.",
+    "example": "'Suck, squeeze, bang, blow!' as one take at length-scale 1.25, word onsets measured from the take",
+    "why": "Single-word Piper takes come out clipped.",
+    "source": "v003-jet-engine/publish/make_short_audio.py:7-8,85-92"
+   },
+   {
+    "rule": "Cut every take at its recognised words: about 0.10-0.15 s before the first and 0.22-0.25 s after the last. Allow a longer tail (0.45 s) when a line ends on a number.",
+    "example": "HEAD, TAIL = 0.12, 0.25; TAIL_S = 0.45",
+    "why": "This removes Chatterbox run-on (breaths, mumbles). Whisper ends a spoken number early.",
+    "source": "RS-ENGINE-PRODUCTION-GUIDE.md:192; beta-pic-b-radio/publish/make_vo_en.py:37,153-154; raibo2-marathon/tools/make_vo.py:32; v900-qft/v3/synth_cb.py:20"
+   },
+   {
+    "rule": "Put pauses in the assembly, not in the text: fixed silences between sentences of a beat, between beats, and extra after a full stop.",
+    "example": "v013 INNER 0.38 / GAP 0.55 + SENTENCE 0.45; v012 0.55 / 0.6 + 0.5; v900 synth_cb INNER 0.42 / GAP 0.5 + 0.45; raibo2 PAUSE 0.34 after a full stop, 0.26 after a colon",
+    "why": "Guide §14.",
+    "source": "RS-ENGINE-PRODUCTION-GUIDE.md:655; v013-jev-decisions/tools/synth_kokoro.py:31; v012-black-hole-jets/tools/synth_kokoro.py:26; v900-qft/v3/synth_cb.py:21-22; raibo2-marathon/tools/make_vo.py:31"
+   },
+   {
+    "rule": "Leave longer gaps at movement or chapter changes and a breath before key reveals. Leave 1-2 s without narration before big reveals.",
+    "example": "raibo2 GAP_DEFAULT 0.7, GAP_MOVEMENT 2.6, GAP_EXTRA up to 1.2 s",
+    "why": "",
+    "source": "raibo2-marathon/tools/script.py:85-88; RS-ENGINE-PRODUCTION-GUIDE.md:126"
+   },
+   {
+    "rule": "Pace: 4.5-6 syllables/s and at most 2.8 words/s. Calm, well-reviewed films run 95-120 words/min. Never time-compress. Ease a fast take by at most 15 % with formant-preserving rubberband.",
+    "example": "raibo2 eased to 4.6 syll/s (MAX_EASE 0.86); v012 speed 0.88 for <= 2.8 w/s; v013 133 wpm with pauses",
+    "why": "Rushed delivery (7-9 syllables/s) and compression artefacts passed a word-error check.",
+    "source": "RS-ENGINE-PRODUCTION-GUIDE.md:40,119,191,624; raibo2-marathon/tools/pace_vo.py:24-25; v012-black-hole-jets/tools/synth_kokoro.py:23; v013-jev-decisions/plan/plan.md:165-166"
+   },
+   {
+    "rule": "Measure pace as words (or syllables) over the clip duration, not over Whisper's first-to-last-word span. Vowel-group syllable counting over-counts English; raibo2 subtracts a silent final 'e'.",
+    "example": "beta-pic: PACE 2.7 / FAST 3.1 words/s; v900: PACE 2.9 / FAST 3.3; v010 Short: 4.2-4.4 vowel groups/s",
+    "why": "Whisper's span overstates pace.",
+    "source": "RS-ENGINE-PRODUCTION-GUIDE.md:658; beta-pic-b-radio/publish/make_vo_en.py:38; v900-qft/v3/synth_cb.py:23; raibo2-marathon/tools/pace_vo.py:28-36; v010-one-piece-at-a-time/short/make_vo_chatterbox.py:43"
+   },
+   {
+    "rule": "For timing estimates before synthesis, count numbers and acronyms as the words they are spoken as.",
+    "example": "SPOKEN_EXTRA: '2025' +3, '1,250' +4, '4.4' +2, 'TBD' +2, 'LOFAR' +1 at WPM 150",
+    "why": "Slot lengths were computed from the text before any audio existed.",
+    "source": "beta-pic-b-radio/build.py:12,70-81"
+   },
+   {
+    "rule": "In shorts, keep one line per shot that ends before the cut. Shorten the lines rather than speeding them up.",
+    "example": "v010 Short: 8 takes, VO_MAX_STRETCH=1.0, VO_CFG=0.3, eased to 4.4",
+    "why": "",
+    "source": "RS-ENGINE-PRODUCTION-GUIDE.md:522,583; v010-one-piece-at-a-time/short/README.md:19-20,24-25"
+   },
+   {
+    "rule": "Gate every line with Whisper large-v3 on the final mix (not only the raw take). Kokoro WER_MAX is 0.12 (v013) or 0.15 (v012); the Chatterbox vo_qa flags above 0.08.",
+    "example": "qa/vo_qa.py out/film.mp4",
+    "why": "Guide gate.",
+    "source": "RS-ENGINE-PRODUCTION-GUIDE.md:193,625; v013-jev-decisions/tools/synth_kokoro.py:32; v012-black-hole-jets/tools/synth_kokoro.py:28; v004-sun/publish/vo_qa.py:88"
+   },
+   {
+    "rule": "Score WER against a normalised form that folds formatting (years, %, ×, ordinals, decimals, versions, 'a hundred', dropped 'and', joined spelled letters) and maps every respelling back through an alias table. Otherwise respellings read as errors and real errors hide in the noise.",
+    "example": "v900 per-take WER against 'glue-ons' was 0.278 though Whisper heard 'gluons'; v013 ALIAS archive->arxiv, nowl->noul",
+    "why": "v900 synth_cb scores against the respelled text with no alias map. beta-pic scores against the written text.",
+    "source": "v013-jev-decisions/tools/synth_kokoro.py:34-66; v900-qft/v3/synth_cb.py:111; v900-qft/v3/vo/report_cb.json gluons; beta-pic-b-radio/publish/make_vo_en.py:159"
+   },
+   {
+    "rule": "A word Whisper drops or truncates in the mix is a listening cue, not an ASR quirk. Have a person listen to the opening line.",
+    "example": "'an A model' (WER 0.10) was the A.I. split, first put down to transcription",
+    "why": "",
+    "source": "v013-jev-decisions/plan/plan.md:315; RS-ENGINE-PRODUCTION-GUIDE.md:580"
+   },
+   {
+    "rule": "Fold British and American spellings in the gate. Whisper writes American forms.",
+    "example": "centre/center, metres/meters, kilometres/kilometers, colour/color, modelled/modeled, travelling/traveling, disc/disk",
+    "why": "Only v012 (disc->disk) and v900 shorts (color->colour) fold any. The others show up as residual WER.",
+    "source": "v012-black-hole-jets/tools/synth_kokoro.py:38; v900-qft/shorts/words.py:28; raibo2-marathon/data/vo.json L02,L11; v012-black-hole-jets/vo/report.json star,big,disk2"
+   },
+   {
+    "rule": "Run vo.hazards on every spoken line before synthesis, then have a person listen to the opening line; Whisper on the mix can mis-hear a split word as a plausible one and pass it.",
+    "example": "Whisper heard 'an A model' for 'an A... I model'",
+    "source": "v013"
+   },
+   {
+    "rule": "Hyphenated identifiers (model tags, handles) lose the hyphen and are written as the words they are said as.",
+    "example": "jev-latest -> Jev latest",
+    "source": "v013"
+   }
+  ],
+  "asr_aliases": [
+   {
+    "heard": "a.i.",
+    "means": "ai",
+    "source": "v013"
+   },
+   {
+    "heard": "archive",
+    "means": "arxiv",
+    "source": "v013"
+   },
+   {
+    "heard": "llms",
+    "means": "llm",
+    "source": "v013"
+   },
+   {
+    "heard": "a hundred",
+    "means": "one hundred",
+    "source": "v013 synth_kokoro.py"
+   },
+   {
+    "heard": "%",
+    "means": "percent",
+    "source": "v013 synth_kokoro.py"
+   },
+   {
+    "heard": "×",
+    "means": "times",
+    "source": "v013 synth_kokoro.py"
+   },
+   {
+    "heard": "δ",
+    "means": "delta",
+    "source": "v900-qft qa/vo_qa.py"
+   },
+   {
+    "heard": "glue-on",
+    "means": "gluon",
+    "source": "v900-qft (respelling scored as an error without it)"
+   },
+   {
+    "heard": "glue-ons",
+    "means": "gluons",
+    "source": "v900-qft"
+   },
+   {
+    "heard": "dih-rack",
+    "means": "dirac",
+    "source": "v900-qft"
+   },
+   {
+    "heard": "anti-matter",
+    "means": "antimatter",
+    "source": "v900-qft"
+   },
+   {
+    "heard": "anti-quark",
+    "means": "antiquark",
+    "source": "v900-qft"
+   },
+   {
+    "heard": "kilometers",
+    "means": "kilometres",
+    "source": "v012, v900-qft, raibo2 (Whisper writes American spellings; fold both sides)"
+   },
+   {
+    "heard": "meters",
+    "means": "metres",
+    "source": "v012, v900-qft, raibo2 (Whisper writes American spellings; fold both sides)"
+   },
+   {
+    "heard": "center",
+    "means": "centre",
+    "source": "v012, v900-qft, raibo2 (Whisper writes American spellings; fold both sides)"
+   },
+   {
+    "heard": "centers",
+    "means": "centres",
+    "source": "v012, v900-qft, raibo2 (Whisper writes American spellings; fold both sides)"
+   },
+   {
+    "heard": "color",
+    "means": "colour",
+    "source": "v012, v900-qft, raibo2 (Whisper writes American spellings; fold both sides)"
+   },
+   {
+    "heard": "colored",
+    "means": "coloured",
+    "source": "v012, v900-qft, raibo2 (Whisper writes American spellings; fold both sides)"
+   },
+   {
+    "heard": "modeled",
+    "means": "modelled",
+    "source": "v012, v900-qft, raibo2 (Whisper writes American spellings; fold both sides)"
+   },
+   {
+    "heard": "traveling",
+    "means": "travelling",
+    "source": "v012, v900-qft, raibo2 (Whisper writes American spellings; fold both sides)"
+   },
+   {
+    "heard": "disc",
+    "means": "disk",
+    "source": "v012, v900-qft, raibo2 (Whisper writes American spellings; fold both sides)"
+   },
+   {
+    "heard": "discs",
+    "means": "disks",
+    "source": "v012, v900-qft, raibo2 (Whisper writes American spellings; fold both sides)"
+   }
+  ]
+ },
+ "pt-br": {
+  "entries": [
+   {
+    "written": "URSS",
+    "spoken": "União Soviética",
+    "engine": "any",
+    "why": "Acronym expanded. This is the intended difference that Whisper reports against the written text.",
+    "source": "v007-ww2/publish/make_audio.py:30; v007-ww2/publish/README.md:9"
+   },
+   {
+    "written": "EUA",
+    "spoken": "Estados Unidos",
+    "engine": "any",
+    "why": "Acronym expanded.",
+    "source": "v007-ww2/publish/make_audio.py:31"
+   },
+   {
+    "written": "RAF",
+    "spoken": "Ráf",
+    "engine": "any",
+    "why": "English acronym read as one pt-BR word (accent marks the stress).",
+    "source": "v007-ww2/publish/make_audio.py:31; v007-ww2/publish/vo.json 08"
+   },
+   {
+    "written": "Lend-Lease",
+    "spoken": "Lend-Lís",
+    "engine": "any",
+    "why": "English term respelled in pt-BR orthography.",
+    "source": "v007-ww2/publish/make_audio.py:31; v007-ww2/publish/vo.json 18"
+   },
+   {
+    "written": "OTAN",
+    "spoken": "Otan",
+    "engine": "any",
+    "why": "Acronym read as a word.",
+    "source": "v007-ww2/publish/make_audio.py:32; v007-ww2/publish/vo.json 31"
+   },
+   {
+    "written": "Dia D",
+    "spoken": "Dia Dê",
+    "engine": "any",
+    "why": "Letter named in Portuguese. Unspelled, Chatterbox read 'Dia D' as 'dia W' (the Short dropped the phrase).",
+    "source": "v007-ww2/publish/make_audio.py:70; v007-ww2/short/README.md:35"
+   },
+   {
+    "written": "H-alfa",
+    "spoken": "agá alfa",
+    "engine": "chatterbox",
+    "why": "Letter named in Portuguese ('agá'), hyphen dropped; Whisper writes 'Hα'.",
+    "source": "v004-sun/publish/script.json:14 (06); v004-sun/publish/vo.json 06"
+   },
+   {
+    "written": "tag",
+    "spoken": "tégui",
+    "engine": "piper",
+    "why": "English loanword respelled for pt-BR; the caption keeps 'tag'. The guide cites it as the model respelling.",
+    "source": "sem-parar-campanha/final/make_final.py:9,45; sem-parar-campanha/final/README.md:8; RS-ENGINE-PRODUCTION-GUIDE.md:194"
+   },
+   {
+    "written": "Bf 109",
+    "spoken": "Messerschmitt cento e nove",
+    "engine": "piper",
+    "why": "Aircraft designation: maker's name plus the number in words.",
+    "source": "v007-ww2/publish/make_audio.py:31"
+   },
+   {
+    "written": "Organização das Nações Unidas (ONU)",
+    "spoken": "Organização das Nações Unidas",
+    "engine": "any",
+    "why": "a parenthetical acronym after its expansion is not spoken; the caption keeps '(ONU)'",
+    "source": "v007-ww2/publish/README.md:24; v007-ww2/publish/vo.json 29"
+   },
+   {
+    "written": "Sr.",
+    "spoken": "senhor",
+    "engine": "any",
+    "why": "a period followed by a space ends the sentence for the splitter",
+    "source": "v013 (same splitter)"
+   },
+   {
+    "written": "Sra.",
+    "spoken": "senhora",
+    "engine": "any",
+    "why": "a period followed by a space ends the sentence for the splitter",
+    "source": "v013 (same splitter)"
+   },
+   {
+    "written": "Dr.",
+    "spoken": "doutor",
+    "engine": "any",
+    "why": "a period followed by a space ends the sentence for the splitter",
+    "source": "v013 (same splitter)"
+   },
+   {
+    "written": "Dra.",
+    "spoken": "doutora",
+    "engine": "any",
+    "why": "a period followed by a space ends the sentence for the splitter",
+    "source": "v013 (same splitter)"
+   },
+   {
+    "written": "etc.",
+    "spoken": "et cétera",
+    "engine": "any",
+    "why": "a period followed by a space ends the sentence for the splitter",
+    "source": "v013 (same splitter)"
+   },
+   {
+    "written": "p.ex.",
+    "spoken": "por exemplo",
+    "engine": "any",
+    "why": "a period followed by a space ends the sentence for the splitter",
+    "source": "v013 (same splitter)"
+   }
+  ],
+  "rules": [
+   {
+    "rule": "Spell every number as words before Chatterbox. Years are pt-BR cardinals.",
+    "example": "1933 -> mil novecentos e trinta e três",
+    "why": "Chatterbox reads digits unreliably. Years came out as 1983/1993 before this rule. 'Numbers are read as words, so years come out correctly.'",
+    "source": "v007-ww2/publish/make_vo_chatterbox.py:9,44-49; v007-ww2/publish/README.md:8"
+   },
+   {
+    "rule": "Ordinals: 'Nº' becomes ordinal words.",
+    "example": "1º -> primeiro; 6º -> sexto",
+    "why": "num2words(to='ordinal', lang='pt_BR').",
+    "source": "v007-ww2/publish/make_vo_chatterbox.py:47; v007-ww2/publish/make_audio.py:30"
+   },
+   {
+    "rule": "Thousands separator is '.': read the group as one number.",
+    "example": "5.772 -> cinco mil setecentos e setenta e dois",
+    "why": "",
+    "source": "v007-ww2/publish/make_vo_chatterbox.py:48; v004-sun/publish/script.json:6"
+   },
+   {
+    "rule": "Decimal comma is spoken 'vírgula'. Pre-spell decimals in the spoken text, because the synthesis-side words() does not handle them.",
+    "example": "1,4 -> um vírgula quatro; 0,7 % -> zero vírgula sete por cento",
+    "why": "words() turns '1,4' into 'um,quatro' and '0,7 %' into 'zero,sete %' (tested on a copy). Only vo_qa.to_words handles the comma, and make_vo's WER still counted Whisper's '1,4'/'0,7%' as errors (0.062/0.176).",
+    "source": "v004-sun/publish/script.json:2,46; v004-sun/publish/vo_qa.py:37; v004-sun/publish/vo.json 00,22; v004-sun/publish/make_vo_chatterbox.py:50-56"
+   },
+   {
+    "rule": "Percent is 'por cento'.",
+    "example": "0,7 % -> zero vírgula sete por cento",
+    "why": "",
+    "source": "v004-sun/publish/script.json:46"
+   },
+   {
+    "rule": "Expand units and notation into words.",
+    "example": "km -> quilômetros; km/s -> quilômetros por segundo; g/cm³ -> gramas por centímetro cúbico; 10⁴⁴ J -> dez elevado a quarenta e quatro joules",
+    "why": "",
+    "source": "v004-sun/publish/script.json:4,6,16; v002-supernova/make_vo_ptbr.py:7-8,34-35"
+   },
+   {
+    "rule": "For acronyms, either expand them (URSS, EUA, ONU) or read them as one word with an accent for the stress (Otan, Onu, Ráf). Name a single letter in Portuguese.",
+    "example": "Dia D -> Dia Dê; H-alfa -> agá alfa",
+    "why": "Unspelled, 'Dia D' was read 'dia W'.",
+    "source": "v007-ww2/publish/make_audio.py:29-33,70; v007-ww2/short/README.md:35; v004-sun/publish/script.json:14"
+   },
+   {
+    "rule": "Speak a hyphen-number compound as two words.",
+    "example": "hélio-3 -> hélio três",
+    "why": "",
+    "source": "v004-sun/publish/script.json:42-44"
+   },
+   {
+    "rule": "Respell English loanwords in pt-BR orthography.",
+    "example": "tag -> tégui; Lend-Lease -> Lend-Lís",
+    "why": "",
+    "source": "sem-parar-campanha/final/make_final.py:45; v007-ww2/publish/make_audio.py:31"
+   },
+   {
+    "rule": "Apply loanword respellings to whole words, not substrings.",
+    "example": "' tag' -> ' tégui' would also turn 'tags' into 'téguis' and 'tagarela' into 'téguiarela'",
+    "why": "sem-parar's spoken() uses str.replace on ' tag'. It is latent: the current cue sheet has only 'tag' and 'tag.' (inferred).",
+    "source": "sem-parar-campanha/final/make_final.py:45"
+   },
+   {
+    "rule": "A mid-line ellipsis becomes a full stop in the spoken text (Piper). A trailing ellipsis is left as is.",
+    "example": "'Então... vai' -> 'Então. Vai'; 'Senhoras e senhores...' unchanged",
+    "why": "The pause comes from Piper's --sentence-silence.",
+    "source": "sem-parar-campanha/final/make_final.py:46,69; sem-parar-campanha/audio/cue-sheet.json (04-narrador-15s line 0)"
+   },
+   {
+    "rule": "Do not speak a parenthetical acronym after its expansion.",
+    "example": "Organização das Nações Unidas (ONU) -> Organização das Nações Unidas",
+    "why": "",
+    "source": "v007-ww2/publish/README.md:24"
+   },
+   {
+    "rule": "Condense the narration when the caption sentence is longer than its shot allows at a natural pace.",
+    "example": "NARR: condensed lines per caption group",
+    "why": "",
+    "source": "v007-ww2/publish/make_audio.py:36-68"
+   },
+   {
+    "rule": "In shorts, put years on screen only and keep lines short.",
+    "example": "'Setembro: a Alemanha invade a Polônia.' (the year is in the title)",
+    "why": "The first cut ran up to 8 syllables/s with full years inside 4 s shots.",
+    "source": "v007-ww2/short/README.md:5,33-36; RS-ENGINE-PRODUCTION-GUIDE.md:194"
+   },
+   {
+    "rule": "Pace: calm pt-BR is 5-5.5 syllables/s. Take selection aims at 5.3. Ease lines above 6.0 toward 5.6 (at most 15 % slower). vo_qa flags above 6.2. Never compress (VO_MAX_STRETCH 1.0 in shorts).",
+    "example": "v007 Short final: 4.9-6.0 syll/s; v004 Short: 5.3-5.7",
+    "why": "Chatterbox's pt delivery runs 6-8 syllables/s whatever the settings. cfg_weight 0.3 gives a slower, more deliberate delivery.",
+    "source": "v007-ww2/short/make_vo_chatterbox.py:41,43,47; v004-sun/publish/vo_pace.py:6,33,41; v004-sun/publish/vo_qa.py:8,90; v007-ww2/short/README.md:37-39; v004-sun/short/README.md:33-34"
+   },
+   {
+    "rule": "Count syllables as vowel groups after stripping accents; Portuguese is close to one syllable per vowel group.",
+    "example": "syllables(): NFKD, strip combining marks, count [aeiouy]+",
+    "why": "",
+    "source": "v007-ww2/short/make_vo_chatterbox.py:86-90; v004-sun/publish/vo_qa.py:52-55"
+   },
+   {
+    "rule": "Cut each Chatterbox take at Whisper's first and last word (0.15 s before, 0.25 s after), not by level.",
+    "example": "HEAD, TAIL = 0.15, 0.25",
+    "why": "Chatterbox runs on after the sentence with breaths and mumbles that Whisper does not transcribe.",
+    "source": "v007-ww2/short/make_vo_chatterbox.py:44,145-152; v007-ww2/short/README.md:34-36"
+   },
+   {
+    "rule": "Lines must not overlap and must end before their cut. The builder errors when a line starts less than 0.1 s after the previous one ends. vo_qa flags a gap under 0.15 s or a line running more than 0.15 s past a cut.",
+    "example": "--cuts 4,8.5,13,17,21.5,26",
+    "why": "",
+    "source": "v007-ww2/short/make_vo_chatterbox.py:193-196; v004-sun/publish/vo_qa.py:94-101"
+   },
+   {
+    "rule": "On screen, use pt-BR locale formats.",
+    "example": "'170 mil anos', '2,3 s' (were '170,000', '2.3')",
+    "why": "",
+    "source": "RS-ENGINE-PRODUCTION-GUIDE.md:620; v004-sun/publish/README.md:48"
+   },
+   {
+    "rule": "Piper fitting: try shorter length-scales before giving up the window, and start the line a little after its caption appears.",
+    "example": "v002: scale 1.0 down to 0.88 in 0.04 steps, LEAD 0.4 s, MARGIN 0.3 s; v007 Piper: 1.0/0.95/0.91/0.87",
+    "why": "Historical (Piper is no longer used).",
+    "source": "v002-supernova/make_vo_ptbr.py:43-44,67-69; v007-ww2/publish/make_audio.py:110"
+   },
+   {
+    "rule": "Abbreviations never carry periods in the spoken text; write them out.",
+    "example": "Sr. -> senhor; Dra. -> doutora; etc. -> et cétera; p.ex. -> por exemplo",
+    "why": "the sentence splitter breaks at a period followed by a space",
+    "source": "v013 (same splitter)"
+   },
+   {
+    "rule": "Run vo.hazards on every spoken line before synthesis, then have a person listen to the opening line.",
+    "example": "",
+    "source": "v013"
+   }
+  ],
+  "asr_aliases": [
+   {
+    "heard": "hα",
+    "means": "agá alfa",
+    "source": "v004-sun (Whisper writes the symbol)"
+   },
+   {
+    "heard": "união soviética",
+    "means": "urss",
+    "source": "v007-ww2 (the intended expansion)"
+   },
+   {
+    "heard": "estados unidos",
+    "means": "eua",
+    "source": "v007-ww2 (the intended expansion)"
+   },
+   {
+    "heard": "ráf",
+    "means": "raf",
+    "source": "v007-ww2"
+   },
+   {
+    "heard": "lend-lís",
+    "means": "lend-lease",
+    "source": "v007-ww2"
+   },
+   {
+    "heard": "dia dê",
+    "means": "dia d",
+    "source": "v007-ww2"
+   },
+   {
+    "heard": "%",
+    "means": "por cento",
+    "source": "v004-sun"
+   }
+  ]
+ }
+}

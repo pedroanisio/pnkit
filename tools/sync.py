@@ -3,7 +3,7 @@
 
     python3 tools/sync.py PROJECT_DIR [--dry-run]
 
-Copies the package (pnkit/*.py) and the component catalog (kit.json) into PROJECT_DIR/film/vendor/pnkit/, replacing
+Copies the package (pnkit/*.py, pnkit/data/*.json) and the component catalog (kit.json) into PROJECT_DIR/film/vendor/pnkit/, replacing
 what was there, makes sure PROJECT_DIR/film/vendor/__init__.py exists (so `from vendor import pnkit` finds this
 copy first), and writes PROJECT_DIR/film/vendor/pnkit.lock: the version, the library commit it came from, and the
 SHA-256 of every vendored file. tools/check_lock.py verifies a project against its lock.
@@ -24,6 +24,9 @@ def sha256(path):
 def package_files():
     """[(relative path, source path)] of what is vendored, sorted"""
     out = [(n, os.path.join(PKG, n)) for n in sorted(os.listdir(PKG)) if n.endswith(".py")]
+    data = os.path.join(PKG, "data")                   # the package's data files (vo_lexicon.json), vendored as data/<name>
+    if os.path.isdir(data):
+        out += [(f"data/{n}", os.path.join(data, n)) for n in sorted(os.listdir(data)) if n.endswith(".json")]
     out.append(("kit.json", os.path.join(LIB, "kit.json")))
     return out
 
@@ -70,6 +73,7 @@ def main():
         shutil.rmtree(dest)
     os.makedirs(dest)
     for rel, src in files:
+        os.makedirs(os.path.dirname(os.path.join(dest, rel)), exist_ok=True)
         shutil.copyfile(src, os.path.join(dest, rel))
     init = os.path.join(film, "vendor", "__init__.py")
     if not os.path.exists(init):

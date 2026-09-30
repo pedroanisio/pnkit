@@ -5,6 +5,36 @@ release adds components or parameters and keeps every existing default's output 
 prove it); a change to an existing default's output is a major release until 1.0, and a minor one is never allowed
 to hide it. Each release names the golden projects it was checked against.
 
+## 0.2.0 — 2026-09-30
+
+Adds the narration dictionary. No existing output changes: the golden test (v013 rebuilt with the vendored
+package) is byte-identical as before.
+
+Added
+- `pnkit.vo`:
+  - `speak(text, lang, engine="kokoro")` applies the dictionary's respellings as whole tokens.
+  - `hazards(spoken, lang, known_acronyms=())` is the pre-synthesis check. It flags:
+    - a period that splits a word or phrase ("A.I.", "Dr.", "George W. Bush");
+    - digits and symbols;
+    - dashes, the en dash that shipped "Harvard to Smithsonian" in beta-pic;
+    - a mid-line ellipsis;
+    - a lone capital letter ("Dia D", "queue A");
+    - acronyms not in the dictionary;
+    - sentences over 40 words.
+    Over the 497 spoken lines in the surveyed projects it flags 15, all worth a look. v013's final lines are clean.
+  - `rules`, `entries`, `asr_aliases` and `lexicon` read the dictionary.
+  - `asr_normalise(text, lang)` applies the aliases to both sides of a word-error check.
+- `pnkit/data/vo_lexicon.json`, the data for `en` and `pt-br`:
+  - English: 55 entries, 40 rules and 22 aliases.
+  - Brazilian Portuguese: 16 entries, 22 rules and 7 aliases.
+  - Every item names its source: a project file and line, the guide, or the 2026-09-30 probe.
+  - The data merges v013's fixes, a survey of 13 projects and a Kokoro `af_heart` probe. The probe showed that Kokoro reads RLHF, LLMs, GPT, JSON, HTTP, FAQ, CUDA and NVIDIA correctly unaided. It also showed that "A.I." pauses about 0.3 s even in a single call and that digit decimals and versions are misread.
+- `tools/vo_probe.py` (voice venv): Kokoro reads each line, Whisper large-v3 hears it back, and pauses over 0.25 s inside a line are listed. Use it to test a term before it goes into the dictionary.
+
+Changed
+- `tools/sync.py` also vendors the package's data files (`pnkit/data/*.json` becomes `film/vendor/pnkit/data/`).
+- `tools/check_lock.py` walks subdirectories when it looks for files that are not in the lock. A project's `vpkg.json` needs `/film/vendor/pnkit/data/*` in its include list once it syncs 0.2.0.
+
 ## 0.1.0 — 2026-09-30
 
 First release, extracted from v013 "How Jev works" (`~/videos/v013-jev-decisions/film/`). Golden (`tests/golden/`):
