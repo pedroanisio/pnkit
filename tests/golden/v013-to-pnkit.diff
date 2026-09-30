@@ -1,0 +1,886 @@
+v013-jev-decisions -> pnkit 0.1.0: the project-side changes (film/*.py), apply from the project root.
+
+  python3 ~/videos/lib/tools/sync.py ~/videos/v013-jev-decisions      # vendors film/vendor/pnkit + pnkit.lock + vendor/__init__.py
+  cd ~/videos/v013-jev-decisions && patch -p1 < v013-to-pnkit.diff
+  python3 film/build.py && cmp film.scene.xml <the delivered film.scene.xml>   # byte-identical
+
+Changed: lib.py (binds pnkit to the film's Doc, styles, palette and timeline; Cam subclass; physics wrappers),
+brand.py (episode params + title-card emblem over pnkit.brand), captions.py (film_words + pnkit.captions,
+WEAK + "queue"), shorts.py (Shorts list, subject, hook title over pnkit.shorts; keeps the unused hl-* asset),
+emblems.py (rr = pnkit round_rect_d), styles.py and build.py (pnkit.brand.extend).
+
+--- a/film/lib.py
++++ b/film/lib.py
+@@ -1,293 +1,52 @@
+-"""lib.py — building blocks for v013 "How Jev works": ids, text and drawing helpers, the film's recurring objects
+-(pills, dots and rings, the email sheet), and the 2D camera groups with their framing check (guide §14)."""
++"""lib.py — building blocks for v013 "How Jev works": the shared helpers come from pnkit (vendored in film/vendor/pnkit,
++pinned by film/vendor/pnkit.lock); this module binds them to the film's document, its text styles and its timeline,
++and keeps what is the film's own: the palette extras, the 2D camera keyed to the narration's beats, the physics cache."""
+ import math, os
+ from timeline import *  # noqa: F401,F403  (W, H, FPS, ACT, ORDER, tb, te, ts, tw, twe, DURATION, ROOT)
++from vendor import pnkit
++from vendor.pnkit import camera as _camera, physics as _physics
++from vendor.pnkit.xml import f, esc, opacity, keys, path_d, hash01, HASH_EXPR, fmt  # noqa: F401
++from vendor.pnkit.draw import arrow_d  # noqa: F401
++from vendor.pnkit.palette import CREAM, MUTED, ORANGE, COOL, INK, RAISED, RULE  # noqa: F401
+ 
+-ASSETS = []        # <assets> children
+-PAINTS = []        # <paints> children
+-MATERIALS = []     # <materials> children
+-FIELDS = []        # <physics> force fields and constraints
+-CREAM, MUTED, ORANGE, COOL, INK, RAISED, RULE = "#F2EBDD", "#B8B1A4", "#E8581C", "#5FA8D3", "#16181D", "#22252C", "#3A3E47"
+ DIM = "#6E6A62"      # a cream at low weight for de-emphasised geometry (never type below 4.5:1: labels use MUTED)
++STYLE = {"text": "j-text", "caps": "j-caps", "num": "j-num", "head": "j-head", "note": "j-note", "big": "j-big"}   # styles.py
+ 
+-
+-def f(x):
+-    if isinstance(x, (int,)) and not isinstance(x, bool):
+-        return str(x)
+-    if isinstance(x, float):
+-        s = f"{x:.3f}".rstrip("0").rstrip(".")
+-        return "0" if s in ("-0", "") else s
+-    return str(x)
+-
+-
+-def esc(s):
+-    return s.replace("&", "&amp;").replace('"', "&quot;").replace("<", "&lt;").replace(">", "&gt;")
+-
+-
+-_ids = set()
+-
+-
+-def uid(base):
+-    i, k = base, 1
+-    while i in _ids:
+-        k += 1; i = f"{base}-{k}"
+-    _ids.add(i); return i
+-
+-
+-def opacity(a, b, fin=0.5, fout=0.5, peak=1.0, ease_in="cubic-out", ease_out="cubic-in"):
+-    """visible from a (fading in over fin) to b (fading out over fout)"""
+-    a, b = float(a), float(b)
+-    if b < a + 0.1: b = a + 0.1
+-    if fin + fout > b - a: fin = fout = (b - a) / 2
+-    pk = f(float(peak))
+-    return (f'<animate property="opacity"><key time="{f(a)}" value="0" interpolation="{ease_in}"/><key time="{f(a + fin)}" value="{pk}"/>'
+-            f'<key time="{f(max(a + fin, b - fout))}" value="{pk}" interpolation="{ease_out}"/><key time="{f(b)}" value="0"/></animate>')
+-
+-
+-def keys(prop, pairs, ease="sine-in-out"):
+-    """<animate> from (time, value[, ease]) tuples; the ease of a key shapes the move that starts there"""
+-    out = []
+-    for p in pairs:
+-        t, v = p[0], p[1]; e = p[2] if len(p) > 2 else ease
+-        out.append(f'<key time="{f(round(float(t), 3))}" value="{f(v) if isinstance(v, (int, float)) else v}" interpolation="{e}"/>')
+-    return f'<animate property="{prop}">' + "".join(out) + "</animate>"
+-
+-
+-# ------------------------------------------------------------------ text
+-STYLE = {"text": "j-text", "caps": "j-caps", "num": "j-num", "head": "j-head", "note": "j-note", "big": "j-big"}
+-_TXT = {}
+-
+-
+-def text_asset(text, size=40, color=CREAM, style="text", width=None, height=None, align="start", tracking=None, wrap=None, spans=None):
+-    key = (text, size, color, style, width, height, align, tracking, wrap, str(spans))
+-    if key in _TXT:
+-        return _TXT[key]
+-    aid = uid("t")
+-    per = {"caps": 0.78, "num": 0.62, "big": 0.56, "head": 0.62}.get(style, 0.58)
+-    width = width or int(max(60, len(text) * size * per + (len(text) * (tracking or 0) * size / 1000) + 30))
+-    height = height or int(size * 1.4)
+-    extra = (f' tracking="{tracking}"' if tracking else "") + (f' wrap="{wrap}"' if wrap else "")
+-    if spans:   # [(text, role or None, color or None)]
+-        inner = "".join(f'<span{" role=" + chr(34) + r + chr(34) if r else ""}{" color=" + chr(34) + c + chr(34) if c else ""}>{esc(t)}</span>' for t, r, c in spans)
+-        ASSETS.append(f'<text id="{aid}" style="{STYLE[style]}" size="{size}" width="{width}" height="{height}" align="{align}" color="{color}"{extra}>{inner}</text>')
+-    else:
+-        ASSETS.append(f'<text id="{aid}" text="{esc(text)}" style="{STYLE[style]}" size="{size}" width="{width}" height="{height}" align="{align}" color="{color}"{extra}/>')
+-    _TXT[key] = (aid, width, height)
+-    return aid, width, height
+-
+-
+-def label(text, x, y, a, b, size=40, color=CREAM, style="text", anchor="center", fin=0.4, fout=0.4, extra="", width=None,
+-          tracking=None, peak=1.0, preset=None, pdur=0.8, wrap=None, height=None, spans=None, lid=None, attrs=""):
+-    """a text layer; anchor center|left|right at (x, y), vertically centred. Visible [a, b]."""
+-    size = max(size, 36)                                        # guide §5: information >= 36 px at 1080p
+-    aid, w, h = text_asset(text, size, color, style, width=width, align={"center": "center", "left": "start", "right": "end"}[anchor],
+-                           tracking=tracking, wrap=wrap, height=height, spans=spans)
+-    ax = {"center": w / 2, "left": 0, "right": w}[anchor]
+-    anim = f'<textAnimator preset="{preset}" presetStart="{f(a)}" presetDuration="{f(pdur)}"/>' if preset else ""
+-    op = opacity(a, b, fin, fout, peak) if b is not None else ""
+-    return f'<layer id="{lid or uid("l-" + aid)}" asset="{aid}" x="{f(x)}" y="{f(y)}" anchorX="{f(float(ax))}" anchorY="{f(h / 2)}"{attrs}>{anim}{op}{extra}</layer>'
+-
+-
+-# ------------------------------------------------------------------ drawing
+-def path_d(pts, closed=False):
+-    d = "M" + " L".join(f"{f(round(float(x), 1))} {f(round(float(y), 1))}" for x, y in pts)
+-    return d + (" Z" if closed else "")
+-
+-
+-def draw(d, a, b, stroke=CREAM, width=3.0, dur=1.0, dash=None, fill="#00000000", effects=None, peak=1.0, fin=0.15, fout=0.5,
+-         sid=None, extra="", cap="round", ease="cubic-in-out", attrs=""):
+-    """a path that draws itself from a over dur, then stays until b"""
+-    ds = f' dash="{dash}"' if dash else ""; fx = f' effects="{effects}"' if effects else ""
+-    trim = (f'<animate property="trimEnd"><key time="{f(a)}" value="0" interpolation="{ease}"/><key time="{f(a + dur)}" value="1"/></animate>'
+-            if dur > 0 else "")
+-    return (f'<shape id="{uid(sid or "p")}" shape="path" width="{W}" height="{H}" path="{d}" fill="{fill}" stroke="{stroke}" '
+-            f'strokeWidth="{f(width)}" strokeCap="{cap}" strokeJoin="round" trimEnd="{0 if dur > 0 else 1}"{ds}{fx}{attrs}>'
+-            f'{trim}{opacity(a, b, fin, fout, peak)}{extra}</shape>')
+-
+-
+-def rect(x, y, w, h, fill, a, b, radius=0, stroke=None, sw=2, peak=1.0, fin=0.4, fout=0.4, extra="", sid=None, attrs="", anchor="center"):
+-    st = f' stroke="{stroke}" strokeWidth="{f(sw)}"' if stroke else ""
+-    ax, ay = (w / 2, h / 2) if anchor == "center" else (0, 0)
+-    op = opacity(a, b, fin, fout, peak) if b is not None else ""
+-    return (f'<shape id="{uid(sid or "r")}" shape="rect" x="{f(x)}" y="{f(y)}" anchorX="{f(ax)}" anchorY="{f(ay)}" width="{f(w)}" '
+-            f'height="{f(h)}" radius="{f(radius)}" fill="{fill}"{st}{attrs}>{op}{extra}</shape>')
+-
+-
+-def disc(x, y, r, fill, a, b, stroke=None, sw=2, peak=1.0, fin=0.3, fout=0.4, extra="", sid=None, attrs=""):
+-    st = f' stroke="{stroke}" strokeWidth="{f(sw)}"' if stroke else ""
+-    op = opacity(a, b, fin, fout, peak) if b is not None else ""
+-    return (f'<shape id="{uid(sid or "d")}" shape="ellipse" x="{f(x)}" y="{f(y)}" anchorX="{f(r)}" anchorY="{f(r)}" width="{f(2 * r)}" '
+-            f'height="{f(2 * r)}" fill="{fill}"{st}{attrs}>{op}{extra}</shape>')
+-
+-
+-def arrow_d(x1, y1, x2, y2, head=16):
+-    ang = math.atan2(y2 - y1, x2 - x1)
+-    h1 = (x2 - head * math.cos(ang - 0.45), y2 - head * math.sin(ang - 0.45)); h2 = (x2 - head * math.cos(ang + 0.45), y2 - head * math.sin(ang + 0.45))
+-    return f"M{f(x1)} {f(y1)} L{f(x2)} {f(y2)} M{f(h1[0])} {f(h1[1])} L{f(x2)} {f(y2)} L{f(h2[0])} {f(h2[1])}"
+-
+-
+-def group(content, gid=None, a=None, b=None, fin=0.5, fout=0.5, attrs="", extra=""):
+-    op = opacity(a, b, fin, fout) if a is not None else ""
+-    return f'<group id="{uid(gid or "g")}"{attrs}>{op}{extra}\n' + "\n".join(c for c in content if c) + "\n</group>"
+-
+-
+-def pill(x, y, text, a, b, w=None, h=64, fill=ORANGE, color=INK, size=38, pid=None, extra="", fin=0.3, fout=0.4, stroke=None, attrs=""):
+-    """a decision pill centred on (x, y): rounded rect + label, as one group (anchor at its centre)"""
+-    w = w or int(len(text) * size * 0.62 + 56)
+-    pid = uid(pid or "pill")
+-    st = f' stroke="{stroke}" strokeWidth="3"' if stroke else ""
+-    aid, tw_, th = text_asset(text, size, color, "caps", width=w, align="center", tracking=20)
+-    return (f'<group id="{pid}" x="{f(x)}" y="{f(y)}" anchorX="{f(w / 2)}" anchorY="{f(h / 2)}" width="{w}" height="{h}"{attrs}>{opacity(a, b, fin, fout)}{extra}'
+-            f'<shape id="{pid}-b" shape="rect" width="{w}" height="{h}" radius="{f(h / 2)}" fill="{fill}"{st}/>'
+-            f'<layer id="{pid}-t" asset="{aid}" x="0" y="{f((h - th) / 2 + 1)}"/></group>')
+-
++DOC = pnkit.Doc(W, H, styles=STYLE)
++ASSETS = DOC.assets          # <assets> children
++PAINTS = DOC.paints          # <paints> children
++MATERIALS = DOC.materials    # <materials> children
++FIELDS = DOC.fields          # <physics> force fields and constraints
++BODIES = DOC.bodies          # set by acts that use rigid bodies (physics block is written only then)
++
++_K = pnkit.bind(DOC)
++uid, text_asset, label = _K.uid, _K.text_asset, _K.label
++draw, rect, disc, group, pill = _K.draw, _K.rect, _K.disc, _K.group, _K.pill
+ 
+ # ------------------------------------------------------------------ 2D camera groups (one per act)
+ CX, CY = W / 2, H / 2
+ FULL = (150, 150, 1770, 930)
+ 
+ 
+-class Cam:
+-    """A 2D camera for one act: framing cues (when, cx, cy, zoom) keyed to beats, clamped to the safe rectangles in force
+-    (what must stay in frame), moving with sine-in-out and drifting between cues so no shot holds still (§5, §14).
+-    `when` is a film time (float) or a beat id. Content placed inside `open()` ... `close()` lives in world coordinates."""
+-
+-    MOVE = (1.8, 3.6)
+-    LEAD = 1.2
++class Cam(_camera.Cam):
++    """pnkit's Cam for one act of this film: the act's window by default, `when` as a film time, a beat id or
++    (beat id, offset), resolved on the narration's clock (guide §5, §14)."""
+ 
+     def __init__(self, act, cues, safe=None, drift=0.022, start=None, end=None):
+-        self.act = act
+-        self.start = ACT[act]["start"] if start is None else start
+-        self.end = ACT[act]["end"] if end is None else end
+-        self.holds = {round(self._t(c[0]), 3) for c in cues if len(c) > 4 and c[4] == "hold"}   # no drift after these cues
+-        self.cues = sorted(((self._t(c[0]), c[1], c[2], c[3]) for c in cues), key=lambda c: c[0])
+-        self.safe = sorted(((self._t(w), r) for w, r in (safe or [(self.start, FULL)])), key=lambda s: s[0])
+-        self.drift = drift
+-        self.keys = self._track()
+-
+-    def _t(self, w):
+-        return float(w) if isinstance(w, (int, float)) else (tb(w[0]) + w[1] if isinstance(w, tuple) else tb(w))
+-
+-    def safe_at(self, t):
+-        rect_ = self.safe[0][1]
+-        for w, r in self.safe:
+-            if w <= t + 1e-6: rect_ = r
+-        return rect_
+-
+-    MX, MY = 150, 84      # the safe rect is kept this far inside the frame (the kit's title-safe is 5 %: 96 x 54)
+-
+-    def clamp(self, t, cx, cy, z):
+-        x0, y0, x1, y1 = self.safe_at(t)
+-        slack = 1 + self.drift
+-        z = min(z, (W - 2 * self.MX) / (x1 - x0) / slack, (H - 2 * self.MY) / (y1 - y0) / slack)
+-        hw, hh = (CX - self.MX) / (z * slack), (CY - self.MY) / (z * slack)   # half the usable view, in world units
+-        cx = min(max(cx, x1 - hw), x0 + hw)
+-        cy = min(max(cy, y1 - hh), y0 + hh)
+-        return cx, cy, z
+-
+-    def _track(self):
+-        cues = [(t, *self.clamp(t, cx, cy, z)) for t, cx, cy, z in self.cues]
+-        a, b = self.start - 0.5, self.end + 0.5
+-        keys = [(a, *cues[0][1:])]
+-        for i, (t, cx, cy, z) in enumerate(cues):
+-            nxt = cues[i + 1][0] - self.LEAD if i + 1 < len(cues) else b
+-            prev = keys[-1]
+-            r0, r1 = self.safe_at(t - 0.5), self.safe_at(t)
+-            area = lambda r: (r[2] - r[0]) * (r[3] - r[1])
+-            widening, narrowing = area(r1) > area(r0) * 1.05, area(r1) < area(r0) * 0.95
+-            if i == 0:
+-                keys.append((max(t, a + 0.1), cx, cy, z))
+-            else:
+-                start = max(prev[0] + 0.05, t + 1.2 if narrowing else t - self.LEAD)
+-                if start > prev[0] + 0.05:
+-                    keys.append((start, *prev[1:]))
+-                dur = 1.4 if widening else 1.7 if narrowing else min(max((nxt - start) * 0.5, self.MOVE[0]), self.MOVE[1])
+-                tt = min(start + dur, max(start + 0.3, nxt - 0.05))
+-                keys.append((tt, cx, cy, z))
+-            sgn = -1 if i % 2 else 1
+-            last = keys[-1]
+-            if round(t, 3) in self.holds:
+-                keys.append((max(last[0] + 0.1, nxt - 0.05), *last[1:]))
+-                continue
+-            dcx, dcy, dz = self.clamp(max(last[0] + 0.1, nxt - 0.05), cx + sgn * 12, cy - 7, z * (1 + self.drift))
+-            keys.append((max(last[0] + 0.1, nxt - 0.05), dcx, dcy, dz))
+-        return keys
+-
+-    def at(self, t):
+-        k = self.keys
+-        if t <= k[0][0]: return k[0][1:]
+-        for (t0, *p), (t1, *q) in zip(k, k[1:]):
+-            if t0 <= t <= t1:
+-                u = (t - t0) / max(t1 - t0, 1e-6); e = 0.5 - 0.5 * math.cos(math.pi * u)
+-                return tuple(pp + (qq - pp) * e for pp, qq in zip(p, q))
+-        return k[-1][1:]
+-
+-    def anim(self, factor=1.0):
+-        xs, ys, ss = [], [], []
+-        for t, cx, cy, z in self.keys:
+-            cx, cy, z = CX + (cx - CX) * factor, CY + (cy - CY) * factor, 1 + (z - 1) * factor
+-            xs.append((t, round(CX - (cx - CX) * z, 2))); ys.append((t, round(CY - (cy - CY) * z, 2))); ss.append((t, round(z, 4)))
+-        return keys("x", xs) + keys("y", ys) + keys("scaleX", ss) + keys("scaleY", ss)
+-
+-    def open(self, gid=None):
+-        return f'<group id="{uid(gid or "cam2d-" + self.act)}" anchorX="{f(CX)}" anchorY="{f(CY)}" x="{f(CX)}" y="{f(CY)}">{self.anim()}'
+-
+-    CLOSE = "</group>"
+-
+-    def verify(self, fade=1.2, step=0.25, lo=None, hi=None):
+-        """every step s: the safe rect in force, and the one before it for `fade` s, must sit inside the frame's usable
+-        area (MX, MY from the edges). -> [(act, t, px over)]"""
+-        bad = []
+-        t = self.start + 3.6 if lo is None else lo
+-        hi = self.end if hi is None else hi
+-        while t < hi:
+-            cx, cy, z = self.at(t)
+-            vx0, vx1, vy0, vy1 = cx - (CX - self.MX) / z, cx + (CX - self.MX) / z, cy - (CY - self.MY) / z, cy + (CY - self.MY) / z
+-            for x0, y0, x1, y1 in {self.safe_at(t), self.safe_at(t - fade)}:
+-                over = max(vx0 - x0, x1 - vx1, vy0 - y0, y1 - vy1) * z
+-                if over > 6: bad.append((self.act, round(t, 2), round(over)))
+-            t += step
+-        return bad
+-
+-
+-# ------------------------------------------------------------------ small objects
+-def hash01(i, salt=0):
+-    """a stable pseudo-random value in [0, 1) for an integer (the same formula is used in expressions)"""
+-    q = math.sin((i + salt * 97.13) * 12.9898) * 43758.5453
+-    return q - math.floor(q)
+-
+-
+-HASH_EXPR = "var q = Math.sin((index + {salt} * 97.13) * 12.9898) * 43758.5453; q = q - Math.floor(q);"
+-
+-
+-def fmt(n):
+-    return f"{n:,}"
+-
+-
+-BODIES = []        # set by acts that use rigid bodies (physics block is written only then)
++        super().__init__(DOC, act, cues, ACT[act]["start"] if start is None else start, ACT[act]["end"] if end is None else end,
++                         safe=safe, drift=drift, resolve=tb)
+ 
+ 
++# ------------------------------------------------------------------ physics
+ PHYS_CACHE = os.path.join(ROOT, "film", "physics.cache")
+ PHYS_META = os.path.join(ROOT, "film", "physics.cache.json")
+ 
+ 
+ def physics_signature(doc_body):
+     """what the simulation depends on: every element that carries a rigid body (with its animation) and the fields"""
+-    import hashlib, re
+-    parts = re.findall(r"<(?:layer|shape)\b[^>]*>(?:(?!</(?:layer|shape)>).)*?<rigidBody[^>]*/>.*?</(?:layer|shape)>", doc_body, re.S)
+-    fields = [x for x in FIELDS if 'affects="particles"' not in x]      # particle-only fields cannot move a body
+-    return hashlib.sha256(("\n".join(parts) + "\n".join(fields)).encode()).hexdigest()
++    return _physics.signature(doc_body, FIELDS)
+ 
+ 
+ def physics_xml(sig=None):
+     """the physics block; a simulation cache (scene-render simulate) is used when it was made for this signature"""
+-    if not BODIES and not FIELDS:
+-        return ""
+-    cache = ""
+-    if sig and os.path.exists(PHYS_CACHE) and os.path.exists(PHYS_META):
+-        import json
+-        meta = json.load(open(PHYS_META))
+-        if meta.get("signature") == sig:
+-            cache = f' cache="film/physics.cache" cacheSha256="{meta["sha256"]}"'
+-    return (f'  <physics gravityY="-9.80665" pixelsPerMeter="200" bounds="none"{cache}>\n'
+-            + "\n".join("    " + x for x in FIELDS) + "\n  </physics>")
++    return _physics.block(BODIES, FIELDS, sig, PHYS_CACHE, PHYS_META, "film/physics.cache")
+--- a/film/brand.py
++++ b/film/brand.py
+@@ -1,14 +1,11 @@
+ """brand.py — PALS's Notes brand for this episode (film/kit/palsnotes-brand.xml, a pinned copy of ~/videos/docs/palsnotes-brand.xml).
+ 
+-The kit's prologue (parameters, styles, layouts, safe areas, the font asset, its text assets and symbols) is carried
+-verbatim, because style and token references resolve only inside the document that uses them; only the parameter
+-defaults are set for this episode. The kit's components are placed on the film's timeline as inline copies (same
+-styles, sizes, positions and motion), not as symbol instances: per-instance text would need <override>, which the
+-encoder drops after the first frame (guide §6, Avoid 1). They are composited above the film's finish (halation, grain,
+-vignette), so the brand colours stay exact (guide §14).
++The kit's prologue and components come from pnkit.brand (inline copies above the film's finish: guide §6 Avoid 1,
++§14); this module holds the episode's parameter values and its emblem for the title card.
+ """
+-import os, re
+-from lib import uid, esc, f, W, H
++import os
++from lib import DOC
++from vendor.pnkit import brand as _brand
+ import emblems
+ 
+ KIT = os.path.join(os.path.dirname(os.path.abspath(__file__)), "kit", "palsnotes-brand.xml")   # vendored copy, pinned in kit/KIT.sha256
+@@ -24,135 +21,18 @@
+     "pn-headline-accent": "ODDS",
+     "pn-headline-after": "",
+ }
+-MOTION_IN, MOTION_OUT = 0.40, 0.30          # pn:motion-in cubic-out, pn:motion-out cubic-in
+-NOTCH = 64
+-
+-
+-def _block(src, tag):
+-    m = re.search(rf"\n  <{tag}[ >].*?\n  </{tag}>", src, re.S)
+-    return m.group(0).strip("\n") if m else ""
++BRAND = _brand.Brand(DOC)
++ASSETS = BRAND.assets      # brand text assets made for this episode
++OVERLAYS = BRAND.overlays  # brand components, composited above the finish
+ 
+ 
+ def prologue():
+     """the kit's sections, verbatim except parameter defaults"""
+-    src = open(KIT).read()
+-    params = _block(src, "parameters")
+-    for pid, val in PARAMS.items():
+-        params, n = re.subn(rf'(<param id="{pid}"[^>]*?default=")[^"]*(")', lambda m: m.group(1) + esc(val) + m.group(2), params)
+-        assert n == 1, pid
+-    assets = _block(src, "assets")
+-    font = re.search(r'<font id="pn-archivo".*?/>', assets, re.S).group(0)
+-    texts = re.findall(r'<text id="pn-t-[^"]+".*?(?:/>|</text>)', assets, re.S)
+-    access = re.search(r"<accessibility [^>]*/>", src).group(0)
+-    return {"parameters": params, "styles": _block(src, "styles"), "layouts": _block(src, "layouts"),
+-            "safeAreas": _block(src, "safeAreas"), "symbols": _block(src, "symbols"), "font": font, "texts": texts,
+-            "accessibility": access}
+-
+-
+-ASSETS = []      # brand text assets made for this episode
+-OVERLAYS = []    # brand components, composited above the finish
+-SIZES = {"pn-label": 28, "pn-display": 120, "pn-number": 160, "pn-heading": 64, "pn-cite": 24}
+-COLOURS = {"pn-label": "var(--pn-cream-muted)", "pn-display": "var(--pn-cream)", "pn-number": "var(--pn-orange)",
+-           "pn-heading": "var(--pn-cream)", "pn-cite": "var(--pn-cream-muted)"}
+-
+-
+-def _text(txt, style, width, height, extra=""):
+-    aid = uid("bt")
+-    if "color=" not in extra:
+-        extra = f' color="{COLOURS[style]}"' + extra
+-    ASSETS.append(f'<text id="{aid}" text="{esc(txt)}" width="{width}" height="{height}" size="{SIZES[style]}" style="{style}"{extra}/>')
+-    return aid
+-
+-
+-def _fade(a, b, fin=MOTION_IN, fout=MOTION_OUT):
+-    b = max(b, a + fin + fout)
+-    return (f'<animate property="opacity"><key time="{f(a)}" value="0" interpolation="cubic-out"/><key time="{f(a + fin)}" value="1"/>'
+-            f'<key time="{f(b - fout)}" value="1" interpolation="cubic-in"/><key time="{f(b)}" value="0"/></animate>')
+-
+-
+-def notch(a, b, x=0, y=H - NOTCH):
+-    return (f'<shape id="{uid("notch")}" shape="path" x="{x}" y="{y}" width="{NOTCH}" height="{NOTCH}" path="M0 0 L0 {NOTCH} L{NOTCH} {NOTCH} Z" '
+-            f'fill="var(--pn-orange)" tags="logo">{_fade(a, b)}</shape>')
+-
+-
+-def ink(a, b, fin=0.5, fout=0.6):
+-    return f'<shape id="{uid("ink")}" shape="rect" width="{W}" height="{H}" fill="var(--pn-ink)">{_fade(a, b, fin, fout)}</shape>'
+-
+-
+-def _emblem(items, a, b, dur=1.6):
+-    """line-drawn subject: each stroke draws on in turn (trimEnd), then fades with the card; the whole emblem drifts
+-    slowly, so the card never holds a frozen frame"""
+-    out, n = [], max(1, len(items))
+-    for i, it in enumerate(items):
+-        d, col, w = it[:3]; fill = it[3] if len(it) > 3 else "#00000000"
+-        t0 = a + 0.25 + (dur - 0.6) * i / n
+-        out.append(f'<shape id="{uid("em")}" shape="path" width="{W}" height="{H}" path="{d}" fill="{fill}" stroke="{col}" strokeWidth="{w}" '
+-                   f'strokeCap="round" strokeJoin="round" trimEnd="0"><animate property="trimEnd"><key time="{f(t0)}" value="0" interpolation="cubic-out"/>'
+-                   f'<key time="{f(t0 + 0.7)}" value="1"/></animate>{_fade(a, b, 0.2, MOTION_OUT)}</shape>')
+-    drift = (f'<animate property="x"><key time="{f(a)}" value="0" interpolation="linear"/><key time="{f(b)}" value="-{f(12 * (b - a))}"/></animate>')
+-    return f'<group id="{uid("emg")}">{drift}' + "\n".join(out) + "</group>"
+-
+-
+-def _title_card(a, b, kicker, title):
+-    k = _text(kicker, "pn-label", 1200, 48); t = _text(title, "pn-display", 1400, 360, ' wrap="balance" maxLines="3"')
+-    return "\n".join([ink(a, b), f'<layer id="{uid("tc-k")}" asset="{k}" x="192" y="300">{_fade(a, b)}</layer>',
+-                      f'<layer id="{uid("tc-t")}" asset="{t}" x="192" y="360">{_fade(a + 0.1, b)}'
+-                      f'<animate property="y"><key time="{f(a + 0.1)}" value="392" interpolation="cubic-out"/><key time="{f(a + 0.5)}" value="360"/></animate></layer>',
+-                      _emblem(emblems.card(1290, 290, 0.85), a + 0.2, b, 2.0),
+-                      notch(a, b)])
+-
+-
+-def _chapter_card(a, b, number, title, emblem=None):
+-    n = _text(number, "pn-number", 400, 180); t = _text(title, "pn-heading", 1300, 160, ' wrap="balance" maxLines="2"')
+-    out = [ink(a, b, 0.35, 0.5), f'<layer id="{uid("cc-n")}" asset="{n}" x="192" y="340">{_fade(a, b)}</layer>',
+-           f'<shape id="{uid("cc-r")}" shape="rect" width="1536" height="2" x="192" y="520" fill="var(--pn-rule)">{_fade(a, b)}</shape>',
+-           f'<layer id="{uid("cc-t")}" asset="{t}" x="192" y="540">{_fade(a + 0.15, b)}</layer>']
+-    if emblem:
+-        out.append(_emblem(emblem, a + 0.1, b, 1.8))
+-    return "\n".join(out)
+-
+-
+-def _lower_third(a, b, name, role):
+-    """the kit's lower third: raised panel with an orange bar at 192,680, 900 x 152 (orange is never type here)"""
+-    nm = _text(name, "pn-heading", 820, 84, ' maxLines="1"'); rl = _text(role, "pn-label", 820, 40, ' maxLines="1"')
+-    gid = uid("lt")
+-    return (f'<group id="{gid}" x="192" y="680" width="900" height="152">{_fade(a, b)}'
+-            f'<animate property="x"><key time="{f(a)}" value="160" interpolation="cubic-out"/><key time="{f(a + 0.4)}" value="192"/></animate>'
+-            f'<shape id="{gid}-p" shape="rect" width="900" height="152" fill="var(--pn-ink-raised)"/>'
+-            f'<shape id="{gid}-b" shape="rect" width="8" height="152" fill="var(--pn-orange)"/>'
+-            f'<layer id="{gid}-n" asset="{nm}" x="40" y="22"/><layer id="{gid}-r" asset="{rl}" x="40" y="98"/></group>')
+-
+-
+-def _source_line(a, b, text):
+-    s = _text(text, "pn-cite", 1100, 64, ' maxLines="2"')
+-    return f'<layer id="{uid("sl")}" asset="{s}" x="192" y="108">{_fade(a, b)}</layer>'
+-
+-
+-def _end_card(a, b, credits):
+-    nx = _text("NEXT ON PALS'S NOTES", "pn-label", 1200, 48)
+-    txt = [f'<layer id="{uid("ec")}" asset="{nx}" x="192" y="480">{_fade(a + 0.2, b, 0.4, 1.2)}</layer>']
+-    for i, line in enumerate(credits):
+-        c = _text(line, "pn-cite", 620, 36)
+-        txt.append(f'<layer id="{uid("ec-c")}" asset="{c}" x="192" y="{560 + 34 * i}">{_fade(a + 0.6 + 0.1 * i, b, 0.4, 1.2)}</layer>')
+-    drift = f'<animate property="y"><key time="{f(a)}" value="12" interpolation="linear"/><key time="{f(b)}" value="-{f(5 * (b - a))}"/></animate>'
+-    return "\n".join([ink(a, b, 0.8, 1.2), f'<group id="{uid("ecg")}">{drift}' + "\n".join(txt) + "</group>", notch(a, b)])
+-
+-
+-def title_card(*a, **k):
+-    OVERLAYS.append(_title_card(*a, **k)); return ""
+-
+-
+-def chapter_card(*a, **k):
+-    OVERLAYS.append(_chapter_card(*a, **k)); return ""
+-
+-
+-def lower_third(*a, **k):
+-    OVERLAYS.append(_lower_third(*a, **k)); return ""
++    return _brand.prologue(KIT, PARAMS)
+ 
+ 
+-def source_line(*a, **k):
+-    OVERLAYS.append(_source_line(*a, **k)); return ""
++def title_card(a, b, kicker, title):
++    return BRAND.title_card(a, b, kicker, title, emblem=emblems.card(1290, 290, 0.85))
+ 
+ 
+-def end_card(*a, **k):
+-    OVERLAYS.append(_end_card(*a, **k)); return ""
++chapter_card, lower_third, source_line, end_card = BRAND.chapter_card, BRAND.lower_third, BRAND.source_line, BRAND.end_card
+--- a/film/captions.py
++++ b/film/captions.py
+@@ -1,17 +1,15 @@
+-"""captions.py — captions from the narration's written text and word timings (vo/words.json).
++"""captions.py — captions from the narration's written text and word timings (vo/words.json), by pnkit.captions.
+ 
+ sidecar(): the long film's English track, written next to the video as WebVTT: cues of at most two 42-character
+ lines, split at sentence and clause ends, each word timed (guide §5, §14).
+ short_cues(spans, map): the same words inside a Short's spans, mapped to output time, as cues of at most two
+ 26-character lines for the burned active-word track (guide §9: karaoke/active word is the Shorts default).
+ """
+-import html, math
+ from timeline import ACT, ORDER, TM, WORDS, _shift
++from vendor.pnkit import captions as _cap
+ 
+-LINE, SHORT_LINE = 42, 26
+-WEAK = {"the", "a", "an", "of", "that", "are", "is", "to", "for", "and", "or", "if", "in", "with", "its", "it", "on", "as",
+-        "at", "by", "from", "this", "these", "was", "were", "be", "been", "has", "have", "no", "not", "so", "than", "when", "which",
+-        "does", "do", "can", "will", "would", "should", "into", "about", "queue", "more", "own"}
++LINE, SHORT_LINE = _cap.LINE, _cap.SHORT_LINE
++WEAK = _cap.WEAK | {"queue"}        # "queue A or queue B": never end a line or a cue on "queue"
+ 
+ 
+ def film_words():
+@@ -24,163 +22,18 @@
+     return out
+ 
+ 
+-def _cues(words, width, first_end=None):
+-    """sentences (or clauses at a pause) split into the fewest two-line cues that fit, balanced by length"""
+-    units, cur = [], []
+-    for i, w in enumerate(words):
+-        cur.append(w)
+-        gap = words[i + 1][1] - w[2] if i + 1 < len(words) else 9
+-        if w[0].endswith((".", "?", "!")) or gap > 0.45:
+-            units.append(cur); cur = []
+-    if cur:
+-        units.append(cur)
+-
+-    def fits(ws):
+-        n, ln = 1, 0
+-        for w in ws:
+-            add = len(w[0]) + (1 if ln else 0)
+-            if ln + add > width:
+-                n, ln = n + 1, len(w[0])
+-            else:
+-                ln += add
+-        return n <= 2
+-
+-    import itertools
+-
+-    def rate(ws):
+-        return len(" ".join(w[0] for w in ws)) / max(0.3, ws[-1][2] - ws[0][1] + 0.5)
+-
+-    def weak_lines(ws):
+-        t = " ".join(w[0] for w in ws)
+-        L = _two_lines(t, width)
+-        return len(L) > 1 and L[0].split()[-1].lower() in WEAK
+-
+-    out = []
+-    for ui, u in enumerate(units):
+-        if fits(u) and not (weak_lines(u) and len(u) > 5):
+-            out.append(u); continue
+-        best = None
+-        for n in range(2, 9):
+-            if math.comb(len(u) - 1, n - 1) > 400000:       # too many to try: the greedy balanced split below
+-                break
+-            for cuts in itertools.combinations(range(1, len(u)), n - 1):
+-                parts = [u[a:b] for a, b in zip((0,) + cuts, cuts + (len(u),))]
+-                if not all(fits(p) for p in parts):
+-                    continue
+-                # prefer even reading speed, breaks after punctuation, and never after a function word or a stub
+-                weak = (sum(p[-1][0].lower().strip(",.") in WEAK for p in parts[:-1]) + sum(len(p) < 3 for p in parts)
+-                        + sum(weak_lines(p) for p in parts) + sum((p[-1][2] - p[0][1]) < 1.3 for p in parts))
+-                score = (max(rate(p) for p in parts) + 2.0 * weak + 8.0 * max(0.0, max(rate(p) for p in parts) - 16.8)
+-                         - 0.8 * sum(p[-1][0].endswith((",", ";", ":")) for p in parts[:-1])
+-                         + (10.0 if first_end is not None and ui == 0 and parts[0][-1][2] < first_end else 0.0))
+-                if best is None or score < best[0]:
+-                    best = (score, parts)
+-            if best:
+-                break
+-        if best is None:                                    # balanced by length, as few parts as fit
+-            n = 2
+-            while True:
+-                total = sum(len(w[0]) + 1 for w in u)
+-                parts, cur, acc = [], [], 0
+-                for w in u:
+-                    if cur and acc + len(w[0]) / 2 > total * (len(parts) + 1) / n and len(parts) < n - 1:
+-                        parts.append(cur); cur = []
+-                    cur.append(w); acc += len(w[0]) + 1
+-                parts.append(cur)
+-                if all(fits(p) for p in parts):
+-                    break
+-                n += 1
+-            best = (0, parts)
+-        out += best[1]
+-    return out
+-
+-
+-def _two_lines(text, width):
+-    """the cue's text as at most two lines of `width`, balanced, broken after punctuation when that is close"""
+-    if len(text) <= width:
+-        return [text]
+-    words = text.split(" ")
+-    best = None
+-    for i in range(1, len(words)):
+-        a, b = " ".join(words[:i]), " ".join(words[i:])
+-        if len(a) > width or len(b) > width:
+-            continue
+-        score = abs(len(a) - len(b)) - (8 if a.endswith((",", ";", ":", ".")) else 0) + (25 if words[i - 1].lower() in WEAK else 0)
+-        if best is None or score < best[0]:
+-            best = (score, [a, b])
+-    return best[1] if best else [text]
+-
+-
+-def _timed(cues, cps=16.5):
+-    """display windows. Each cue needs len(text)/cps seconds; beyond its own speech it takes that time from the pauses
+-    either side (its tail first, then the next cue's lead), and lingers up to 1 s when a pause allows (guide §5:
+-    readable at 17 characters/s)."""
+-    n = len(cues)
+-    span = [(c[0][1], c[-1][2]) for c in cues]
+-    need = [max(0.15, len(" ".join(w[0] for w in c)) / cps - (b - a)) for c, (a, b) in zip(cues, span)]
+-    lead, tail = [0.0] * n, [0.0] * n
+-    lead[0] = min(0.25, span[0][0])
+-    for k in range(n):
+-        g = (span[k + 1][0] - span[k][1] - 0.04) if k + 1 < n else 3.0
+-        g = max(0.0, g)
+-        t = min(max(0.0, need[k] - lead[k]), g)
+-        if k + 1 < n:
+-            l_ = min(need[k + 1], g - t)
+-            r = g - t - l_
+-            t += min(r, max(0.0, 1.0 - t)) * (0.7 if l_ < 0.25 else 1.0)
+-            lead[k + 1] = min(g - t, max(l_, min(0.25, g - t)))
+-        else:
+-            t = max(t, min(g, 1.0))
+-        tail[k] = t
+-    return [(c, max(0.0, a - lead[k]), b + tail[k]) for k, (c, (a, b)) in enumerate(zip(cues, span))]
+-
+-
+-def _cue_xml(cues, indent="      ", width=None):
+-    xml = []
+-    for c, start, end in _timed(cues):
+-        text = " ".join(w[0] for w in c)
+-        body = "\n".join(_two_lines(text, width)) if width else text
+-        ws = "".join(f'<word start="{w[1]:.3f}" end="{w[2]:.3f}" text="{html.escape(w[0], quote=True)}"/>' for w in c)
+-        xml.append(f'{indent}<cue start="{start:.3f}" end="{end:.3f}" text="{html.escape(body, quote=True).replace(chr(10), "&#10;")}">{ws}</cue>')
+-    return "\n".join(xml)
+-
+-
+ def sidecar():
+-    cues = _cues(film_words(), LINE)
+-    return ('  <captions>\n    <captionTrack id="subs-en" language="en" kind="subtitles" label="English" mode="sidecar">\n'
+-            + _cue_xml(cues, width=LINE) + "\n    </captionTrack>\n  </captions>")
++    return _cap.sidecar(film_words(), LINE, weak=WEAK)
+ 
+ 
+ def short_cues(spans, not_before=0.0):
+     """spans: [(film_from, film_to, output_start)] -> cue XML in output time; no cue shows before `not_before` (the cover)"""
+-    words = []
+-    for a, b, o in spans:
+-        for w, s, e in film_words():
+-            if s >= a and e <= b:
+-                words.append((w, round(o + s - a, 3), round(o + e - a, 3)))
+-    for i in range(1, len(words)):      # sentence case after a cut into the middle of nothing: keep as written
+-        pass
+-    cues = _cues(words, SHORT_LINE, first_end=not_before + 0.8)
+-    # a first cue that would only flash between the cover's lift and its last word joins the next one when both fit
+-    if len(cues) > 1 and cues[0][-1][2] - not_before < 0.7 and len(" ".join(w[0] for w in cues[0] + cues[1])) <= 2 * SHORT_LINE:
+-        cues = [cues[0] + cues[1]] + cues[2:]
+-    xml = _cue_xml(cues, indent="      ")
+-    import re as _re
+-    first = _re.search(r'<cue start="([\d.]+)"', xml)
+-    if first and float(first.group(1)) < not_before:
+-        xml = xml.replace(first.group(0), f'<cue start="{not_before:.3f}"', 1)
+-    return xml
++    return _cap.short_cues(film_words(), spans, not_before, SHORT_LINE, weak=WEAK)
+ 
+ 
+ def stats(width=LINE):
+     """(cues, over 17 characters/s, worst characters/s, longest line)"""
+-    cues = _cues(film_words(), width)
+-    rates, longest = [], 0
+-    for c, a, b in _timed(cues):
+-        text = " ".join(w[0] for w in c)
+-        rates.append(len(text) / (b - a))
+-        longest = max(longest, max(len(x) for x in _two_lines(text, width)))
+-    return len(cues), sum(r > 17 for r in rates), round(max(rates), 1), longest
++    return _cap.stats(film_words(), width, weak=WEAK)
+ 
+ 
+ if __name__ == "__main__":
+--- a/film/shorts.py
++++ b/film/shorts.py
+@@ -3,16 +3,17 @@
+ 
+ Each Short: its spans start and end in narration pauses (the voice starts ~0.7 s in, under the cover card, and the
+ last word ends before the span does); consecutive spans join by a 0.3 s crossfade; a last 2.6 s segment takes the
+-film's own musical close, under the hook. The overlay symbol, in output time, draws the thumbnail guide's cover card
+-for the first 0.8 s (so the first frame is the cover), then the headline band above the picture and the ink below it,
+-and the hook to the long video at the end. Each Short burns its own caption track (output time, active word).
++film's own musical close, under the hook. The overlay symbol (pnkit.shorts), in output time, draws the thumbnail
++guide's cover card for the first 0.8 s (so the first frame is the cover), then the headline band above the picture
++and the ink below it, and the hook to the long video at the end. Each Short burns its own caption track (output
++time, active word). This module holds the episode's Shorts, its subject (the decision card) and its hook title.
+ """
+ from lib import *  # noqa: F401,F403
+ import captions, objects
++from vendor.pnkit import shorts as _shorts
+ 
+-OW, OH = 1080, 1920
+-PIC_Y0, PIC_Y1 = 656, 1264          # where the fitted 16:9 picture lands
+-HOOK = 2.6
++HOOK = _shorts.HOOK
++HOOK_TITLE = ("HOW JEV ", "WORKS")
+ SHORTS = [
+     ("s1", "text-breaks-programs", [("text.para", "text.breaks")], ("", "TEXT", " BREAKS PROGRAMS")),
+     ("s2", "no-off-list-answers", [("inout.prims", "inout.choice"), ("inout.list", "inout.halluc")], ("NO OFF-LIST ", "ANSWERS", "")),
+@@ -27,15 +28,7 @@
+     """film span for beats b0..b1: from 0.72 s before the first word (inside the pause before it) to 0.45 s after the
+     last word, both checked against the neighbouring beats"""
+     import timeline as T
+-    beats = T.all_beats()
+-    keys_ = [f"{a}.{b}" for a, b, *_ in beats]
+-    i0, i1 = keys_.index(b0), keys_.index(b1)
+-    start, end = beats[i0][2] - 0.72, beats[i1][3] + 0.45
+-    if i0 > 0:
+-        assert start > beats[i0 - 1][3] + 0.05, (b0, "starts inside the previous line")
+-    if i1 + 1 < len(beats):
+-        assert end < beats[i1 + 1][2] - 0.1, (b1, "ends inside the next line")
+-    return round(start, 3), round(end, 3)
++    return _shorts.span_times([(f"{a}.{b}", s, e) for a, b, s, e, _ in T.all_beats()], b0, b1)
+ 
+ 
+ def hook_span():
+@@ -44,83 +37,34 @@
+     return round(t, 3), round(t + HOOK, 3)
+ 
+ 
++def _subject(x, y, s, gid):
++    return objects.card(x, y, s, gid=gid, head_color=MUTED)
++
++
+ def overlay(sid, T, head):
+     before, accent, after = head
+-    out = []
+-    # the cover card, first 0.8 s: ink, the headline band (y 220-680), the subject band (the decision card), the notch
++    # a 176 px cover headline that no layer places (the running headline serves the cover too); kept so the
++    # document stays as delivered
+     aid = uid(f"hl-{sid}")
+     ASSETS.append(f'<text id="{aid}" width="920" height="500" size="176" style="pn-cover-headline" verticalAlign="bottom" wrap="balance" maxLines="3">'
+                   f'<span style="pn-cover-headline" color="var(--pn-cream)">{esc(before)}</span><span style="pn-cover-accent" color="var(--pn-orange)">{esc(accent)}</span>'
+                   f'<span style="pn-cover-headline" color="var(--pn-cream)">{esc(after)}</span></text>')
+-    cover = [f'<shape id="{sid}-cv-bg" shape="rect" width="{OW}" height="{OH}" fill="var(--pn-ink)"/>',
+-             objects.card(100, 760, 1.3, gid=f"{sid}-cv-card", head_color=MUTED),
+-             f'<shape id="{sid}-cv-n" shape="path" x="80" y="1336" width="64" height="64" path="M0 0 L0 64 L64 64 Z" fill="var(--pn-orange)"/>']
+-    # running: ink above and below the picture, the headline smaller in the top band
+-    aid2 = uid(f"hs-{sid}")
+-    ASSETS.append(f'<text id="{aid2}" width="920" height="300" size="118" style="pn-cover-headline" verticalAlign="bottom" wrap="balance" maxLines="2">'
+-                  f'<span style="pn-cover-headline" color="var(--pn-cream)">{esc(before)}</span><span style="pn-cover-accent" color="var(--pn-orange)">{esc(accent)}</span>'
+-                  f'<span style="pn-cover-headline" color="var(--pn-cream)">{esc(after)}</span></text>')
+-    out.append(f'<shape id="{sid}-top" shape="rect" width="{OW}" height="{PIC_Y0}" fill="var(--pn-ink)"/>')
+-    out.append(f'<shape id="{sid}-bot" shape="rect" y="{PIC_Y1}" width="{OW}" height="{OH - PIC_Y1}" fill="var(--pn-ink)"/>')
+-    # the film's vignetted edge meets the bands' ink: a short feather hides the seam
+-    out.append(f'<shape id="{sid}-ft" shape="rect" y="{PIC_Y0}" width="{OW}" height="22" fill="url(#pt-feather-down)"/>')
+-    out.append(f'<shape id="{sid}-fb" shape="rect" y="{PIC_Y1 - 22}" width="{OW}" height="22" fill="url(#pt-feather-up)"/>')
+-    out.append(f'<shape id="{sid}-n" shape="path" x="80" y="600" width="40" height="40" path="M0 0 L0 40 L40 40 Z" fill="var(--pn-orange)"/>')
+-    out.append(f'<group id="{sid}-cover">' + keys("opacity", [(0, 1, "hold"), (0.8, 1, "cubic-in"), (1.05, 0)]) + cover[0]
+-               + f'<group id="{sid}-cv-fg">' + keys("opacity", [(0, 1, "hold"), (0.5, 1, "cubic-in"), (0.78, 0)]) + "".join(cover[1:]) + "</group></group>")
+-    # the same headline over the cover and above the picture: it rises from the cover's headline band into the top band
+-    out.append(f'<layer id="{sid}-head" asset="{aid2}" x="80" y="390">' + keys("y", [(0, 390, "hold"), (0.8, 390, "cubic-in-out"), (1.15, 290)])
+-               + keys("opacity", [(0, 1, "hold"), (T - HOOK - 0.1, 1, "cubic-in"), (T - HOOK + 0.2, 0)]) + "</layer>")
+-    # the hook, last 2.6 s: a pointer to the long video
+-    k1, k2, k3 = uid(f"hk1-{sid}"), uid(f"hk2-{sid}"), uid(f"hk3-{sid}")
+-    ASSETS.append(f'<text id="{k1}" text="THE FULL VIDEO" width="920" height="60" size="44" style="pn-label" color="var(--pn-cream-muted)" tracking="120"/>')
+-    ASSETS.append(f'<text id="{k2}" width="920" height="380" size="150" style="pn-display" wrap="balance" maxLines="2">'
+-                  f'<span color="var(--pn-cream)">HOW JEV </span><span color="var(--pn-orange)">WORKS</span></text>')
+-    ASSETS.append(f'<text id="{k3}" text="ON PALS\'S NOTES · LINKED BELOW" width="920" height="60" size="40" style="pn-label" color="var(--pn-cream-muted)" tracking="80"/>')
+-    ta = T - HOOK
+-    hook = [f'<shape id="{sid}-hk-bg" shape="rect" width="{OW}" height="{OH}" fill="var(--pn-ink)"/>',
+-            f'<layer id="{sid}-hk1" asset="{k1}" x="80" y="430"/>',
+-            f'<layer id="{sid}-hk2" asset="{k2}" x="80" y="500">' + keys("y", [(ta, 540, "cubic-out"), (ta + 0.5, 500)]) + "</layer>",
+-            f'<layer id="{sid}-hk3" asset="{k3}" x="80" y="880"/>',
+-            objects.card(210, 1000, 1.0, gid=f"{sid}-hk-card", head_color=MUTED),
+-            f'<shape id="{sid}-hk-n" shape="path" x="80" y="1336" width="64" height="64" path="M0 0 L0 64 L64 64 Z" fill="var(--pn-orange)"/>']
+-    out.append(f'<group id="{sid}-hook" opacity="0">' + keys("opacity", [(ta, 0, "cubic-out"), (ta + 0.35, 1)]) + "".join(hook) + "</group>")
+-    return f'    <symbol id="ov-{sid}" width="{OW}" height="{OH}" duration="{f(round(T, 3))}">\n' + "\n".join(out) + "\n    </symbol>\n"
++    return _shorts.overlay(DOC, sid, T, head, _subject, HOOK_TITLE)
++
++
++def _segs(spans):
++    return [span_times(a, b) for a, b in spans] + [hook_span()]
+ 
+ 
+ def xml():
+-    PAINTS.append('<linearGradient id="pt-feather-down" x1="0" y1="0" x2="0" y2="1"><stop offset="0" color="#16181DFF"/><stop offset="1" color="#16181D00"/></linearGradient>')
+-    PAINTS.append('<linearGradient id="pt-feather-up" x1="0" y1="0" x2="0" y2="1"><stop offset="0" color="#16181D00"/><stop offset="1" color="#16181DFF"/></linearGradient>')
+-    outputs, symbols = [], []
+-    for sid, slug, spans, head in SHORTS:
+-        segs = [span_times(a, b) for a, b in spans] + [hook_span()]
+-        T, o, maps = 0.0, 0.0, []
+-        seg_xml = []
+-        for i, (a, b) in enumerate(segs):
+-            maps.append((a, b, o))
+-            tr = '<transition type="crossfade" duration="0.3"/>' if i + 1 < len(segs) else ""
+-            seg_xml.append(f'    <segment from="{f(a)}" to="{f(b)}">{tr}</segment>')
+-            o += b - a
+-        T = o
+-        cues = captions.short_cues([m for m in maps[:-1]], not_before=0.9)
+-        outputs.append(
+-            f'  <output id="{sid}" path="out/shorts/{sid}-{slug}.mp4" codec="h264" crf="18" preset="slow" layout="short-9x16" '
+-            f'overlay="ov-{sid}" burnCaptions="cap-{sid}" captions="cap-{sid}" joinFade="0.05">\n'
+-            f'    <thumbnail path="out/shorts/{sid}-{slug}-cover.png" format="png" time="0.2" width="1080"/>\n'
+-            + "\n".join(seg_xml) + "\n"
+-            f'    <captionTrack id="cap-{sid}" language="en" kind="captions" label="English" mode="burn" preset="highlight" style="j-cap-short" '
+-            f'activeStyle="j-cap-short-on" maxCharsPerLine="26" maxLines="2" x="50%" y="67.4%" width="90%">\n{cues}\n    </captionTrack>\n'
+-            f'  </output>')
+-        symbols.append(overlay(sid, T, head))
+-    layouts = '    <layout id="short-9x16" width="1080" height="1920" aspect="9:16" reframe="fit"/>\n'
+-    return "\n".join(outputs), "".join(symbols), layouts
++    return _shorts.build(DOC, SHORTS, _segs, lambda maps: captions.short_cues(maps, not_before=0.9), overlay, "j-cap-short", "j-cap-short-on")
+ 
+ 
+ def plan():
+     """(id, spans in film time, duration) for the publishing notes and QA"""
+     rows = []
+     for sid, slug, spans, head in SHORTS:
+-        segs = [span_times(a, b) for a, b in spans] + [hook_span()]
++        segs = _segs(spans)
+         rows.append((sid, slug, segs, round(sum(b - a for a, b in segs), 2), "".join(head)))
+     return rows
+ 
+--- a/film/emblems.py
++++ b/film/emblems.py
+@@ -2,10 +2,7 @@
+ cream and orange (thumbnail.md: abstract topics get a single emblem). Each function returns [(path d, colour, width)]
+ placed with its top-left corner at (x, y) and scaled by s."""
+ from lib import f, CREAM, ORANGE, MUTED
+-
+-rr = lambda x, y, w, h, r: (f"M{f(x + r)} {f(y)} L{f(x + w - r)} {f(y)} A{f(r)} {f(r)} 0 0 1 {f(x + w)} {f(y + r)} L{f(x + w)} {f(y + h - r)} "
+-                            f"A{f(r)} {f(r)} 0 0 1 {f(x + w - r)} {f(y + h)} L{f(x + r)} {f(y + h)} A{f(r)} {f(r)} 0 0 1 {f(x)} {f(y + h - r)} "
+-                            f"L{f(x)} {f(y + r)} A{f(r)} {f(r)} 0 0 1 {f(x + r)} {f(y)} Z")
++from vendor.pnkit.draw import round_rect_d as rr      # a rounded rectangle's path, top-left at (x, y)
+ 
+ 
+ def card(x, y, s=1.0):
+--- a/film/styles.py
++++ b/film/styles.py
+@@ -1,4 +1,5 @@
+ """styles.py — this episode's text styles, added to the brand kit's <styles> (all based on pn-base: Archivo)."""
++from vendor.pnkit.brand import extend
+ J_STYLES = """    <textStyle id="j-text" basedOn="pn-base" weight="500" variation="wght 500, wdth 100" lineHeight="1.15"/>
+     <textStyle id="j-note" basedOn="pn-base" weight="400" variation="wght 400, wdth 100" lineHeight="1.2"/>
+     <textStyle id="j-caps" basedOn="pn-base" weight="700" variation="wght 700, wdth 100" textTransform="uppercase"/>
+@@ -11,4 +12,4 @@
+ 
+ 
+ def styles_block(kit_styles):
+-    return kit_styles.replace("  </styles>", J_STYLES + "  </styles>")
++    return extend(kit_styles, "styles", J_STYLES)
+--- a/film/build.py
++++ b/film/build.py
+@@ -7,6 +7,7 @@
+ sys.path.insert(0, os.path.join(os.path.dirname(os.path.dirname(os.path.abspath(__file__))), "script"))
+ from lib import *  # noqa: F401,F403
+ import lib, brand, styles, backdrop
++from vendor.pnkit.brand import extend
+ from narration import CHAPTER, TITLE
+ 
+ KIT = brand.prologue()
+@@ -63,7 +64,7 @@
+ markers = [f'    <marker id="ch-{a}" time="{f(0.0 if a == "open" else ACT[a]["start"])}" kind="chapter" label="{esc(CHAPTER_LABEL[a])}"/>' for a in ORDER]
+ markers.append(f'    <marker id="m-title" time="{f(title_time() + 1.6)}" kind="section" label="Title card"/>')
+ 
+-layouts = KIT["layouts"].replace("  </layouts>", short_layouts + "  </layouts>")
++layouts = extend(KIT["layouts"], "layouts", short_layouts)
+ doc = f'''<?xml version="1.0" encoding="UTF-8"?>
+ <!-- How Jev works: the AI that doesn't write. PALS's Notes v013, after research/roteiro.md (claims: research/claims.md).
+      Generated by film/build.py; timing comes from the narration (vo/timings.json). Do not edit by hand. -->
+@@ -102,7 +103,7 @@
+     <material id="m-none" baseColor="#000000"/>
+ {chr(10).join("    " + m for m in lib.MATERIALS)}
+   </materials>
+-  {KIT["symbols"].replace("  </symbols>", short_symbols + "  </symbols>")}
++  {extend(KIT["symbols"], "symbols", short_symbols)}
+   <markers>
+ {chr(10).join(markers)}
+   </markers>
