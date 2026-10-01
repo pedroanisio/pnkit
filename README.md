@@ -80,7 +80,7 @@ tests/            unit tests (python3 -m unittest discover -s tests) and the gol
    `BRAND.assets` with the assets and `BRAND.overlays` after the finish adjustment. Captions:
    `pnkit.captions.sidecar(words)`. Shorts: `pnkit.shorts.build(DOC, SHORTS, segs_of, cues_of, overlay_of, ...)`,
    where `overlay_of` calls `pnkit.shorts.overlay(..., subject=<the episode's drawing>, hook_title=...)`.
-   `~/videos/v013-jev-decisions/film/` is the worked example once `tests/golden/v013-to-pnkit.diff` is applied.
+   `~/videos/done/v013-jev-decisions/film/` is the worked example once `tests/golden/v013-to-pnkit.diff` is applied.
    Narration: `from vendor.pnkit import vo`, then `say = vo.speak(text, "en")` (numbers in words by the project),
    `vo.hazards(say, "en")` before synthesis, and `vo.asr_normalise` on both sides of the Whisper check. Test a new term
    with `~/.venvs/voice/bin/python ~/videos/lib/tools/vo_probe.py --lang en "bare." "respelled."` and add it to
@@ -92,7 +92,7 @@ tests/            unit tests (python3 -m unittest discover -s tests) and the gol
    `CUES.tracks(duration)` in the audio mix, and call `CUES.bake_beds(ROOT, duration, tag)` so each bed ends with the
    film. Make the palette's own files once per project with `~/.venvs/voice/bin/python ~/videos/lib/tools/foley.py`
    (run in the project directory). After the encode, `tools/tail_check.py out/film.mp4 --voice-end T --scene
-   film.scene.xml` measures the ending itself. `~/videos/v015-short-pack` is where the rule and the palette come from.
+   film.scene.xml` measures the ending itself. `~/videos/done/v015-short-pack` is where the rule and the palette come from.
 3. Keep episode code in the project: the timeline, acts, subjects and emblems, effects and sound. Pass them in
    where pnkit takes a callable or a parameter.
 4. Before delivery, run `python3 ~/videos/lib/tools/check_lock.py PROJECT_DIR`, which checks that the copy is

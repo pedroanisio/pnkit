@@ -44,7 +44,7 @@ def copy_project(src, dst):
 
 def main():
     ap = argparse.ArgumentParser(description=__doc__.split("\n\n")[0])
-    ap.add_argument("--project", default=os.path.expanduser("~/videos/v013-jev-decisions"))
+    ap.add_argument("--project", default=os.path.expanduser("~/videos/done/v013-jev-decisions"))
     ap.add_argument("--work", help="work directory (default: a new temporary one)")
     ap.add_argument("--patch", default=os.path.join(HERE, "v013-to-pnkit.diff"))
     ap.add_argument("--draft", action="store_true", help="build with JEV_DRAFT=1 (no backdrop)")

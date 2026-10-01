@@ -4,7 +4,7 @@ A golden test rebuilds a delivered project with the vendored pnkit and compares 
 delivered one, byte for byte. A release of pnkit must pass every golden test listed here. If a change is meant
 to alter output, it must say so in the CHANGELOG and bump the version as a breaking change.
 
-## v013 "How Jev works" (`~/videos/v013-jev-decisions`)
+## v013 "How Jev works" (`~/videos/done/v013-jev-decisions`)
 
 ```bash
 python3 tests/golden/run_v013.py --ab --validate          # the strict A/B (use this)
