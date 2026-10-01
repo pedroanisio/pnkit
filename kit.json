@@ -1,12 +1,12 @@
 {
  "id": "pnkit",
  "name": "PALS's Notes component kit",
- "version": "0.2.0",
+ "version": "0.3.0",
  "summary": "Python generators for PALS's Notes scenes (scene-render 1.1/1.2): helpers and components that write inline XML, vendored into each project with a lock file.",
  "requires": {"python": ">=3.8", "dependencies": [], "brand_kit": "palsnotes-brand.xml (passed in by the project; the source of truth for tokens and styles)"},
  "source": "~/videos/lib",
  "changelog": "CHANGELOG.md",
- "extracted_from": "v013-jev-decisions (film/lib.py, brand.py, captions.py, shorts.py, emblems.py), byte-identical golden: tests/golden/",
+ "extracted_from": "v013-jev-decisions (film/lib.py, brand.py, captions.py, shorts.py, emblems.py), byte-identical golden: tests/golden/. mesh and figure generalized from v014-bayonet-charge-2011 (film/trees.py's tube-mesh engine, film/figures.py's articulated rig) — not byte-identical, no golden: v014's own figures.py keeps its rifle-soldier look and is unchanged by this.",
  "guide": "~/videos/RS-ENGINE-PRODUCTION-GUIDE.md",
  "components": [
   {"name": "Doc", "module": "pnkit.doc", "summary": "The document under construction: frame size, text-role styles, id set and the registries that become sections (assets, paints, materials, fields, bodies).",
@@ -60,6 +60,12 @@
    "params": ["beats [(key, start, end)]", "segs_of(spans)", "cues_of(maps)", "overlay_of(sid, T, head)", "caption_style", "active_style"], "rules": ["Shorts are output segments of the film's document (SREP 13)"]},
   {"name": "physics.signature / physics.block", "module": "pnkit.physics", "summary": "The <physics> block, pointing at a simulation cache only when the cache was made for this document's rigid bodies and fields.",
    "params": ["bodies", "fields", "sig", "cache_path", "meta_path", "cache_ref"], "rules": []},
+  {"name": "mesh.tapered_tube / mesh.bake_bone / mesh.Mesh / mesh.rot_towards", "module": "pnkit.mesh", "summary": "A tapered tube along a 3D polyline, baked once to assets/*.obj and referenced by <object3D primitive=\"mesh\">, for geometry no native primitive covers (a native capsule is one uniform radius). Pure standard library, no numpy: baking is offline, not per-frame.",
+   "params": ["tapered_tube(length, r0, r1, sides=10, segs=6, bulge=0.0, seed=None, up=False)", "bake_bone(out_dir, name, length, r0, r1, ..., up=False) -> mesh id, cached per (out_dir, name)", "Mesh.tube(pts, radii, sides, cap_ends=False)"],
+   "rules": ["OBJ is Y-up metres; the scene imports a mesh as (100x, -100y, -100z) (guide, confirmed against v014's world.py/trees.py)", "up=False (the default) grows the tube away from the root (a limb bone); up=True grows it toward the root (a torso rising from a spine joint at pelvis height) — get this backward and the bone points away from its joint, not into it; caught on a render, not a reading of the code"]},
+  {"name": "figure.figure / figure.bone_meshes / figure.default_materials / figure.POSES / figure.DIMS", "module": "pnkit.figure", "summary": "An articulated 3D figure (stand, walk, run, crouch, kneel-fire, prone) following a ground path at a cadence set by the pose, built from pnkit.mesh's tapered bones so it holds up closer to camera than a uniform-capsule rig. Generalized from v014-bayonet-charge-2011's film/figures.py (a rifle soldier) — this module's own POSES are sized for empty hands, not copied from that rifle-carrying figure's.",
+   "params": ["figure(fid, segments [(t0, t1, mode, path)], x0, z0, mesh_ids, materials, heading0=0, dims=DIMS, poses=POSES, head_accessory=None, chest_accessory=None, extra_y=None)", "bone_meshes(assets_dir, dims=DIMS) -> (mesh_ids, asset_xml), bake once per document", "default_materials() -> (ids, xml) — a plain unarmed look; pass your own for a specific one"],
+   "rules": ["every pose table's joint-angle signs are copied from v014's, not re-derived (guide: the engine's positive rotationX swings a hanging limb's end forward; the sign per joint is empirically tuned, not a clean rule)", "a carried object (a rifle, a tool) needs its own `poses` with bent elbows, as v014's did — this module's defaults hang the arms"]},
   {"name": "vo.speak / vo.hazards / vo.rules / vo.entries / vo.asr_aliases / vo.asr_normalise / vo.lexicon", "module": "pnkit.vo", "summary": "The narration dictionary by language (pnkit/data/vo_lexicon.json: respellings, rules, Whisper aliases, each with its source). speak() applies the respellings; hazards() lists what a TTS engine is likely to misread before synthesis (a period that splits a word, digits, symbols, untested acronyms, over-long sentences); asr_normalise() makes known mis-hearings compare equal in the word-error check.",
    "params": ["speak(text, lang, engine=kokoro)", "hazards(spoken, lang, known_acronyms=())", "asr_normalise(text, lang)", "lang: BCP 47 as the projects use it (en, pt-br); a base language falls back (en-us -> en)"],
    "rules": ["abbreviations without periods in the spoken text: AI, not A.I. (guide §12 step 3, observed in v013)", "numbers written as words in the spoken text; the screen and captions keep digits (guide §5)", "a bad Kokoro reading is fixed by changing the text, never by re-rolling (guide §14)", "test a new term with tools/vo_probe.py before adding it"]}

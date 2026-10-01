@@ -3,7 +3,8 @@
 pnkit is the shared library for the Python generators that write PALS's Notes scenes (`film/build.py` →
 `film.scene.xml`). It holds what every episode re-implemented: number formatting and ids, fades and keyframes,
 text layers with the 36 px floor, self-drawing paths, pills, the 2D camera with its safe-rect clamp and check,
-the brand kit's prologue and components, captions, the Shorts overlay and spans, and the physics block.
+the brand kit's prologue and components, captions, the Shorts overlay and spans, the physics block, baked
+tapered-tube meshes for 3D geometry no native primitive covers, and an articulated 3D figure built from them.
 
 It is a Python package with no dependencies outside the standard library. It writes inline XML. It does not use
 `<include>` or symbol instances, because neither can carry per-use text: an included document resolves with its
@@ -29,6 +30,8 @@ pnkit/            the package; vendored into projects as film/vendor/pnkit/
   captions.py     split_cues, two_lines, timed, cue_xml, sidecar, short_cues, stats
   shorts.py       span_times, segments, overlay, output_xml, build
   physics.py      signature, block
+  mesh.py         baked tapered-tube meshes (Mesh, tapered_tube, bake_bone) for geometry no primitive covers
+  figure.py       an articulated 3D figure (stand/walk/run/crouch/kneel-fire/prone) built from mesh.py's bones
   vo.py           the narration dictionary: speak, hazards, rules, entries, asr_aliases, asr_normalise
   data/vo_lexicon.json   its data by language (en, pt-br): respellings, rules, Whisper aliases, each with a source
 kit.json          the catalog: every component, its parameters and the guide rules it satisfies

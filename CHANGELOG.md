@@ -5,6 +5,29 @@ release adds components or parameters and keeps every existing default's output 
 prove it); a change to an existing default's output is a major release until 1.0, and a minor one is never allowed
 to hide it. Each release names the golden projects it was checked against.
 
+## 0.3.0 — 2026-10-01
+
+Adds baked tapered-tube meshes and an articulated 3D figure built from them, generalized from
+v014-bayonet-charge-2011's film/trees.py and film/figures.py (a desert-camo rifle soldier). Both are new
+modules with no existing consumer, so there is no golden project to keep byte-identical; v014 itself is
+unchanged and keeps its own figures.py.
+
+Added
+- `pnkit.mesh`: `Mesh` (a triangle soup built from tapered tubes; `tube()`, `write()` as OBJ), `rot_towards`,
+  `tapered_tube(length, r0, r1, ..., up=False)`, `bake_bone(out_dir, name, ..., up=False)` (cached per
+  (out_dir, name)). For geometry a native primitive can't do — the engine's `capsule` is one uniform radius,
+  and a limb drawn from one reads as a mannequin's rod up close. Pure standard library: no numpy, since
+  baking is a one-off offline step, not a per-frame one. `up` is the direction a tube grows relative to its
+  own origin (away from the root, or toward it) — see the module's docstring; this was the subtlest bug in
+  porting v014's rig, caught only by rendering a figure and looking at it, not by reading the code.
+- `pnkit.figure`: `figure(fid, segments, x0, z0, mesh_ids, materials, ...)`, `bone_meshes(assets_dir, dims)`,
+  `default_materials()`, `POSES`, `DIMS`. An articulated figure (stand, walk, run, crouch, kneel-fire,
+  prone) following a ground path at a cadence set by the pose, its limbs and torso built from
+  `pnkit.mesh`'s tapered bones. v014's joint-angle *signs* are kept exactly (empirically tuned per joint,
+  not a clean rule — see the module's docstring, lesson 1); its pose *magnitudes* are not — v014's figure
+  carries a rifle across its chest even at "stand", which read as an invisible rifle on an unarmed figure
+  with this module's defaults, so the default poses here are this module's own, sized for empty hands.
+
 ## 0.2.0 — 2026-09-30
 
 Adds the narration dictionary. No existing output changes: the golden test (v013 rebuilt with the vendored
