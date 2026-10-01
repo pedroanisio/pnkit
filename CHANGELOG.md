@@ -5,6 +5,35 @@ release adds components or parameters and keeps every existing default's output 
 prove it); a change to an existing default's output is a major release until 1.0, and a minor one is never allowed
 to hide it. Each release names the golden projects it was checked against.
 
+## 0.5.0 — 2026-10-01 — captions: breaks and minimum display time
+
+Changes what `pnkit.captions` writes, so by the rule above it is a breaking release (0.5.0),
+and the v013 golden test no longer passes byte for byte until its reference is regenerated. v013 rebuilt differs from its own build in 31 `<cue>` lines
+and nowhere else, and validates clean. A project moves to it by syncing and rebuilding; its sidecar changes.
+
+Found by the sound specialist's `qa/caption_check.py` on six films (v016, v018, v019, v020, v024, v028).
+
+Changed
+- `WEAK` gains what, how, where, who, while, because, there, here, per, our, your, their, his, her, my, you, we,
+  they, but, then, after, before (the checker's list). A weak word followed by a comma is still weak; only
+  `. ? ! ; :` free the break after it.
+- `no_break(tokens, weak, start)` (new) lists the places where no break may fall, between cues or between lines:
+  after a weak word; inside a number ("one in ten", "twenty thousand", "three times in ten", "75 per cent",
+  `is_number`, `NUMBERS`, `NUM_TAIL`); inside a name (a run of capitalised words that is not just a sentence's
+  first word, or a capitalised word and the digit after it: "Apollo 12").
+- `line_break(tokens, width, weak, start)` (new) is the one function that says whether a cue fits two lines and where
+  its line breaks. `split_cues` used a greedy wrap to accept a cue and `two_lines` a balanced break to show it;
+  both now come here, as do `cue_xml` and `stats`. `two_lines` takes `start` (the text opens a sentence).
+- `split_cues` cuts a unit only where `no_break` allows, taking a cue more when that is the price (up to two more
+  than the fewest that fit), and counts as faults a cue whose only line break is a forbidden one, a cue the pauses
+  cannot show for `min_show` s and a cue over 17 characters/s however long it is shown. Forbidden places are used
+  only when no split is free of faults. Then a cue still under `min_show` s or over 17 characters/s is cut again
+  with its two neighbours (`_mend`): "No." said 0.04 s before the next sentence becomes "No. Before the test, /
+  your chance was one in a hundred.", so a cue may now span a sentence end.
+- `timed` takes `min_show` (default `MIN_SHOW`, 1 s): a short cue is held from its own tail pause, never by showing
+  it earlier. The first cue may lead by up to 0.5 s (it was 0.25 s) when its reading time needs it. A cue's end is
+  clamped to the next cue's start, so word times that overlap in the source cannot make cues overlap.
+
 ## 0.4.0 — 2026-10-01
 
 Adds the audio-design rule as code, generalized from v015-short-pack, and a few narration entries from the same

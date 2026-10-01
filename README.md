@@ -27,7 +27,8 @@ pnkit/            the package; vendored into projects as film/vendor/pnkit/
   camera.py       Cam: cues, safe rectangles, clamp, drift, verify()
   brand.py        prologue(kit, params), extend, Brand: title_card, chapter_card, lower_third, source_line,
                   end_card, notch, ink, emblem
-  captions.py     split_cues, two_lines, timed, cue_xml, sidecar, short_cues, stats
+  captions.py     split_cues, two_lines, timed, cue_xml, sidecar, short_cues, stats; no_break, line_break (no break
+                  after a weak word, inside a number or a name), MIN_SHOW (no cue under 1 s)
   shorts.py       span_times, segments, overlay, output_xml, build
   physics.py      signature, block
   mesh.py         baked tapered-tube meshes (Mesh, tapered_tube, bake_bone) for geometry no primitive covers

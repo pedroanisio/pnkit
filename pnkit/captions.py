@@ -3,27 +3,113 @@
 Rules (guide §5 Typography, §13, §14 QA gates):
   - a cue is at most two lines of LINE (42) characters for the long film, SHORT_LINE (26) for a Short's burned track;
   - cues split at sentence ends and at pauses over PAUSE s, then into the fewest two-line cues that fit, preferring
-    an even reading rate, breaks after punctuation, and never a break (between cues or lines) after a weak word
-    (an article, preposition, auxiliary...) or a stub of one or two words;
-  - each cue is shown for at least len(text) / CPS s (16.5 characters/s, inside the guide's 17), taking the extra
-    time from the pauses either side, and lingers up to 1 s when a pause allows.
+    an even reading rate and breaks after punctuation;
+  - no break, between cues or between lines, after a weak word (an article, preposition, auxiliary, possessive...),
+    inside a number ("one in ten", "twenty thousand", "three times in ten", "75 per cent") or inside a name
+    ("Apollo 12", "New Horizons"): no_break() lists those places, and they are used only when no other break fits;
+  - one function, line_break(), decides whether a cue fits two lines and where its line breaks, so a cue is shown
+    with the break it was accepted with;
+  - each cue is shown for at least len(text) / CPS s (16.5 characters/s, inside the guide's 17) and never under
+    MIN_SHOW s, taking the extra time from the pauses either side, and lingers up to 1 s when a pause allows; a cue
+    the pauses cannot hold for MIN_SHOW s ("No." before the next sentence) joins a neighbour.
 
 Words carry their written punctuation ("decisions," "odds."); times are seconds on whatever clock the caller uses
 (film time for a sidecar, output time for a Short). Nothing here reads files or timelines.
 """
 import html, itertools, math, re
 
-__all__ = ["LINE", "SHORT_LINE", "CPS", "MAX_CPS", "PAUSE", "WEAK", "split_units", "split_cues", "two_lines", "timed",
-           "cue_xml", "sidecar", "short_cues", "stats"]
+__all__ = ["LINE", "SHORT_LINE", "CPS", "MAX_CPS", "MIN_SHOW", "PAUSE", "WEAK", "NUMBERS", "NUM_TAIL", "is_number",
+           "no_break", "line_break", "split_units", "split_cues", "two_lines", "timed", "cue_xml", "sidecar",
+           "short_cues", "stats"]
 
 LINE, SHORT_LINE = 42, 26         # characters per line: long film, Short
 CPS = 16.5                        # display-time rate the timing aims for, characters/s
 MAX_CPS = 17                      # the guide's readability limit, characters/s
 RATE_SOFT = 16.8                  # cue splitting penalises a part read faster than this
+MIN_SHOW = 1.0                    # no cue is shown for less than this, s
 PAUSE = 0.45                      # a pause longer than this ends a unit, like a sentence end
+FAULT = 50.0                      # cue splitting: the cost of one break where none may fall, of one cue too short or too fast
 WEAK = frozenset({"the", "a", "an", "of", "that", "are", "is", "to", "for", "and", "or", "if", "in", "with", "its", "it", "on",
                   "as", "at", "by", "from", "this", "these", "was", "were", "be", "been", "has", "have", "no", "not", "so", "than",
-                  "when", "which", "does", "do", "can", "will", "would", "should", "into", "about", "more", "own"})
+                  "when", "which", "does", "do", "can", "will", "would", "should", "into", "about", "more", "own",
+                  "what", "how", "where", "who", "while", "because", "there", "here", "per", "our", "your", "their", "his", "her",
+                  "my", "you", "we", "they", "but", "then", "after", "before"})
+NUMBERS = frozenset("zero one two three four five six seven eight nine ten eleven twelve thirteen fourteen fifteen sixteen "
+                    "seventeen eighteen nineteen twenty thirty forty fifty sixty seventy eighty ninety hundred thousand "
+                    "million billion trillion half".split())
+NUM_TAIL = frozenset({"in", "out", "of", "per", "cent", "percent", "%", "times"})   # what ties a number to the next one
+_END = (".", "?", "!")            # a sentence ends
+_STOP = _END + (";", ":")         # after these a break is always allowed
+_PUNCT = ".,;:?!\"'"
+
+
+def is_number(token):
+    """a number as it is written: digits (1982, 3.8, 95%, 12-km), number words (twenty, ninety-five, half), and the
+    per / cent / percent that belong to one"""
+    t = token.lower().strip(_PUNCT + "()%").replace("\u2013", "-")
+    if re.fullmatch(r"\d[\d,.\-]*[%a-z]*", t):
+        return True
+    parts = t.split("-")
+    return any(p in NUMBERS for p in parts) and all(p in NUMBERS or p == "" for p in parts) or t in ("per", "cent", "percent")
+
+
+def no_break(tokens, weak=WEAK, start=True):
+    """{i}: the places where no break may fall between tokens[i - 1] and tokens[i], for cues and for lines alike:
+      - after a weak word;
+      - inside a number: between a number and the number, or the in / out / of / per / cent / percent / times,
+        that follows it ("twenty thousand", "75 per cent"), and anywhere between two numbers joined by those words
+        ("one in ten", "three times in ten");
+      - inside a name: a capitalised word and the capitalised word or the digit that follows it. A word that only
+        opens a sentence is no name ("Then Newton"), unless a digit follows ("Apollo 12").
+    A token that ends in . ? ! ; : frees the break after it. start: tokens[0] opens a sentence."""
+    out, n = set(), len(tokens)
+    bare = [t.lower().strip(_PUNCT) for t in tokens]
+    num = [is_number(t) for t in tokens]
+    free = [t.endswith(_STOP) for t in tokens]
+    for i in range(1, n):
+        a, b = tokens[i - 1], tokens[i]
+        if free[i - 1]:
+            continue
+        if bare[i - 1] in weak or num[i - 1] and (num[i] or bare[i] in NUM_TAIL):
+            out.add(i)
+        opens = start if i == 1 else tokens[i - 2].endswith(_END)
+        if a[:1].isupper() and a != "I" and not a.endswith(",") and (b[:1].isdigit() or b[:1].isupper() and not opens):
+            out.add(i)
+    for j in range(n):                                      # a number, its joining words, the next number: one run
+        if not num[j]:
+            continue
+        k = j + 1
+        while k < n and bare[k] in NUM_TAIL and not free[k - 1]:
+            k += 1
+        if j + 1 < k < n and num[k] and not free[k - 1]:
+            out.update(range(j + 1, k + 1))
+    return out
+
+
+def line_break(tokens, width, weak=WEAK, start=True):
+    """(lines, legal) for a cue's words, or None when they do not fit two lines of `width`. The break is the most
+    balanced one that no_break() allows, nearer punctuation when that is close; legal is False when every break
+    that fits is one no_break() forbids, and the most balanced of those is used. Both split_cues (does this cue
+    fit, is its break a good one) and two_lines (what is shown) come here."""
+    text = " ".join(tokens)
+    if len(text) <= width:
+        return [text], True
+    if len(text) > 2 * width + 1:
+        return None
+    stuck, best = no_break(tokens, weak, start), None
+    for i in range(1, len(tokens)):
+        a, b = " ".join(tokens[:i]), " ".join(tokens[i:])
+        if len(a) > width or len(b) > width:
+            continue
+        score = (1000 if i in stuck else 0) + abs(len(a) - len(b)) - (8 if a.endswith((",",) + _STOP) else 0)
+        if best is None or score < best[0]:
+            best = (score, [a, b], i not in stuck)
+    return best and (best[1], best[2])
+
+
+def _opens(cues, k):
+    """does cue k open a sentence"""
+    return k == 0 or cues[k - 1][-1][0].endswith(_END)
 
 
 def split_units(words):
@@ -32,59 +118,86 @@ def split_units(words):
     for i, w in enumerate(words):
         cur.append(w)
         gap = words[i + 1][1] - w[2] if i + 1 < len(words) else 9
-        if w[0].endswith((".", "?", "!")) or gap > PAUSE:
+        if w[0].endswith(_END) or gap > PAUSE:
             units.append(cur); cur = []
     if cur:
         units.append(cur)
     return units
 
 
-def split_cues(words, width=LINE, first_end=None, weak=WEAK):
-    """[[word, ...] per cue]: each unit split into the fewest two-line cues that fit, balanced by reading rate.
+def split_cues(words, width=LINE, first_end=None, weak=WEAK, min_show=MIN_SHOW):
+    """[[word, ...] per cue]: each unit split into the fewest two-line cues that fit with every break (between cues
+    and between lines) where no_break() allows one and every cue on screen for min_show s, balanced by reading
+    rate; then a cue the pauses cannot hold for min_show s joins a neighbour (_mend), so a cue may span a sentence
+    end.
     first_end: the first cue should not end before this time (a Short's cover), a soft rule."""
     units = split_units(words)
-
-    def fits(ws):
-        n, ln = 1, 0
-        for w in ws:
-            add = len(w[0]) + (1 if ln else 0)
-            if ln + add > width:
-                n, ln = n + 1, len(w[0])
-            else:
-                ln += add
-        return n <= 2
-
-    def rate(ws):
-        return len(" ".join(w[0] for w in ws)) / max(0.3, ws[-1][2] - ws[0][1] + 0.5)
-
-    def weak_lines(ws):
-        t = " ".join(w[0] for w in ws)
-        L = two_lines(t, width, weak)
-        return len(L) > 1 and L[0].split()[-1].lower() in weak
-
     out = []
     for ui, u in enumerate(units):
-        if fits(u) and not (weak_lines(u) and len(u) > 5):
-            out.append(u); continue
-        best = None
-        for n in range(2, 9):
-            if math.comb(len(u) - 1, n - 1) > 400000:       # too many to try: the greedy balanced split below
-                break
-            for cuts in itertools.combinations(range(1, len(u)), n - 1):
-                parts = [u[a:b] for a, b in zip((0,) + cuts, cuts + (len(u),))]
-                if not all(fits(p) for p in parts):
+        toks = [w[0] for w in u]
+        opens = ui == 0 or units[ui - 1][-1][0].endswith(_END)
+        stuck = no_break(toks, weak, opens)
+        after = units[ui + 1][0][1] if ui + 1 < len(units) else u[-1][2] + 3.0
+        if ui == 0:                                         # the lead timed() can give the unit's first cue
+            early = min(0.5, u[0][1])
+        else:                                               # the pause before it, less what the cue before needs of it
+            q = out[-1]; said = q[-1][2] - q[0][1]
+            early = max(0.0, u[0][1] - q[-1][2] - 0.04 - max(0.15, len(" ".join(w[0] for w in q)) / CPS - said, min_show - said))
+        memo = {}
+
+        def part(a, b):
+            """u[a:b] as one cue: None when it does not fit, else (rate, faults, soft faults). Its faults: a line
+            break where none may fall, under min_show s on screen, and (the limit, so it counts three times) over
+            MAX_CPS however long it is shown"""
+            if (a, b) not in memo:
+                p, L = u[a:b], line_break(toks[a:b], width, weak, opens and a == 0)
+                if L is None:
+                    memo[a, b] = None
+                else:
+                    chars = len(" ".join(toks[a:b]))
+                    room = (u[b][1] if b < len(u) else after) - 0.04 - p[0][1]      # the longest it can be shown
+                    lead = early if a == 0 else 0.0
+                    fast = chars / max(0.1, room + lead) > MAX_CPS
+                    memo[a, b] = (chars / max(0.3, p[-1][2] - p[0][1] + 0.5), (not L[1]) + (room + min(lead, 0.15) < min_show) + 3 * fast,
+                                  (b - a < 3) + (p[-1][2] - p[0][1] < 1.3))
+            return memo[a, b]
+
+        def search(places, n):
+            """the best split into n cues cut at `places`: (score, faults, parts), or None when none fits"""
+            best = None
+            for cuts in itertools.combinations(places, n - 1):
+                edges = (0,) + cuts + (len(u),)
+                ps = [part(a, b) for a, b in zip(edges, edges[1:])]
+                if None in ps:
                     continue
-                # prefer even reading speed, breaks after punctuation, and never after a function word or a stub
-                bad = (sum(p[-1][0].lower().strip(",.") in weak for p in parts[:-1]) + sum(len(p) < 3 for p in parts)
-                       + sum(weak_lines(p) for p in parts) + sum((p[-1][2] - p[0][1]) < 1.3 for p in parts))
-                score = (max(rate(p) for p in parts) + 2.0 * bad + 8.0 * max(0.0, max(rate(p) for p in parts) - RATE_SOFT)
-                         - 0.8 * sum(p[-1][0].endswith((",", ";", ":")) for p in parts[:-1])
-                         + (10.0 if first_end is not None and ui == 0 and parts[0][-1][2] < first_end else 0.0))
+                # prefer even reading speed and breaks after punctuation; never a break after a weak word, inside a
+                # number or a name, a cue under min_show s, or (softer) a stub
+                top = max(p[0] for p in ps)
+                faults = sum(p[1] for p in ps) + sum(c in stuck for c in cuts)
+                score = (top + FAULT * faults + (2.0 * sum(p[2] for p in ps) if n > 1 else 0.0) + 8.0 * max(0.0, top - RATE_SOFT)
+                         - 0.8 * sum(toks[c - 1].endswith((",", ";", ":")) for c in cuts)
+                         + (10.0 if first_end is not None and ui == 0 and u[edges[1] - 1][2] < first_end else 0.0))
                 if best is None or score < best[0]:
-                    best = (score, parts)
-            if best:
+                    best = (score, faults, [u[a:b] for a, b in zip(edges, edges[1:])])
+            return best
+
+        legal, every = [i for i in range(1, len(u)) if i not in stuck], range(1, len(u))
+        best = least = None                                 # least: the fewest cues that fit at all
+        for n in range(1, min(len(u), 12) + 1):
+            if math.comb(len(legal), n - 1) > 400000 or least is not None and n > least + 2:
                 break
-        if best is None:                                    # balanced by length, as few parts as fit
+            got = search(legal, n)                          # first with legal cuts only, a cue more if that is the price
+            if least is None and (got or (math.comb(len(u) - 1, n - 1) <= 400000 and search(every, n))):
+                least = n
+            if got and (best is None or got[0] < best[0]):
+                best = got
+            if got and not got[1]:
+                break
+        if (best is None or best[1]) and least is not None:   # no faultless split: the least bad of any cuts
+            got = search(every, least)
+            if got and (best is None or got[0] < best[0]):
+                best = got
+        if best is None:                                    # too many to try: balanced by length, as few parts as fit
             n = 2
             while True:
                 total = sum(len(w[0]) + 1 for w in u)
@@ -94,44 +207,89 @@ def split_cues(words, width=LINE, first_end=None, weak=WEAK):
                         parts.append(cur); cur = []
                     cur.append(w); acc += len(w[0]) + 1
                 parts.append(cur)
-                if all(fits(p) for p in parts):
+                if all(line_break([w[0] for w in p], width, weak) for p in parts):
                     break
                 n += 1
-            best = (0, parts)
-        out += best[1]
-    return out
+            best = (0, 0, parts)
+        out += best[2]
+    return _mend(out, width, weak, min_show)
 
 
-def two_lines(text, width, weak=WEAK):
-    """the cue's text as at most two lines of `width`, balanced, broken after punctuation when that is close and
-    not after a weak word"""
-    if len(text) <= width:
-        return [text]
-    words = text.split(" ")
-    best = None
-    for i in range(1, len(words)):
-        a, b = " ".join(words[:i]), " ".join(words[i:])
-        if len(a) > width or len(b) > width:
-            continue
-        score = abs(len(a) - len(b)) - (8 if a.endswith((",", ";", ":", ".")) else 0) + (25 if words[i - 1].lower() in weak else 0)
-        if best is None or score < best[0]:
-            best = (score, [a, b])
-    return best[1] if best else [text]
+def _mend(cues, width, weak, min_show):
+    """a cue that timed() cannot show for min_show s, or under MAX_CPS, is cut again together with its two
+    neighbours, into as many cues or fewer: it joins the one it belongs with (the smallest pause first) or the cuts
+    move, whichever leaves the fewest faults; a cue may then span a sentence end ("No. Before the test, ...")"""
+    def text(c):
+        return " ".join(w[0] for w in c)
+
+    def faults(trial, lo, n, stuck=(), cuts=()):
+        tl, bad = timed(trial, min_show=min_show), sum(c in stuck for c in cuts)
+        for k in range(lo, lo + n):
+            c, a, b = tl[k]
+            L = line_break([w[0] for w in c], width, weak, _opens(trial, k))
+            if L is None:
+                return None
+            bad += (not L[1]) + (b - a < min_show - 1e-6) + 3 * (len(text(c)) / max(0.1, b - a) > MAX_CPS)
+        return bad
+
+    left = set()                                            # cues nothing can be done for
+    for _ in range(4 * len(cues)):
+        tl = timed(cues, min_show=min_show)
+        k = next((k for k, (c, a, b) in enumerate(tl) if c[0] not in left
+                  and (b - a < min_show - 1e-6 or len(text(c)) / max(0.1, b - a) > MAX_CPS)), None)
+        if k is None:
+            break
+        lo, hi = max(0, k - 1), min(len(cues), k + 2)
+        W = [w for c in cues[lo:hi] for w in c]
+        toks = [w[0] for w in W]
+        stuck = no_break(toks, weak, _opens(cues, lo))
+        now = [len(c) for c in cues[lo:hi]]
+        was, best = faults(cues, lo, hi - lo, stuck, list(itertools.accumulate(now))[:-1]), None
+        for n in range(1, hi - lo + 1):
+            for cuts in itertools.combinations(range(1, len(W)), n - 1):
+                edges = (0,) + cuts + (len(W),)
+                if any(len(" ".join(toks[a:b])) > 2 * width + 1 for a, b in zip(edges, edges[1:])):
+                    continue
+                trial = cues[:lo] + [W[a:b] for a, b in zip(edges, edges[1:])] + cues[hi:]
+                bad = faults(trial, lo, n, stuck, cuts)
+                if bad is None:
+                    continue
+                inside = [i for i in range(1, len(W)) if toks[i - 1].endswith(_END) and i not in cuts]
+                rank = (bad, len(inside), sum(not toks[c - 1].endswith((",",) + _STOP) for c in cuts),
+                        sum(W[i][1] - W[i - 1][2] for i in inside), n,
+                        max(len(" ".join(toks[a:b])) for a, b in zip(edges, edges[1:])))
+                if bad < was and (best is None or rank < best[0]):
+                    best = (rank, trial)
+        if best is None:
+            left.add(cues[k][0])
+        else:
+            cues = best[1]
+    return cues
 
 
-def timed(cues, cps=CPS):
-    """[(cue, start, end)]: display windows. Each cue needs len(text)/cps s; beyond its own speech it takes that
-    time from the pauses either side (its tail first, then the next cue's lead), and lingers up to 1 s when a pause
-    allows."""
+def two_lines(text, width, weak=WEAK, start=True):
+    """the cue's text as at most two lines of `width`: line_break()'s break (balanced, after punctuation when that is
+    close, never after a weak word or inside a number or a name while another break fits). start: the text opens a
+    sentence, so its first word's capital is no name."""
+    L = line_break(text.split(" "), width, weak, start)
+    return L[0] if L else [text]
+
+
+def timed(cues, cps=CPS, min_show=MIN_SHOW):
+    """[(cue, start, end)]: display windows. Each cue needs len(text)/cps s and at least min_show s; beyond its own
+    speech it takes that time from the pauses either side (its tail first, then the next cue's lead; what only
+    min_show asks for comes from the cue's own tail, so a short cue is never shown long before it is said: when the
+    tail has no room split_cues joins it to a neighbour), and lingers up to 1 s when a pause allows."""
     n = len(cues)
     span = [(c[0][1], c[-1][2]) for c in cues]
     need = [max(0.15, len(" ".join(w[0] for w in c)) / cps - (b - a)) for c, (a, b) in zip(cues, span)]
+    more = [max(0.0, min_show - (b - a) - nd) for nd, (a, b) in zip(need, span)]
+    gap = [max(0.0, span[k + 1][0] - span[k][1] - 0.04) if k + 1 < n else 3.0 for k in range(n)]
     lead, tail = [0.0] * n, [0.0] * n
-    lead[0] = min(0.25, span[0][0])
+    lead[0] = min(max(0.25, min(need[0], 0.5)), span[0][0])
     for k in range(n):
-        g = (span[k + 1][0] - span[k][1] - 0.04) if k + 1 < n else 3.0
-        g = max(0.0, g)
-        t = min(max(0.0, need[k] - lead[k]), g)
+        g = gap[k]
+        t = min(max(0.0, need[k] + more[k] - lead[k]), g)
         if k + 1 < n:
             l_ = min(need[k + 1], g - t)
             r = g - t - l_
@@ -140,16 +298,18 @@ def timed(cues, cps=CPS):
         else:
             t = max(t, min(g, 1.0))
         tail[k] = t
-    return [(c, max(0.0, a - lead[k]), b + tail[k]) for k, (c, (a, b)) in enumerate(zip(cues, span))]
+    show = [(max(0.0, a - lead[k]), b + tail[k]) for k, (a, b) in enumerate(span)]
+    return [(c, a, min(b, show[k + 1][0]) if k + 1 < n else b)       # word times that overlap never make cues overlap
+            for k, (c, (a, b)) in enumerate(zip(cues, show))]
 
 
 def cue_xml(cues, indent="      ", width=None, weak=WEAK, cps=CPS):
     """<cue> elements with their <word>s; width: break each cue's text into two lines (sidecar), None: one line
     (a burned track lays out its own lines)"""
     xml = []
-    for c, start, end in timed(cues, cps):
+    for k, (c, start, end) in enumerate(timed(cues, cps)):
         text = " ".join(w[0] for w in c)
-        body = "\n".join(two_lines(text, width, weak)) if width else text
+        body = "\n".join(two_lines(text, width, weak, _opens(cues, k))) if width else text
         ws = "".join(f'<word start="{w[1]:.3f}" end="{w[2]:.3f}" text="{html.escape(w[0], quote=True)}"/>' for w in c)
         xml.append(f'{indent}<cue start="{start:.3f}" end="{end:.3f}" text="{html.escape(body, quote=True).replace(chr(10), "&#10;")}">{ws}</cue>')
     return "\n".join(xml)
@@ -185,8 +345,8 @@ def stats(words, width=LINE, weak=WEAK, cps=CPS, max_cps=MAX_CPS):
     """(cues, cues over max_cps, worst characters/s, longest line) for a sidecar made from `words`"""
     cues = split_cues(words, width, weak=weak)
     rates, longest = [], 0
-    for c, a, b in timed(cues, cps):
+    for k, (c, a, b) in enumerate(timed(cues, cps)):
         text = " ".join(w[0] for w in c)
         rates.append(len(text) / (b - a))
-        longest = max(longest, max(len(x) for x in two_lines(text, width, weak)))
+        longest = max(longest, max(len(x) for x in two_lines(text, width, weak, _opens(cues, k))))
     return len(cues), sum(r > max_cps for r in rates), round(max(rates), 1), longest
