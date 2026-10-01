@@ -12,6 +12,7 @@ Languages are BCP 47 tags as the projects use them ("en", "pt-br").
     for h in vo.hazards(say, "en"): print(h)            # before synthesis: what the engine is likely to misread
     vo.rules("en")                                      # the conventions, for the script writer
     vo.asr_normalise(hyp, "en")                         # the Whisper check: known mis-hearings compare equal
+    vo.asr_currency(hyp)                                # "$450 billion" -> "450 billion dollars", before spelling numbers
 
 `hazards` is the check that would have caught v013's "A.I.": Kokoro pauses at the periods of a dotted abbreviation, and
 a one-sentence-per-call synthesiser also splits there, so the listener hears a pause inside the word. An entry whose
@@ -66,6 +67,16 @@ def asr_normalise(text, lang):
     for heard, means in sorted(asr_aliases(lang).items(), key=lambda kv: -len(kv[0])):
         t = re.sub(rf"(?<![\w.]){re.escape(heard.lower())}(?![\w])", means.lower(), t)
     return t
+
+
+_CURRENCY = re.compile(r"\$\s*(\d[\d,]*(?:\.\d+)?)(\s*(?:thousand|million|billion|trillion))?", re.I)
+
+
+def asr_currency(text):
+    """'$450 billion' -> '450 billion dollars', '$5' -> '5 dollars': a transcript writes the symbol first, the narration
+    says the unit last. For both sides of a word-error check, before the project's number speller (asr_normalise does
+    not call it: it only applies the aliases)."""
+    return _CURRENCY.sub(lambda m: f"{m.group(1)}{m.group(2) or ''} dollars", text)
 
 
 def speak(text, lang, engine="kokoro"):

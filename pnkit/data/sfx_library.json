@@ -1,0 +1,398 @@
+{
+ "_meta": {
+  "about": "The channel's sound-effect palette and the cues it no longer uses. Read by pnkit.audio.",
+  "rule": "No laser-like sound (user, 2026-10-01): no pitch sweep, no synthetic sting, no sustained pure high tone. Every film gets its own sound design; after the last word only soft struck foley may start, then the music resolves.",
+  "fields": {
+   "cues": "name -> an AudioForge cue (kind audioforge: model, prompt) or a file made by tools/foley.py (kind file: path, relative to the project); gain is the default track volume; class is struck | noise | impact | bed | sting; tail_ok marks the cues allowed to start after the last word",
+   "retired": "cues a film may not name: what to use instead, and why"
+  }
+ },
+ "cues": [
+  {
+   "name": "boom",
+   "kind": "audioforge",
+   "model": "transition/impact",
+   "prompt": "duration=4.0 seed=3",
+   "gain": 0.5,
+   "class": "impact",
+   "tail_ok": false,
+   "use": "a long low impact: an arrival, a weight",
+   "source": "v015-short-pack film/core.py (audio redesign, 2026-10-01)"
+  },
+  {
+   "name": "hit",
+   "kind": "audioforge",
+   "model": "transition/impact",
+   "prompt": "duration=3.0 seed=7",
+   "gain": 0.45,
+   "class": "impact",
+   "tail_ok": false,
+   "use": "an impact on a reveal",
+   "source": "v015-short-pack film/core.py (audio redesign, 2026-10-01)"
+  },
+  {
+   "name": "impact",
+   "kind": "audioforge",
+   "model": "transition/impact",
+   "prompt": "duration=2.0 seed=11",
+   "gain": 0.4,
+   "class": "impact",
+   "tail_ok": false,
+   "use": "a shorter impact",
+   "source": "v015-short-pack film/core.py (audio redesign, 2026-10-01)"
+  },
+  {
+   "name": "swell",
+   "kind": "audioforge",
+   "model": "transition/reverse-swell",
+   "prompt": "duration=1.4 seed=2",
+   "gain": 0.35,
+   "class": "noise",
+   "tail_ok": false,
+   "use": "air gathering into a moment (noise, not a pitch rise)",
+   "source": "v015-short-pack film/core.py (audio redesign, 2026-10-01)"
+  },
+  {
+   "name": "whoosh",
+   "kind": "audioforge",
+   "model": "transition/whoosh",
+   "prompt": "duration=1.2 direction=up seed=4",
+   "gain": 0.3,
+   "class": "noise",
+   "tail_ok": false,
+   "use": "air for a camera move",
+   "source": "v015-short-pack film/core.py (audio redesign, 2026-10-01)"
+  },
+  {
+   "name": "whoosh2",
+   "kind": "audioforge",
+   "model": "transition/whoosh",
+   "prompt": "duration=1.2 direction=up seed=9",
+   "gain": 0.3,
+   "class": "noise",
+   "tail_ok": false,
+   "use": "a second air gesture, so two moves do not sound alike",
+   "source": "v015-short-pack film/core.py (audio redesign, 2026-10-01)"
+  },
+  {
+   "name": "click",
+   "kind": "audioforge",
+   "model": "ui/click",
+   "prompt": "duration=0.06 pitch=2600 seed=2",
+   "gain": 0.18,
+   "class": "struck",
+   "tail_ok": true,
+   "use": "a small hard click: a switch, a stopwatch",
+   "source": "v015-short-pack film/core.py (audio redesign, 2026-10-01)"
+  },
+  {
+   "name": "tick",
+   "kind": "audioforge",
+   "model": "ui/click",
+   "prompt": "duration=0.09 pitch=900 seed=5",
+   "gain": 0.25,
+   "class": "struck",
+   "tail_ok": true,
+   "use": "a tick: a count, a second, a mark",
+   "source": "v015-short-pack film/core.py (audio redesign, 2026-10-01)"
+  },
+  {
+   "name": "stamp",
+   "kind": "audioforge",
+   "model": "foley/stamp",
+   "prompt": "duration=0.5 seed=2",
+   "gain": 0.35,
+   "class": "struck",
+   "tail_ok": true,
+   "use": "a rubber stamp: a verdict",
+   "source": "v015-short-pack film/core.py (audio redesign, 2026-10-01)"
+  },
+  {
+   "name": "paper",
+   "kind": "audioforge",
+   "model": "foley/paper-tap",
+   "prompt": "duration=0.25 seed=1",
+   "gain": 0.3,
+   "class": "struck",
+   "tail_ok": true,
+   "use": "paper set down: a card, a tag",
+   "source": "v015-short-pack film/core.py (audio redesign, 2026-10-01)"
+  },
+  {
+   "name": "clap",
+   "kind": "audioforge",
+   "model": "foley/paper-tap",
+   "prompt": "duration=0.25 seed=6",
+   "gain": 0.3,
+   "class": "struck",
+   "tail_ok": false,
+   "use": "a flat clap",
+   "source": "v015-short-pack film/core.py (audio redesign, 2026-10-01)"
+  },
+  {
+   "name": "shutter",
+   "kind": "audioforge",
+   "model": "ui/click",
+   "prompt": "duration=0.07 pitch=1300 seed=8",
+   "gain": 0.22,
+   "class": "struck",
+   "tail_ok": true,
+   "use": "a camera shutter",
+   "source": "v015-short-pack film/core.py (audio redesign, 2026-10-01)"
+  },
+  {
+   "name": "pin",
+   "kind": "audioforge",
+   "model": "foley/pin-tap",
+   "prompt": "duration=0.2 seed=3",
+   "gain": 0.2,
+   "class": "struck",
+   "tail_ok": true,
+   "use": "a pin pushed in: a point marked",
+   "source": "v015-short-pack film/core.py (audio redesign, 2026-10-01)"
+  },
+  {
+   "name": "error",
+   "kind": "audioforge",
+   "model": "sting/error",
+   "prompt": "duration=0.8 seed=2",
+   "gain": 0.22,
+   "class": "sting",
+   "tail_ok": false,
+   "use": "an error sting (not used by v015; prefer tok)",
+   "source": "v015-short-pack film/core.py (audio redesign, 2026-10-01)"
+  },
+  {
+   "name": "slide",
+   "kind": "audioforge",
+   "model": "foley/paper-swish",
+   "prompt": "duration=0.5 seed=2",
+   "gain": 0.25,
+   "class": "noise",
+   "tail_ok": true,
+   "use": "paper sliding: a card or a row moving",
+   "source": "v015-short-pack film/core.py (audio redesign, 2026-10-01)"
+  },
+  {
+   "name": "scratch",
+   "kind": "audioforge",
+   "model": "foley/pencil-scratch",
+   "prompt": "duration=0.9 seed=3",
+   "gain": 0.22,
+   "class": "noise",
+   "tail_ok": true,
+   "use": "pencil: a line being drawn",
+   "source": "v015-short-pack film/core.py (audio redesign, 2026-10-01)"
+  },
+  {
+   "name": "typing",
+   "kind": "audioforge",
+   "model": "foley/typing",
+   "prompt": "duration=1.2 seed=4",
+   "gain": 0.2,
+   "class": "struck",
+   "tail_ok": false,
+   "use": "a burst of typing",
+   "source": "v015-short-pack film/core.py (audio redesign, 2026-10-01)"
+  },
+  {
+   "name": "room",
+   "kind": "audioforge",
+   "model": "ambience/room-tone",
+   "prompt": "duration=40 seed=2",
+   "gain": 0.12,
+   "class": "bed",
+   "tail_ok": false,
+   "use": "a quiet room",
+   "source": "v015-short-pack film/core.py (audio redesign, 2026-10-01)"
+  },
+  {
+   "name": "ocean",
+   "kind": "audioforge",
+   "model": "ambience/ocean",
+   "prompt": "duration=40 seed=5",
+   "gain": 0.14,
+   "class": "bed",
+   "tail_ok": false,
+   "use": "open water",
+   "source": "v015-short-pack film/core.py (audio redesign, 2026-10-01)"
+  },
+  {
+   "name": "tap",
+   "kind": "file",
+   "path": "sfx/custom/tap.wav",
+   "gain": 0.2,
+   "class": "struck",
+   "tail_ok": true,
+   "use": "a small thing landing",
+   "source": "v015-short-pack film/core.py (audio redesign, 2026-10-01); tools/foley.py"
+  },
+  {
+   "name": "tok",
+   "kind": "file",
+   "path": "sfx/custom/tok.wav",
+   "gain": 0.22,
+   "class": "struck",
+   "tail_ok": true,
+   "use": "a wooden knock: a miss, a refusal, a finish line",
+   "source": "v015-short-pack film/core.py (audio redesign, 2026-10-01); tools/foley.py"
+  },
+  {
+   "name": "thud",
+   "kind": "file",
+   "path": "sfx/custom/thud.wav",
+   "gain": 0.3,
+   "class": "struck",
+   "tail_ok": true,
+   "use": "a low body: the weight of a word",
+   "source": "v015-short-pack film/core.py (audio redesign, 2026-10-01); tools/foley.py"
+  },
+  {
+   "name": "tink",
+   "kind": "file",
+   "path": "sfx/custom/tink.wav",
+   "gain": 0.14,
+   "class": "struck",
+   "tail_ok": false,
+   "use": "a glass tick",
+   "source": "v015-short-pack film/core.py (audio redesign, 2026-10-01); tools/foley.py"
+  },
+  {
+   "name": "clunk",
+   "kind": "file",
+   "path": "sfx/custom/clunk.wav",
+   "gain": 0.24,
+   "class": "struck",
+   "tail_ok": true,
+   "use": "a heavy switch or gate",
+   "source": "v015-short-pack film/core.py (audio redesign, 2026-10-01); tools/foley.py"
+  },
+  {
+   "name": "chime",
+   "kind": "file",
+   "path": "sfx/custom/chime.wav",
+   "gain": 0.18,
+   "class": "struck",
+   "tail_ok": false,
+   "use": "two warm bars: a real check passed (never after the last word)",
+   "source": "v015-short-pack film/core.py (audio redesign, 2026-10-01); tools/foley.py"
+  },
+  {
+   "name": "step",
+   "kind": "file",
+   "path": "sfx/custom/step.wav",
+   "gain": 0.22,
+   "class": "struck",
+   "tail_ok": true,
+   "use": "a footstep",
+   "source": "v015-short-pack film/core.py (audio redesign, 2026-10-01); tools/foley.py"
+  },
+  {
+   "name": "swish",
+   "kind": "file",
+   "path": "sfx/custom/swish.wav",
+   "gain": 0.2,
+   "class": "noise",
+   "tail_ok": false,
+   "use": "a soft stroke through air or water",
+   "source": "v015-short-pack film/core.py (audio redesign, 2026-10-01); tools/foley.py"
+  },
+  {
+   "name": "settle",
+   "kind": "file",
+   "path": "sfx/custom/settle.wav",
+   "gain": 0.18,
+   "class": "noise",
+   "tail_ok": false,
+   "use": "pressure let go: a soft noise release where a falling sweep used to be",
+   "source": "v015-short-pack film/core.py (audio redesign, 2026-10-01); tools/foley.py"
+  },
+  {
+   "name": "rumble",
+   "kind": "file",
+   "path": "sfx/custom/rumble.wav",
+   "gain": 0.25,
+   "class": "noise",
+   "tail_ok": false,
+   "use": "a low build that stops (where a riser used to be)",
+   "source": "v015-short-pack film/core.py (audio redesign, 2026-10-01); tools/foley.py"
+  },
+  {
+   "name": "cascade",
+   "kind": "file",
+   "path": "sfx/custom/cascade.wav",
+   "gain": 0.2,
+   "class": "struck",
+   "tail_ok": false,
+   "use": "many small things landing in a ripple",
+   "source": "v015-short-pack film/core.py (audio redesign, 2026-10-01); tools/foley.py"
+  },
+  {
+   "name": "under",
+   "kind": "file",
+   "path": "sfx/custom/under.wav",
+   "gain": 0.3,
+   "class": "bed",
+   "tail_ok": false,
+   "use": "under water: a low, slow, enclosed wash",
+   "source": "v015-short-pack film/core.py (audio redesign, 2026-10-01); tools/foley.py"
+  },
+  {
+   "name": "hum",
+   "kind": "file",
+   "path": "sfx/custom/hum.wav",
+   "gain": 0.12,
+   "class": "bed",
+   "tail_ok": false,
+   "use": "a mains hum: a machine at rest",
+   "source": "v015-short-pack film/core.py (audio redesign, 2026-10-01); tools/foley.py"
+  },
+  {
+   "name": "roomlarge",
+   "kind": "file",
+   "path": "sfx/custom/roomlarge.wav",
+   "gain": 0.14,
+   "class": "bed",
+   "tail_ok": false,
+   "use": "the air of a large room",
+   "source": "v015-short-pack film/core.py (audio redesign, 2026-10-01); tools/foley.py"
+  }
+ ],
+ "retired": [
+  {
+   "name": "down",
+   "model": "transition/downlifter",
+   "use": "settle, thud or nothing",
+   "why": "a falling pitch sweep",
+   "source": "v015: the user heard the endings as laser-like; measured in qa/tail.py"
+  },
+  {
+   "name": "riser",
+   "model": "transition/riser",
+   "use": "rumble or swell",
+   "why": "a rising pitch sweep",
+   "source": "v015: the user heard the endings as laser-like; measured in qa/tail.py"
+  },
+  {
+   "name": "pop",
+   "model": "ui/pop",
+   "use": "tap",
+   "why": "a tiny descending chirp",
+   "source": "v015: the user heard the endings as laser-like; measured in qa/tail.py"
+  },
+  {
+   "name": "success",
+   "model": "sting/success",
+   "use": "chime (never in the tail)",
+   "why": "a bright synthetic sting",
+   "source": "v015: the user heard the endings as laser-like; measured in qa/tail.py"
+  },
+  {
+   "name": "tone",
+   "model": "sting/notification",
+   "use": "chime or tink",
+   "why": "a pure high notification tone",
+   "source": "v015: the user heard the endings as laser-like; measured in qa/tail.py"
+  }
+ ]
+}

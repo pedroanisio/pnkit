@@ -5,6 +5,59 @@ release adds components or parameters and keeps every existing default's output 
 prove it); a change to an existing default's output is a major release until 1.0, and a minor one is never allowed
 to hide it. Each release names the golden projects it was checked against.
 
+## 0.4.0 — 2026-10-01
+
+Adds the audio-design rule as code, generalized from v015-short-pack, and a few narration entries from the same
+pack. No existing output changes: the golden test (v013 rebuilt with the vendored package, strict A/B, final and
+draft) is byte-identical as before. v015 itself is unchanged and keeps its own film/core.py.
+
+The rule (user, 2026-10-01, after hearing v015's endings as laser beams): every film gets its own sound design, and
+nothing may sound laser-like: no pitch sweep, no synthetic sting, no sustained pure high tone. After the last word
+only soft struck foley may start; then the music resolves.
+
+Added
+- `pnkit.audio`:
+  - `Cues`: a film's effects and beds. `sfx(t, name, gain)` and `ambience(name, gain, fade_in)` take names from the
+    palette; a retired cue (`down`, `riser`, `pop`, `success`, `tone`) or an unknown name raises
+    `AudioDesignError` with what to use instead. `check(voice_end, duration)` raises if anything but soft struck
+    foley starts in the ending (from 0.5 s before the last word ends). `assets()` and `tracks()` write the
+    `<audio>`/`<generated>` assets and the `<audioTrack>`s (effects duck 8 dB under the voice, beds 5 dB);
+    `bake_beds()` cuts each bed to the film with its fades baked in, because a track's `fadeOut` acts at the end
+    of its asset, not of the document. `Cues(extra={...})` adds a project's own cues and cannot bring a retired
+    name back.
+  - `library()`, `cue(name)`, `retired()`, `tail_ok()`, `resolve_digest(root)`.
+  - `scene_cues(xml)` and `scene_tail_violations(xml, voice_end)` read the cues back from a scene document.
+- `pnkit/data/sfx_library.json`: the palette. 19 AudioForge cues and 14 files made by `tools/foley.py`, each with its
+  default gain, its class (struck, noise, impact, bed, sting), whether it may start after the last word, what it is
+  for and where it comes from; and the five retired cues with their AudioForge model, their replacement and why.
+- `tools/foley.py [OUT_DIR]`: synthesises the palette's own sounds (struck bodies with fixed modes, filtered noise,
+  three beds). Deterministic; ends with a self-check that fails on a gliding tonal partial. Voice venv.
+- `tools/tail_check.py MEDIA --voice-end T | --timings JSON [--scene SCENE]`: measures an encoded film's ending. It
+  reports the cues that start in it, the longest held pure partial above 380 Hz (limit 0.4 s), that partial's mean
+  share (limit 30 %), glides, and the decay (the last 0.1 s at least 15 dB under the level 2 s earlier). Voice venv.
+- `pnkit.vo.asr_currency(text)`: `$450 billion` becomes `450 billion dollars`, for both sides of a word-error check
+  before the project's number speller. Whisper writes the symbol first; a normaliser that only drops it scores a
+  false error on every figure. `asr_normalise` is unchanged and does not call it.
+- `pnkit/data/vo_lexicon.json` (en): five Whisper aliases from v015 (`complimentary` for "complementary", and the
+  names AlphaGenome, LiveAvatar, HardFlow and MIT as Whisper writes them) and the rule for money.
+- Tests: `tests/test_audio.py` (15) and two in `tests/test_vo.py`. The four that exercise `tools/tail_check.py` need
+  numpy and scipy and are skipped without them; run the suite with `~/.venvs/voice/bin/python` to include them.
+
+Checked against
+- v013 (golden): `run_v013.py --ab --validate` and `--ab --draft --validate`, identical.
+- v015 (not a golden project; it does not vendor this version):
+  - `Cues.assets()` and `Cues.tracks()` reproduce the audio assets and tracks of all twenty scene documents byte for
+    byte, and `tail_violations()` finds none in them.
+  - `tools/foley.py` writes the same fourteen files (SHA-256).
+  - `tools/tail_check.py` prints the same line as the pack's `qa/sNN/tail.txt` for all twenty encoded files.
+  - Controls: a low chord dying away passes; a 1175 Hz tone held for 3.4 s fails (held 3.46 s); a 600 to 2400 Hz sweep
+    fails (glide).
+
+Not in this release
+- v015's 2D `stage()` camera: `pnkit.camera.Cam` already does it, with the safe-rectangle clamp and `verify()`.
+- A self-contained Short builder and 3D camera helpers (projection, self-aimed keys, tags tracked to 3D points):
+  candidates for a later release; `pnkit.shorts` still builds Shorts by cutting the long film.
+
 ## 0.3.0 — 2026-10-01
 
 Adds baked tapered-tube meshes and an articulated 3D figure built from them, generalized from

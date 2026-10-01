@@ -34,11 +34,16 @@ pnkit/            the package; vendored into projects as film/vendor/pnkit/
   figure.py       an articulated 3D figure (stand/walk/run/crouch/kneel-fire/prone) built from mesh.py's bones
   vo.py           the narration dictionary: speak, hazards, rules, entries, asr_aliases, asr_normalise
   data/vo_lexicon.json   its data by language (en, pt-br): respellings, rules, Whisper aliases, each with a source
+  audio.py        a film's sound cues, held to the audio-design rule: Cues (sfx, ambience, check, assets, tracks,
+                  bake_beds), retired, tail_ok, scene_cues, scene_tail_violations
+  data/sfx_library.json  the channel's palette (AudioForge cues and tools/foley.py's files) and the retired cues
 kit.json          the catalog: every component, its parameters and the guide rules it satisfies
 tools/sync.py     vendor pnkit into a project and write its lock
 tools/check_lock.py   verify a project's vendored copy against its lock
 tools/gate.py     validate --deny-warnings, eval at probe times (E05/E06), flash-check state
 tools/vo_probe.py how Kokoro reads a line, heard back by Whisper, with internal pauses (voice venv)
+tools/foley.py    synthesise the palette's own sounds into sfx/custom (struck bodies, filtered noise; voice venv)
+tools/tail_check.py   measure an encoded film's ending: cues, held pure tone, glide, decay (voice venv)
 tests/            unit tests (python3 -m unittest discover -s tests) and the golden test (tests/golden/)
 ```
 
@@ -80,6 +85,14 @@ tests/            unit tests (python3 -m unittest discover -s tests) and the gol
    `vo.hazards(say, "en")` before synthesis, and `vo.asr_normalise` on both sides of the Whisper check. Test a new term
    with `~/.venvs/voice/bin/python ~/videos/lib/tools/vo_probe.py --lang en "bare." "respelled."` and add it to
    `pnkit/data/vo_lexicon.json` with its source (guide §12 step 3).
+   Sound: `from vendor.pnkit import audio`, then `CUES = audio.Cues()`, `CUES.sfx(t, "clunk", 0.26)` and
+   `CUES.ambience("room", 0.1)` where the film places its sounds. A retired cue (a pitch sweep, a synthetic sting) or
+   an unknown name raises `audio.AudioDesignError`. Before writing the document call `CUES.check(voice_end, duration)`:
+   after the last word only soft struck foley may start. Write `CUES.assets(duration, tag, digest)` with the assets and
+   `CUES.tracks(duration)` in the audio mix, and call `CUES.bake_beds(ROOT, duration, tag)` so each bed ends with the
+   film. Make the palette's own files once per project with `~/.venvs/voice/bin/python ~/videos/lib/tools/foley.py`
+   (run in the project directory). After the encode, `tools/tail_check.py out/film.mp4 --voice-end T --scene
+   film.scene.xml` measures the ending itself. `~/videos/v015-short-pack` is where the rule and the palette come from.
 3. Keep episode code in the project: the timeline, acts, subjects and emblems, effects and sound. Pass them in
    where pnkit takes a callable or a parameter.
 4. Before delivery, run `python3 ~/videos/lib/tools/check_lock.py PROJECT_DIR`, which checks that the copy is

@@ -108,6 +108,16 @@ class AsrNormalise(unittest.TestCase):
     def test_both_sides_compare_equal(self):
         self.assertEqual(vo.asr_normalise("An A.I. model on arXiv", "en"), vo.asr_normalise("an AI model on archive", "en"))
 
+    def test_v015_homophone_and_names(self):
+        self.assertEqual(vo.asr_normalise("with complimentary parts", "en"), vo.asr_normalise("with complementary parts", "en"))
+        self.assertEqual(vo.asr_normalise("a method from MIT called HardFlow", "en"), vo.asr_normalise("a method from M I T called hard flow", "en"))
+        self.assertEqual(vo.asr_normalise("the complimentary ticket", "en"), "the complementary ticket")     # whole tokens, both sides
+
+    def test_currency(self):
+        self.assertEqual(vo.asr_currency("worth $11.6 billion over seven years"), "worth 11.6 billion dollars over seven years")
+        self.assertEqual(vo.asr_currency("$450 billion of debt, $5 a share, $1,250"), "450 billion dollars of debt, 5 dollars a share, 1,250 dollars")
+        self.assertEqual(vo.asr_currency("no money here: 450 billion"), "no money here: 450 billion")
+
 
 if __name__ == "__main__":
     unittest.main()

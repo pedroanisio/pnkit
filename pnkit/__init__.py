@@ -4,8 +4,9 @@ A Python package (standard library only) that writes inline scene XML: formattin
 registries (doc), text (text), shapes (draw), the 2D camera with its safe-rect clamp and check (camera), the brand
 kit's prologue and components (brand), captions (captions), Shorts overlays and spans (shorts), the physics
 block (physics), baked tapered-tube meshes for geometry no native primitive covers (mesh), an articulated 3D
-figure built from them (figure), and the narration dictionary (vo: written -> spoken text by language, and a
-pre-synthesis check). Projects vendor it into film/vendor/pnkit with tools/sync.py and pin it with a lock file.
+figure built from them (figure), the narration dictionary (vo: written -> spoken text by language, and a
+pre-synthesis check) and a film's sound cues held to the audio-design rule (audio: the palette, the retired sweeps and
+stings, soft struck foley only after the last word). Projects vendor it into film/vendor/pnkit with tools/sync.py and pin it with a lock file.
 
     from vendor import pnkit
     DOC = pnkit.Doc(1920, 1080, styles={...})
@@ -14,11 +15,11 @@ pre-synthesis check). Projects vendor it into film/vendor/pnkit with tools/sync.
 import functools, types
 
 from .doc import Doc
-from . import xml, palette, text, draw, camera, brand, captions, shorts, physics, mesh, figure, vo
+from . import xml, palette, text, draw, camera, brand, captions, shorts, physics, mesh, figure, vo, audio
 
-__version__ = "0.3.0"
+__version__ = "0.4.0"
 __all__ = ["Doc", "bind", "__version__", "xml", "palette", "text", "draw", "camera", "brand", "captions", "shorts",
-           "physics", "mesh", "figure", "vo"]
+           "physics", "mesh", "figure", "vo", "audio"]
 
 
 def bind(doc):

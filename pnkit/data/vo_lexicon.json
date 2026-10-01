@@ -634,6 +634,12 @@
     "rule": "Hyphenated identifiers (model tags, handles) lose the hyphen and are written as the words they are said as.",
     "example": "jev-latest -> Jev latest",
     "source": "v013"
+   },
+   {
+    "rule": "Write money as words with the unit last in the spoken text. In the word-error check, pass both sides through vo.asr_currency() before spelling the numbers.",
+    "example": "'$11.6 billion' -> 'eleven point six billion dollars'; a transcript's '$450 billion' -> '450 billion dollars'",
+    "why": "Whisper writes the symbol first ('$450 billion') for a narration that says 'four hundred fifty billion dollars'; a normaliser that only drops the symbol loses the word 'dollars' and scores a false error on every figure",
+    "source": "v015-short-pack s18 and s19 (tools/vo_core.py norm); Whisper large-v3 on Kokoro af_heart, 2026-10-01"
    }
   ],
   "asr_aliases": [
@@ -746,6 +752,31 @@
     "heard": "discs",
     "means": "disks",
     "source": "v012, v900-qft, raibo2 (Whisper writes American spellings; fold both sides)"
+   },
+   {
+    "heard": "complimentary",
+    "means": "complementary",
+    "source": "v015-short-pack s19 (a homophone: Whisper large-v3 writes the commoner spelling for Kokoro's 'complementary')"
+   },
+   {
+    "heard": "alphagenome",
+    "means": "alpha genome",
+    "source": "v015-short-pack s13 (Whisper writes the product name as one word)"
+   },
+   {
+    "heard": "liveavatar",
+    "means": "live avatar",
+    "source": "v015-short-pack s09 (Whisper writes the project name as one word)"
+   },
+   {
+    "heard": "hardflow",
+    "means": "hard flow",
+    "source": "v015-short-pack s08 (Whisper writes the method's name as one word)"
+   },
+   {
+    "heard": "mit",
+    "means": "m i t",
+    "source": "v015-short-pack s08 (the spoken text spells the letters; Whisper writes the acronym as one token)"
    }
   ]
  },
