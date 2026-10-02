@@ -5,6 +5,50 @@ release adds components or parameters and keeps every existing default's output 
 prove it); a change to an existing default's output is a major release until 1.0, and a minor one is never allowed
 to hide it. Each release names the golden projects it was checked against.
 
+## 0.6.0 — 2026-10-02 — captions: no cue ahead of the voice
+
+Changes what `pnkit.captions` writes (cue start and end times, and where a few cues are cut), so by the rule above
+it is a breaking release (0.6.0). A project moves to it by syncing and rebuilding; its
+sidecar changes.
+
+Found by the sound specialist and an independent reviewer on v019 and v024: captions appeared before the voice. In
+0.5.0 a cue led its first word by `max(what its reading time needs, 0.25 s)`, so 0.25 s was a floor and a long cue
+after a pause was shown up to the whole pause early (v019: median 0.31 s, 90th percentile 0.66 s, at most 1.01 s,
+37 of 62 cues over 0.25 s).
+
+Changed
+- `LEAD` (0.30 s), `FIRST_LEAD` (0.35 s) and `HOLD` (1.0 s) are new constants. `timed` starts no cue more than
+  `LEAD` s before its first word (`FIRST_LEAD` s for the first cue of the film; it was 0.5 s), whatever the cue
+  needs.
+- `timed` takes a cue's extra reading time (17 characters/s, `min_show`) from its tail first: the cue is held after
+  its last word, up to `HOLD` s and never past the next cue's start. Only what the tail cannot give comes from the
+  lead, up to the cap. In 0.5.0 the lead was served first and the tail had no limit when the time was needed; a cue
+  that needs nothing still leads by up to 0.25 s and lingers up to 1 s when the pauses allow, as before.
+- A cue that lead and tail together cannot hold under 17 characters/s or for `min_show` s is no longer shown early:
+  `split_cues` counts it as a fault (its estimate of a cue's room now has the same caps) and `_mend` cuts it again
+  with its neighbours, as it already did for a cue under `min_show` s. So some cues are cut elsewhere than in 0.5.0,
+  and a short sentence said straight after a long one may join it ("... ahead of the ground. Every day.").
+- Unchanged: breaks (numbers, names, weak words), two lines of 42, 17 characters/s, 1 s minimum, no overlaps, every
+  word once and in order.
+
+Checked against (sidecars regenerated in a scratch folder from each film's word times; nothing written to a project)
+
+| film | cues | lead before the first word: median / 90th percentile / max, 0.5.0 | same, now | `qa/caption_check.py` |
+|---|---|---|---|---|
+| v019 | 62 -> 62 | 0.31 / 0.66 / 1.01 s | 0.19 / 0.25 / 0.29 s | pass |
+| v024 | 57 -> 56 | 0.25 / 0.54 / 0.92 s | 0.25 / 0.25 / 0.34 s (the first cue; 0.28 s after it) | pass |
+| v028 | 65 -> 65 | 0.25 / 0.52 / 0.72 s | 0.25 / 0.25 / 0.30 s | pass |
+
+- v019 and v028 keep every cue's text and line break; only times change. v024 has 8 cues recut into 7: its word
+  times leave no pause after "ground." and "error.", so "Every day." and "Per day." join the sentence before them,
+  and two sentences that open fast are cut one word group later.
+- Known limit, at the Short width (26) on a whole film's words, which no product uses: one v024 cue ("Every
+  satellite since has been built", said at 21 characters/s with no pause after it) stays at 17.8 characters/s; 0.5.0
+  showed it 0.46 s early instead. No legal recut within its neighbours fits two lines of 26. One v028 cue was already
+  at 17.8 in 0.5.0 and is unchanged.
+- Tests: `tests/test_captions.py` gains `LeadCap` (7): a long cue after a short pause, the first cue, a cue that
+  extends into its tail, the tail before the lead, a cue that must merge, both widths.
+
 ## 0.5.0 — 2026-10-01 — captions: breaks and minimum display time
 
 Changes what `pnkit.captions` writes, so by the rule above it is a breaking release (0.5.0),

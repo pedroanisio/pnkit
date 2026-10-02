@@ -10,15 +10,17 @@ Rules (guide §5 Typography, §13, §14 QA gates):
   - one function, line_break(), decides whether a cue fits two lines and where its line breaks, so a cue is shown
     with the break it was accepted with;
   - each cue is shown for at least len(text) / CPS s (16.5 characters/s, inside the guide's 17) and never under
-    MIN_SHOW s, taking the extra time from the pauses either side, and lingers up to 1 s when a pause allows; a cue
-    the pauses cannot hold for MIN_SHOW s ("No." before the next sentence) joins a neighbour.
+    MIN_SHOW s. The extra time comes from the cue's own tail first (it is held after its last word, up to HOLD s
+    and never into the next cue), then from a lead before its first word, never more than LEAD s (FIRST_LEAD s for
+    the first cue of the film): a caption does not run ahead of the voice. A cue that still cannot be shown long
+    enough ("No." before the next sentence, a long cue said fast) joins a neighbour.
 
 Words carry their written punctuation ("decisions," "odds."); times are seconds on whatever clock the caller uses
 (film time for a sidecar, output time for a Short). Nothing here reads files or timelines.
 """
 import html, itertools, math, re
 
-__all__ = ["LINE", "SHORT_LINE", "CPS", "MAX_CPS", "MIN_SHOW", "PAUSE", "WEAK", "NUMBERS", "NUM_TAIL", "is_number",
+__all__ = ["LINE", "SHORT_LINE", "CPS", "MAX_CPS", "MIN_SHOW", "LEAD", "FIRST_LEAD", "HOLD", "PAUSE", "WEAK", "NUMBERS", "NUM_TAIL", "is_number",
            "no_break", "line_break", "split_units", "split_cues", "two_lines", "timed", "cue_xml", "sidecar",
            "short_cues", "stats"]
 
@@ -27,6 +29,9 @@ CPS = 16.5                        # display-time rate the timing aims for, chara
 MAX_CPS = 17                      # the guide's readability limit, characters/s
 RATE_SOFT = 16.8                  # cue splitting penalises a part read faster than this
 MIN_SHOW = 1.0                    # no cue is shown for less than this, s
+LEAD = 0.30                       # no cue starts more than this before its first word, s
+FIRST_LEAD = 0.35                 # the same for the first cue of the film, s
+HOLD = 1.0                        # a cue is held at most this long after its last word, s
 PAUSE = 0.45                      # a pause longer than this ends a unit, like a sentence end
 FAULT = 50.0                      # cue splitting: the cost of one break where none may fall, of one cue too short or too fast
 WEAK = frozenset({"the", "a", "an", "of", "that", "are", "is", "to", "for", "and", "or", "if", "in", "with", "its", "it", "on",
@@ -139,10 +144,10 @@ def split_cues(words, width=LINE, first_end=None, weak=WEAK, min_show=MIN_SHOW):
         stuck = no_break(toks, weak, opens)
         after = units[ui + 1][0][1] if ui + 1 < len(units) else u[-1][2] + 3.0
         if ui == 0:                                         # the lead timed() can give the unit's first cue
-            early = min(0.5, u[0][1])
+            early = min(FIRST_LEAD, u[0][1])
         else:                                               # the pause before it, less what the cue before needs of it
             q = out[-1]; said = q[-1][2] - q[0][1]
-            early = max(0.0, u[0][1] - q[-1][2] - 0.04 - max(0.15, len(" ".join(w[0] for w in q)) / CPS - said, min_show - said))
+            early = min(LEAD, max(0.0, u[0][1] - q[-1][2] - 0.04 - max(0.15, len(" ".join(w[0] for w in q)) / CPS - said, min_show - said)))
         memo = {}
 
         def part(a, b):
@@ -155,7 +160,7 @@ def split_cues(words, width=LINE, first_end=None, weak=WEAK, min_show=MIN_SHOW):
                     memo[a, b] = None
                 else:
                     chars = len(" ".join(toks[a:b]))
-                    room = (u[b][1] if b < len(u) else after) - 0.04 - p[0][1]      # the longest it can be shown
+                    room = min((u[b][1] if b < len(u) else after) - 0.04, p[-1][2] + HOLD) - p[0][1]   # the longest it can be shown
                     lead = early if a == 0 else 0.0
                     fast = chars / max(0.1, room + lead) > MAX_CPS
                     memo[a, b] = (chars / max(0.3, p[-1][2] - p[0][1] + 0.5), (not L[1]) + (room + min(lead, 0.15) < min_show) + 3 * fast,
@@ -277,26 +282,27 @@ def two_lines(text, width, weak=WEAK, start=True):
 
 def timed(cues, cps=CPS, min_show=MIN_SHOW):
     """[(cue, start, end)]: display windows. Each cue needs len(text)/cps s and at least min_show s; beyond its own
-    speech it takes that time from the pauses either side (its tail first, then the next cue's lead; what only
-    min_show asks for comes from the cue's own tail, so a short cue is never shown long before it is said: when the
-    tail has no room split_cues joins it to a neighbour), and lingers up to 1 s when a pause allows."""
+    speech it takes that time from its tail first (held after its last word, up to HOLD s and never into the next
+    cue), and only what the tail cannot give from a lead before its first word. No cue starts more than LEAD s
+    before its first word (FIRST_LEAD s for the first cue), whatever it needs: when lead and tail together are not
+    enough split_cues joins it to a neighbour. A cue lingers up to HOLD s when a pause allows."""
     n = len(cues)
     span = [(c[0][1], c[-1][2]) for c in cues]
-    need = [max(0.15, len(" ".join(w[0] for w in c)) / cps - (b - a)) for c, (a, b) in zip(cues, span)]
-    more = [max(0.0, min_show - (b - a) - nd) for nd, (a, b) in zip(need, span)]
+    need = [max(0.15, len(" ".join(w[0] for w in c)) / cps - (b - a), min_show - (b - a)) for c, (a, b) in zip(cues, span)]
     gap = [max(0.0, span[k + 1][0] - span[k][1] - 0.04) if k + 1 < n else 3.0 for k in range(n)]
+    short = [max(0.0, nd - min(g, HOLD)) for nd, g in zip(need, gap)]         # what a cue's own tail cannot give it
     lead, tail = [0.0] * n, [0.0] * n
-    lead[0] = min(max(0.25, min(need[0], 0.5)), span[0][0])
+    lead[0] = min(max(0.25, min(short[0], FIRST_LEAD)), span[0][0])
     for k in range(n):
         g = gap[k]
-        t = min(max(0.0, need[k] + more[k] - lead[k]), g)
+        t = min(max(0.0, need[k] - lead[k]), g, HOLD)
         if k + 1 < n:
-            l_ = min(need[k + 1], g - t)
+            l_ = min(short[k + 1], g - t, LEAD)
             r = g - t - l_
-            t += min(r, max(0.0, 1.0 - t)) * (0.7 if l_ < 0.25 else 1.0)
+            t += min(r, max(0.0, HOLD - t)) * (0.7 if l_ < 0.25 else 1.0)
             lead[k + 1] = min(g - t, max(l_, min(0.25, g - t)))
         else:
-            t = max(t, min(g, 1.0))
+            t = max(t, min(g, HOLD))
         tail[k] = t
     show = [(max(0.0, a - lead[k]), b + tail[k]) for k, (a, b) in enumerate(span)]
     return [(c, a, min(b, show[k + 1][0]) if k + 1 < n else b)       # word times that overlap never make cues overlap

@@ -1,5 +1,5 @@
 """captions: cue rules (<= 2 x 42 characters, <= 17 characters/s, sentence and pause units, weak-word breaks),
-display timing, Short cues in output time."""
+display timing (minimum time on screen, lead before the voice), Short cues in output time."""
 import os, re, sys, unittest
 sys.path.insert(0, os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 from pnkit import captions as C
@@ -248,6 +248,96 @@ class MinimumShow(unittest.TestCase):
         words = speak("No.") + speak("Before the test it was one in a hundred.", t0=0.6)
         self.assertEqual(len(C.split_cues(words, min_show=0.0)), 2)
         self.assertEqual(len(C.split_cues(words)), 1)
+
+
+FAST = dict(per_char=0.036, word_gap=0.02)                  # about 21 characters/s: faster than a cue may be read
+LONG = "The controller had never once seen a wing in all of its training."
+
+
+def leads(tl):
+    """how long before its first word each cue starts"""
+    return [c[0][1] - a for c, a, b in tl]
+
+
+class LeadCap(unittest.TestCase):
+    """no cue runs ahead of the voice: at most LEAD s before its first word, FIRST_LEAD s for the first cue (found on
+    v019 and v024: a long cue after a pause was shown up to 1.01 s early)"""
+    def check(self, cues, words):
+        self.assertEqual([w for c in cues for w in c], words)
+        tl = C.timed(cues)
+        for k, ((c, a, b), lead) in enumerate(zip(tl, leads(tl))):
+            text = " ".join(w[0] for w in c)
+            self.assertLessEqual(lead, (C.LEAD if k else C.FIRST_LEAD) + 1e-9, text)
+            self.assertGreaterEqual(lead, -1e-9, text)
+            self.assertLessEqual(b - c[-1][2], C.HOLD + 1e-9, text)
+            self.assertGreaterEqual(b - a, C.MIN_SHOW - 1e-9, text)
+            self.assertLessEqual(len(text) / (b - a), C.MAX_CPS, text)
+            self.assertIsNotNone(C.line_break([w[0] for w in c], C.LINE, start=C._opens(cues, k)))
+            if k + 1 < len(tl):
+                self.assertLessEqual(b, tl[k + 1][1] + 1e-9, text)
+        return tl
+
+    def test_constants(self):
+        self.assertEqual((C.LEAD, C.FIRST_LEAD, C.HOLD), (0.30, 0.35, 1.0))
+
+    def test_a_long_cue_after_a_short_pause(self):
+        words = speak("It works.") + speak(LONG, t0=1.6, **FAST)             # 0.84 s of pause before it, 2 s after
+        words += speak("Then it met one.", t0=words[-1][2] + 2.0)
+        cues = C.split_cues(words)
+        self.assertEqual([" ".join(w[0] for w in c) for c in cues], ["It works.", LONG, "Then it met one."])
+        (c, a, b) = self.check(cues, words)[1]
+        self.assertGreater(len(LONG) / C.CPS - (c[-1][2] - c[0][1]), 0.7)   # it needs 0.75 s more than it is said in
+        self.assertGreater(b - c[-1][2], 0.45)                               # and gets it after its last word
+
+    def test_the_first_cue(self):
+        words = speak(LONG, t0=2.0, **FAST)                                 # 2 s of silence before it, none after
+        words += speak("Then it met one.", t0=words[-1][2] + 0.1)
+        asked = [words[:13], words[13:]]                                    # as two cues the first is over the limit:
+        (c, a, b) = C.timed(asked)[0]                                       # timed() does not show it earlier for that
+        self.assertAlmostEqual(c[0][1] - a, C.FIRST_LEAD)
+        self.assertGreater(len(LONG) / (b - a), C.MAX_CPS)
+        tl = self.check(C.split_cues(words), words)                         # so split_cues joins the two
+        self.assertEqual(len(tl), 1)
+        self.assertEqual(C.timed([speak("One two three four five six.", t0=0.1)])[0][1], 0.0)   # never before the film
+
+    def test_a_cue_extends_into_its_tail(self):
+        words = speak("It works.") + speak(LONG, t0=1.8, **FAST)             # 1 s of pause before it, 0.7 s after
+        words += speak("Then it met one.", t0=words[-1][2] + 0.7)
+        cues = C.split_cues(words)
+        self.assertEqual(len(cues), 3)
+        tl = self.check(cues, words)
+        (c, a, b), nxt = tl[1], tl[2]
+        need = len(LONG) / C.CPS - (c[-1][2] - c[0][1])
+        self.assertGreater(need, C.LEAD + 0.4)                              # more than a lead may give
+        self.assertGreaterEqual((b - c[-1][2]) + (c[0][1] - a), need - 1e-9)
+        self.assertGreaterEqual(b - c[-1][2], need - C.LEAD - 1e-9)        # the rest is held after its last word
+        self.assertLessEqual(b, nxt[1])
+
+    def test_the_tail_is_used_before_the_lead(self):
+        cue = speak(LONG, t0=3.0, **FAST)                                   # pauses of 2 s either side
+        tl = C.timed([speak("It works."), cue, speak("Then it met one.", t0=cue[-1][2] + 2.0)])
+        self.assertLessEqual(leads(tl)[1], 0.25 + 1e-9)                     # no more than any cue's lead
+        self.assertGreaterEqual(tl[1][2] - cue[-1][2], len(LONG) / C.CPS - (cue[-1][2] - cue[0][1]) - 0.25 - 1e-9)
+
+    def test_a_cue_that_must_merge(self):
+        words = speak("It works.") + speak("The controller had never once seen a wing", t0=2.4, **FAST)
+        words += speak("in all of its training, and then it met one over the sea.", t0=words[-1][2] + 0.02)
+        asked = [words[:2], words[2:10], words[10:]]                        # a fast cue with no tail: 1.6 s of pause before it
+        (c, a, b) = C.timed(asked)[1]
+        self.assertAlmostEqual(c[0][1] - a, C.LEAD)                         # is not shown earlier than LEAD s,
+        self.assertGreater(len(" ".join(w[0] for w in c)) / (b - a), C.MAX_CPS)
+        cues = C.split_cues(words)                                          # it is cut again with its neighbour
+        self.assertNotIn(asked[1], cues)
+        self.check(cues, words)
+
+    def test_whole_text_and_short_width(self):
+        for width in (C.LINE, C.SHORT_LINE):
+            for text in (TEXT, " ".join(WeakWords.LINES)):
+                for pace in ({}, dict(per_char=0.055, sentence_gap=0.9)):
+                    words = speak(text, t0=1.0, **pace)
+                    tl = C.timed(C.split_cues(words, width))
+                    for k, lead in enumerate(leads(tl)):
+                        self.assertLessEqual(lead, (C.LEAD if k else C.FIRST_LEAD) + 1e-9)
 
 
 class Xml(unittest.TestCase):
