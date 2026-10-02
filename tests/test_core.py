@@ -1,5 +1,6 @@
 """xml, text and draw helpers: formatting, ids, fades, the 36 px label floor, text-asset caching, pills."""
 import os, sys, unittest
+import xml.etree.ElementTree as ET
 sys.path.insert(0, os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 import pnkit
 from pnkit.xml import f, esc, Ids, opacity, keys, path_d, hash01
@@ -55,6 +56,22 @@ class Text(unittest.TestCase):
     def test_label_anchor(self):
         x = text.label(self.doc, "LEFT", 200, 300, 1, 4, anchor="left")
         self.assertIn('anchorX="0"', x); self.assertIn('align="start"', self.doc.assets[-1])
+
+    def test_open_ended_label_waits_for_start_and_holds(self):
+        node=ET.fromstring(text.label(self.doc,'LATER',200,300,2,None,fin=.4,peak=.6))
+        points=node.find("animate[@property='opacity']").findall('key')
+        self.assertEqual([(float(p.get('time')),float(p.get('value'))) for p in points],[(2,0),(2.4,.6)])
+        self.assertEqual(points[0].get('interpolation'),'cubic-out')
+        self.assertNotIn('value="0"', ET.tostring(points[-1],encoding='unicode'))
+
+    def test_open_ended_label_instant_and_zero_start(self):
+        node=ET.fromstring(text.label(self.doc,'STEP',200,300,2,None,fin=0))
+        points=node.find("animate[@property='opacity']").findall('key')
+        self.assertEqual([(float(p.get('time')),float(p.get('value'))) for p in points],[(0,0),(2,1)])
+        self.assertEqual(points[0].get('interpolation'),'hold')
+        node=ET.fromstring(text.label(self.doc,'NOW',200,300,0,None,fin=0,peak=.7))
+        points=node.find("animate[@property='opacity']").findall('key')
+        self.assertEqual([(float(p.get('time')),float(p.get('value'))) for p in points],[(0,.7)])
 
     def test_spans(self):
         text.text_asset(self.doc, "A B", 40, spans=[("A ", None, None), ("B", "accent", "#E8581C")])

@@ -5,7 +5,7 @@ label() places one as a layer that fades in and out, and enforces the informatio
 information is at least 36 px at 1080p (guide §5, Typography). Brand components (pn-label 28 px, pn-cite 24 px)
 are not labels in this sense and are made by pnkit.brand at the kit's sizes.
 """
-from .xml import f, esc, opacity
+from .xml import f, esc, opacity, keys
 from .palette import CREAM
 
 __all__ = ["MIN_INFO_PX", "WIDTH_PER_EM", "text_asset", "label", "text_box"]
@@ -46,7 +46,8 @@ def text_asset(doc, text, size=40, color=CREAM, style="text", width=None, height
 
 def label(doc, text, x, y, a, b, size=40, color=CREAM, style="text", anchor="center", fin=0.4, fout=0.4, extra="", width=None,
           tracking=None, peak=1.0, preset=None, pdur=0.8, wrap=None, height=None, spans=None, lid=None, attrs=""):
-    """a text layer anchored center|left|right at (x, y), vertically centred, visible [a, b] (b None: no fade).
+    """a text layer anchored center|left|right at (x, y), vertically centred, visible [a, b].
+    With b None it fades in at a over fin and holds peak indefinitely, with no fade-out.
     size is raised to MIN_INFO_PX. preset: a textAnimator preset starting at a for pdur s. extra: XML appended inside
     the layer (more animation); attrs: attributes appended to the layer tag."""
     size = max(size, MIN_INFO_PX)
@@ -54,5 +55,12 @@ def label(doc, text, x, y, a, b, size=40, color=CREAM, style="text", anchor="cen
                            tracking=tracking, wrap=wrap, height=height, spans=spans)
     ax = {"center": w / 2, "left": 0, "right": w}[anchor]
     anim = f'<textAnimator preset="{preset}" presetStart="{f(a)}" presetDuration="{f(pdur)}"/>' if preset else ""
-    op = opacity(a, b, fin, fout, peak) if b is not None else ""
+    if b is not None:
+        op = opacity(a, b, fin, fout, peak)
+    elif fin > 0:
+        op = keys('opacity', [(a, 0, 'cubic-out'), (a + fin, peak)])
+    elif a > 0:
+        op = keys('opacity', [(0, 0, 'hold'), (a, peak, 'hold')])
+    else:
+        op = keys('opacity', [(a, peak, 'hold')])
     return f'<layer id="{lid or doc.uid("l-" + aid)}" asset="{aid}" x="{f(x)}" y="{f(y)}" anchorX="{f(float(ax))}" anchorY="{f(h / 2)}"{attrs}>{anim}{op}{extra}</layer>'
