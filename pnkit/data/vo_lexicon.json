@@ -2,7 +2,7 @@
  "_meta": {
   "about": "The narration dictionary: how written script text becomes the text a TTS engine is given, by language. Read by pnkit.vo.",
   "fields": {
-   "entries": "written -> spoken respellings, applied as whole tokens by vo.speak (engine: any | kokoro | chatterbox | piper)",
+   "entries": "written -> spoken respellings, applied as whole tokens by vo.speak (engine: any | kokoro | chatterbox | piper | elevenlabs)",
    "rules": "conventions for the spoken text that a lookup cannot apply (numbers, dates, pauses, names)",
    "asr_aliases": "Whisper QA only: map both the reference and the transcript through these before the word-error rate; never used to write spoken text"
   },
@@ -893,6 +893,90 @@
     "engine": "any",
     "why": "a period followed by a space ends the sentence for the splitter",
     "source": "v013 (same splitter)"
+   },
+   {
+    "written": "ABC",
+    "spoken": "á bê cê",
+    "engine": "elevenlabs",
+    "why": "read 'ABC' in English by ElevenLabs (Henrique, eleven_v4, pt-BR); respelled as letter names, approved by the owner's ear on 2026-10-07. Whisper cannot verify letter names.",
+    "source": "lula-filme p3/CHANGES.md, owner approval 2026-10-07"
+   },
+   {
+    "written": "PT",
+    "spoken": "pê tê",
+    "engine": "elevenlabs",
+    "why": "ElevenLabs (Henrique, eleven_v4, pt-BR) reads the bare acronym in English or as a word; this respelling was approved by the owner's ear on 2026-10-07. Whisper cannot verify letter names, so only a listener can confirm it.",
+    "source": "lula-filme p3/CHANGES.md, owner approval 2026-10-07"
+   },
+   {
+    "written": "FHC",
+    "spoken": "éfe agá cê",
+    "engine": "elevenlabs",
+    "why": "ElevenLabs (Henrique, eleven_v4, pt-BR) reads the bare acronym in English or as a word; this respelling was approved by the owner's ear on 2026-10-07. Whisper cannot verify letter names, so only a listener can confirm it.",
+    "source": "lula-filme p3/CHANGES.md, owner approval 2026-10-07"
+   },
+   {
+    "written": "IBGE",
+    "spoken": "í bê gê é",
+    "engine": "elevenlabs",
+    "why": "ElevenLabs (Henrique, eleven_v4, pt-BR) reads the bare acronym in English or as a word; this respelling was approved by the owner's ear on 2026-10-07. Whisper cannot verify letter names, so only a listener can confirm it.",
+    "source": "lula-filme p3/CHANGES.md, owner approval 2026-10-07"
+   },
+   {
+    "written": "STJ",
+    "spoken": "ésse tê jota",
+    "engine": "elevenlabs",
+    "why": "ElevenLabs (Henrique, eleven_v4, pt-BR) reads the bare acronym in English or as a word; this respelling was approved by the owner's ear on 2026-10-07. Whisper cannot verify letter names, so only a listener can confirm it.",
+    "source": "lula-filme p3/CHANGES.md, owner approval 2026-10-07"
+   },
+   {
+    "written": "PF",
+    "spoken": "pê éfe",
+    "engine": "elevenlabs",
+    "why": "ElevenLabs (Henrique, eleven_v4, pt-BR) reads the bare acronym in English or as a word; this respelling was approved by the owner's ear on 2026-10-07. Whisper cannot verify letter names, so only a listener can confirm it.",
+    "source": "lula-filme p3/CHANGES.md, owner approval 2026-10-07"
+   },
+   {
+    "written": "CPI",
+    "spoken": "cê pê í",
+    "engine": "elevenlabs",
+    "why": "ElevenLabs (Henrique, eleven_v4, pt-BR) reads the bare acronym in English or as a word; this respelling was approved by the owner's ear on 2026-10-07. Whisper cannot verify letter names, so only a listener can confirm it.",
+    "source": "lula-filme p3/CHANGES.md, owner approval 2026-10-07"
+   },
+   {
+    "written": "PIB",
+    "spoken": "píbi",
+    "engine": "elevenlabs",
+    "why": "read as a word, respelled so ElevenLabs (Henrique, eleven_v4, pt-BR) says it as pt-BR does; approved by the owner's ear on 2026-10-07. Whisper cannot verify the reading.",
+    "source": "lula-filme p3/CHANGES.md, owner approval 2026-10-07"
+   },
+   {
+    "written": "ONU",
+    "spoken": "ônu",
+    "engine": "elevenlabs",
+    "why": "read as a word, respelled so ElevenLabs (Henrique, eleven_v4, pt-BR) says it as pt-BR does; approved by the owner's ear on 2026-10-07. Whisper cannot verify the reading.",
+    "source": "lula-filme p3/CHANGES.md, owner approval 2026-10-07"
+   },
+   {
+    "written": "SUS",
+    "spoken": "sus",
+    "engine": "elevenlabs",
+    "why": "read as a word, respelled so ElevenLabs (Henrique, eleven_v4, pt-BR) says it as pt-BR does; approved by the owner's ear on 2026-10-07. Whisper cannot verify the reading.",
+    "source": "lula-filme p3/CHANGES.md, owner approval 2026-10-07"
+   },
+   {
+    "written": "OAS",
+    "spoken": "OAS",
+    "engine": "elevenlabs",
+    "why": "read correctly as written by ElevenLabs (Henrique, eleven_v4, pt-BR). The respelling 'ó á ésse' was tried and the owner preferred the original reading (2026-10-07: 'OAS e TSE já estavam funcionando antes'); leave it as written.",
+    "source": "lula-filme p3/CHANGES.md, owner approval 2026-10-07"
+   },
+   {
+    "written": "TSE",
+    "spoken": "TSE",
+    "engine": "elevenlabs",
+    "why": "read correctly as written by ElevenLabs (Henrique, eleven_v4, pt-BR). The respelling 'tê essi é' was tried and the owner preferred the original reading (2026-10-07: 'OAS e TSE já estavam funcionando antes'); leave it as written.",
+    "source": "lula-filme p3/CHANGES.md, owner approval 2026-10-07"
    }
   ],
   "rules": [
@@ -1026,6 +1110,12 @@
     "rule": "Run vo.hazards on every spoken line before synthesis, then have a person listen to the opening line.",
     "example": "",
     "source": "v013"
+   },
+   {
+    "rule": "Whisper cannot verify letter names: a respelled acronym (á bê cê, pê tê) is heard back as the bare letters or a different word, so the word-error check passes or fails for the wrong reason. Approve a letter-name respelling by listening, and record who listened and when in the entry's source.",
+    "example": "ABC -> á bê cê (elevenlabs): approved by ear 2026-10-07; the Whisper transcript of the take cannot confirm it",
+    "why": "observed on the Lula 3.0.0 film: eleven acronyms were respelled and approved by the owner's ear because the transcript could not tell the readings apart.",
+    "source": "lula-filme p3/CHANGES.md, owner approval 2026-10-07"
    }
   ],
   "asr_aliases": [

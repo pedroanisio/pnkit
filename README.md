@@ -29,12 +29,16 @@ pnkit/            the package; vendored into projects as film/vendor/pnkit/
                   end_card, notch, ink, emblem
   captions.py     split_cues, two_lines, timed, cue_xml, sidecar, short_cues, stats; no_break, line_break (no break
                   after a weak word, inside a number or a name), MIN_SHOW (no cue under 1 s)
+                  written_words (the voice's spoken words -> caption words in the written form, "12,4%"; raises
+                  CaptionAlignError naming the token), check_text (the caption text gate: cues vs the approved text)
   shorts.py       span_times, segments, overlay, output_xml, build
   physics.py      signature, block
   mesh.py         baked tapered-tube meshes (Mesh, tapered_tube, bake_bone) for geometry no primitive covers
   figure.py       an articulated 3D figure (stand/walk/run/crouch/kneel-fire/prone) built from mesh.py's bones
-  vo.py           the narration dictionary: speak, hazards, rules, entries, asr_aliases, asr_normalise
-  data/vo_lexicon.json   its data by language (en, pt-br): respellings, rules, Whisper aliases, each with a source
+  vo.py           the narration dictionary: speak (numbers=True: pt-br digits as words), speak_map (written token ->
+                  spoken words), pt_number, pt_cardinal, hazards, rules, entries, asr_aliases, asr_normalise
+  data/vo_lexicon.json   its data by language (en, pt-br): respellings by engine (any, kokoro, chatterbox, piper,
+                  elevenlabs), rules, Whisper aliases, each with a source
   audio.py        a film's sound cues, held to the audio-design rule: Cues (sfx, ambience, check, assets, tracks,
                   bake_beds), retired, tail_ok, scene_cues, scene_tail_violations
   data/sfx_library.json  the channel's palette (AudioForge cues and tools/foley.py's files) and the retired cues
@@ -45,6 +49,9 @@ tools/gate.py     validate --deny-warnings, eval at probe times (E05/E06), flash
 tools/vo_probe.py how Kokoro reads a line, heard back by Whisper, with internal pauses (voice venv)
 tools/foley.py    synthesise the palette's own sounds into sfx/custom (struck bodies, filtered noise; voice venv)
 tools/tail_check.py   measure an encoded film's ending: cues, held pure tone, glide, decay (voice venv)
+tools/caption_gate.py CUES --approved TEXT   the caption text gate: cues (.vtt, scene .xml or .json) must equal the approved
+                  written text and, in pt-br, must not spell numbers out; exit 1 on findings
+tools/timings_diff.py A.json B.json   sentences and words whose start or end moved by more than --threshold (0.15 s)
 tests/            unit tests (python3 -m unittest discover -s tests) and the golden test (tests/golden/)
 ```
 
@@ -86,6 +93,19 @@ tests/            unit tests (python3 -m unittest discover -s tests) and the gol
    `vo.hazards(say, "en")` before synthesis, and `vo.asr_normalise` on both sides of the Whisper check. Test a new term
    with `~/.venvs/voice/bin/python ~/videos/lib/tools/vo_probe.py --lang en "bare." "respelled."` and add it to
    `pnkit/data/vo_lexicon.json` with its source (guide §12 step 3).
+   Written-form captions (a film whose voice says "doze vírgula quatro por cento" and whose screen says "12,4%"): never
+   rebuild captions from the spoken text. Keep the approved written text, synthesise from
+   `vo.speak(text, "pt-br", "elevenlabs", numbers=True)` (the engine is the one the audio is made with), and time the
+   written tokens with the TTS alignment: `words = captions.written_words(aligned_spoken_words, text, "pt-br",
+   engine="elevenlabs")` gives `[(word, start, end)]` with "12,4%" carrying the start of "doze" and the end of "cento",
+   ready for `captions.sidecar(words)`. The map comes from `vo.speak_map`, so a text that differs from what was spoken
+   raises `captions.CaptionAlignError` naming the token, instead of a guess. Before delivery run the text gate on the
+   finished cues, `python3 ~/videos/lib/tools/caption_gate.py film.scene.xml --approved approved.txt --lang pt-br`
+   (or `captions.check_text(cues, approved, "pt-br")`): it fails on a clause that was cut and is still shown, a stale
+   copy of the text, and spelled-out "vírgula" / "por cento" / number words where the approved text has digits. When a
+   narration is re-voiced, `python3 ~/videos/lib/tools/timings_diff.py old.json new.json` lists what moved (the simple
+   format is `[{"sentence": id, "text": ..., "words": [[word, start, end], ...]}]`; the Lula `timings-v2.json` shape is
+   read as it is). Letter-name respellings (ABC -> "á bê cê") are approved by ear: Whisper cannot verify them.
    Sound: `from vendor.pnkit import audio`, then `CUES = audio.Cues()`, `CUES.sfx(t, "clunk", 0.26)` and
    `CUES.ambience("room", 0.1)` where the film places its sounds. A retired cue (a pitch sweep, a synthetic sting) or
    an unknown name raises `audio.AudioDesignError`. Before writing the document call `CUES.check(voice_end, duration)`:
