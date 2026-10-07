@@ -25,7 +25,7 @@ class Data(unittest.TestCase):
         for lang in langs:
             for e in lex[lang]["entries"]:
                 self.assertTrue({"written", "spoken", "engine", "why", "source"} <= set(e), (lang, e))
-                self.assertIn(e["engine"], ("any", "kokoro", "chatterbox", "piper"), (lang, e))
+                self.assertIn(e["engine"], ("any", "kokoro", "chatterbox", "piper", "elevenlabs"), (lang, e))
             for r in lex[lang]["rules"]:
                 self.assertTrue({"rule", "example", "source"} <= set(r), (lang, r))
             for a in lex[lang]["asr_aliases"]:

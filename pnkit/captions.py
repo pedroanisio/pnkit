@@ -15,14 +15,19 @@ Rules (guide §5 Typography, §13, §14 QA gates):
     the first cue of the film): a caption does not run ahead of the voice. A cue that still cannot be shown long
     enough ("No." before the next sentence, a long cue said fast) joins a neighbour.
 
+Captions show the WRITTEN text ("12,4%"), the voice says the SPOKEN one ("doze vírgula quatro por cento"):
+written_words() puts the written tokens on the spoken words' times through vo.speak_map (and raises
+CaptionAlignError when they do not align), and check_text() holds the finished cues to the approved written text.
+
 Words carry their written punctuation ("decisions," "odds."); times are seconds on whatever clock the caller uses
 (film time for a sidecar, output time for a Short). Nothing here reads files or timelines.
 """
-import html, itertools, math, re
+import difflib, html, itertools, math, re, unicodedata
+from dataclasses import dataclass
 
 __all__ = ["LINE", "SHORT_LINE", "CPS", "MAX_CPS", "MIN_SHOW", "LEAD", "FIRST_LEAD", "HOLD", "PAUSE", "WEAK", "NUMBERS", "NUM_TAIL", "is_number",
            "no_break", "line_break", "split_units", "split_cues", "two_lines", "timed", "cue_xml", "sidecar",
-           "short_cues", "stats"]
+           "short_cues", "stats", "CaptionAlignError", "written_words", "Finding", "check_text"]
 
 LINE, SHORT_LINE = 42, 26         # characters per line: long film, Short
 CPS = 16.5                        # display-time rate the timing aims for, characters/s
@@ -356,3 +361,131 @@ def stats(words, width=LINE, weak=WEAK, cps=CPS, max_cps=MAX_CPS):
         rates.append(len(text) / (b - a))
         longest = max(longest, max(len(x) for x in two_lines(text, width, weak, _opens(cues, k))))
     return len(cues), sum(r > max_cps for r in rates), round(max(rates), 1), longest
+
+
+# ---- written-form captions and the caption text gate -------------------------------------------------------------
+
+class CaptionAlignError(ValueError):
+    """the spoken words do not line up with the written text's token-level spoken map. `token` is the written token
+    where they diverge (the last one for spoken words left over), `expected` what its spoken form should be, `got` the
+    spoken words found there."""
+
+    def __init__(self, token, index, expected, got, detail=""):
+        self.token, self.index, self.expected, self.got = token, index, expected, got
+        super().__init__(f"written token {token!r} (#{index}) does not align: expected spoken {expected!r}, got {got!r}"
+                         + (f" ({detail})" if detail else ""))
+
+
+def _norm(word):
+    return re.sub(r"[\W_]+", "", unicodedata.normalize("NFC", word).casefold())
+
+
+def written_words(spoken_words, written_text, lang, engine="kokoro", numbers=None):
+    """[(word, start, end)] in the WRITTEN form, from the timed SPOKEN words of the TTS alignment.
+
+    `written_text` is what the cues must show ("12,4%"), `spoken_words` [(word, start, end)] what the engine said and
+    the alignment timed ("doze vírgula quatro por cento"). vo.speak_map(written_text, lang, engine, numbers) says which
+    spoken words each written token became (lexicon respellings, and in pt-br digits and percent: numbers=None means
+    on for pt, off otherwise), and each caption word takes the start of its first spoken word and the end of its
+    last. Spoken words are compared by letters and digits only (case, accents kept; punctuation ignored). A token of
+    punctuation alone ("—") is joined to the previous word. Pass the same `engine` the audio was made with.
+    Raises CaptionAlignError, naming the token, when the two do not align: no silent guess. The result feeds
+    split_cues()/sidecar() as it is."""
+    from . import vo
+    if numbers is None:
+        numbers = lang.lower().split("-")[0] == "pt"
+    m = vo.speak_map(written_text, lang, engine, numbers=numbers)
+    heard = [(w, s, e) for w, s, e in spoken_words if _norm(w)]
+    out, pos, pending = [], 0, ""
+    for i, tok in enumerate(m.tokens):
+        words = [w for w in tok.words if _norm(w)]
+        if not words:                                          # punctuation only: shown with its neighbour
+            if out:
+                out[-1] = (out[-1][0] + " " + tok.written, out[-1][1], out[-1][2])
+            else:
+                pending = (pending + " " + tok.written).strip()
+            continue
+        got = heard[pos:pos + len(words)]
+        if len(got) < len(words) or any(_norm(a) != _norm(b[0]) for a, b in zip(words, got)):
+            raise CaptionAlignError(tok.written, i, " ".join(words), " ".join(g[0] for g in got) or "<end of the spoken words>")
+        out.append(((pending + " " if pending else "") + tok.written, got[0][1], got[-1][2]))
+        pending, pos = "", pos + len(words)
+    if pos < len(heard):
+        last = m.tokens[-1].written if m.tokens else ""
+        raise CaptionAlignError(last, len(m.tokens) - 1, "<end of the written text>", " ".join(h[0] for h in heard[pos:]),
+                                "extra spoken words after the last written token")
+    return out
+
+
+@dataclass(frozen=True)
+class Finding:
+    """one problem the caption text gate found: kind 'text' (the cues differ from the approved text) or 'spelled-out'
+    (a pt-br cue spells a number out); `cue` is the 0-based cue index where it can be placed"""
+    kind: str
+    cue: object
+    detail: str
+
+    def __str__(self):
+        return f"{self.kind}" + (f" (cue {self.cue})" if self.cue is not None else "") + f": {self.detail}"
+
+
+def _cue_text(cue):
+    if isinstance(cue, str):
+        t = cue
+    elif isinstance(cue, dict):
+        t = cue["text"]
+    elif isinstance(cue, (list, tuple)):
+        if len(cue) == 3 and isinstance(cue[0], (list, tuple)) and isinstance(cue[1], (int, float)):
+            cue = cue[0]                                          # a timed cue: (words, start, end)
+        t = " ".join(w if isinstance(w, str) else w[0] for w in cue)
+    else:
+        raise TypeError(f"cannot read a cue from {type(cue).__name__}")
+    return " ".join(t.split())
+
+
+def _plain(text):
+    """for the spelled-out search: lower case, no accents, single spaces, no punctuation"""
+    t = unicodedata.normalize("NFD", text.casefold())
+    t = "".join(c for c in t if not unicodedata.combining(c))
+    return " " + " ".join(re.sub(r"[^\w\s]", " ", t).split()) + " "
+
+
+def check_text(cues, approved_text, lang):
+    """the caption text gate: [Finding], empty when the cues are right.
+
+    - 'text': the cues' joined text differs from `approved_text`. Only whitespace and line breaks are normalised, so a
+      clause the owner cut, a stale copy of the text or a respelled word is a finding (each difference is reported on
+      the word level: what the cues have extra, what they miss).
+    - 'spelled-out' (pt only): a cue says "vírgula" or "por cento" that the approved text does not, or spells out a
+      number the approved text writes in digits ("dois mil e três" where it has "2003").
+    `cues`: strings, {"text": ...}, lists of words or of (word, start, end), or timed cues (words, start, end)."""
+    texts = [_cue_text(c) for c in cues]
+    approved = " ".join(approved_text.split())
+    out = []
+    cw, aw, owner = [], approved.split(), []
+    for k, t in enumerate(texts):
+        for w in t.split():
+            cw.append(w); owner.append(k)
+    if cw != aw:
+        sm = difflib.SequenceMatcher(None, aw, cw, autojunk=False)
+        for op, a1, a2, b1, b2 in sm.get_opcodes():
+            if op == "equal":
+                continue
+            cue = owner[min(b1, len(owner) - 1)] if owner else None
+            want, have = " ".join(aw[a1:a2]), " ".join(cw[b1:b2])
+            detail = {"delete": f"the cues miss {want!r}", "insert": f"the cues have extra {have!r}",
+                      "replace": f"the approved text has {want!r} where the cues have {have!r}"}[op]
+            out.append(Finding("text", cue, detail + f" (after {' '.join(aw[max(0, a1 - 3):a1])!r})"))
+    if lang.lower().split("-")[0] == "pt":
+        from . import vo
+        ap = _plain(approved)
+        for k, t in enumerate(texts):
+            cp = _plain(t)
+            for phrase, shown in (("virgula", "vírgula"), ("por cento", "por cento")):
+                if f" {phrase} " in cp and f" {phrase} " not in ap:
+                    out.append(Finding("spelled-out", k, f"{shown!r} is spelled out; the approved text writes digits and symbols"))
+            for m in vo._PT_NUMBER.finditer(approved):
+                spoken = _plain(vo._pt_number_match(m))
+                if len(spoken.split()) > 1 and spoken in cp and spoken not in ap and m.group(0) not in t:
+                    out.append(Finding("spelled-out", k, f"{spoken.strip()!r} is spelled out; the approved text has {m.group(0)!r}"))
+    return out
