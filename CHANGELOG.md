@@ -5,6 +5,100 @@ release adds components or parameters and keeps every existing default's output 
 prove it); a change to an existing default's output is a major release until 1.0, and a minor one is never allowed
 to hide it. Each release names the golden projects it was checked against.
 
+## 0.7.0 — 2026-10-07 — lessons of the Lula 3.0.0 film: written-form captions, picture checks, pre-batch checks
+
+Additive: every existing default's output is unchanged. Three branches, merged by the coordinator: captions and the
+narration dictionary, picture checks for pixel-art films, and pre-batch checks. Prompted by the reviews in
+`PALS-Notes/docs/reviews/2026-10-07/`. 124 -> 254 unit tests, all passing (4 skipped as before).
+
+**Golden test not run.** The v013 project (`~/videos/done/v013-jev-decisions`) is not on the host where this release
+was made, and its filed package (`channel-wauwmhejrzu-1.0.0.vpkg.zip`) carries the scene and media but not the
+generator sources, so `tests/golden/run_v013.py` cannot run anywhere we know of. In its place: no existing function's
+code path was changed except `pnkit/__init__.py` (one added import) and appended code in `captions.py` and `vo.py`;
+300 random word lists give byte-identical `sidecar()` and `short_cues()` output between 0.6.0 and 0.7.0. A new golden
+project is needed.
+
+Known limitation: `vo.hazards()` treats every spoken form in the lexicon as a known acronym whatever the engine, so
+OAS and TSE (tested as written on ElevenLabs) are no longer flagged in pt-br on any engine.
+
+### Captions and the narration dictionary
+Additive: every existing default's output is unchanged (`speak()` without `numbers`, every `captions` function, the
+engines other than `elevenlabs`). Prompted by the Lula 3.0.0 film, published with caption defects (lula-filme
+p3/CHANGES.md; docs/reviews/2026-10-07/PIPELINE-REVIEW.md).
+
+Found
+- Captions were rebuilt from the SPOKEN text: six captions read "DOZE VÍRGULA QUATRO PARA SEIS VÍRGULA SETE POR CENTO"
+  instead of "12,4% PARA 6,7%".
+- One caption kept a clause the owner had cut: a stale copy of the text fed the assembler, and no gate compared the
+  caption text with the approved text.
+- ElevenLabs (Henrique, eleven_v4, pt-BR) read "ABC" in English.
+
+Added
+- `vo_lexicon.json`, pt-br, engine `elevenlabs`: ABC "á bê cê", PT "pê tê", FHC "éfe agá cê", IBGE "í bê gê é", STJ
+  "ésse tê jota", PF "pê éfe", CPI "cê pê í", PIB "píbi", ONU "ônu", SUS "sus" (approved by the owner's ear,
+  2026-10-07); OAS and TSE as tested-as-written entries (the respellings "ó á ésse" and "tê essi é" were tried and the
+  owner preferred the original); a pt-br rule: Whisper cannot verify letter names. `elevenlabs` is a new allowed
+  `engine` value; `speak()` already took any engine name.
+- `vo.speak(text, lang, engine, numbers=False)`: `numbers=True` writes digits as words (pt-br only; `ValueError`
+  otherwise): `12,4%` -> "doze vírgula quatro por cento", `2003` -> "dois mil e três", `5.772`, a leading-zero decimal
+  digit by digit. Not part of a range, a version or a code (`2003-2010`, `1.4.0`, `A12` stay as written).
+- `vo.speak_map(text, lang, engine, numbers)` -> `SpeakMap(written, spoken, tokens)`: the token-level written -> spoken
+  map (`MapToken.written`, `.spoken`, `.words`, `.start`, `.end`). An entry that spans whitespace ("Dia D") is one
+  token. `.spoken` equals `speak()` for every lexicon entry on every engine (tested). `vo.pt_number`, `vo.pt_cardinal`.
+- `captions.written_words(spoken_words, written_text, lang, engine, numbers=None)`: caption words in the WRITTEN
+  form, each with the start of its first spoken word and the end of its last, aligned with `vo.speak_map`; the result
+  feeds `split_cues`/`sidecar`. `captions.CaptionAlignError(token, index, expected, got)` when they do not align.
+- `captions.check_text(cues, approved_text, lang)` -> `[Finding(kind, cue, detail)]`: `text` (the cues differ from the
+  approved text; only whitespace and line breaks are normalised; reported per difference), `spelled-out` (pt only:
+  "vírgula" or "por cento" the approved text does not contain, or a number spelled out where the approved text has
+  its digits). `captions.Finding`.
+- `tools/caption_gate.py CUES --approved TEXT [--lang] [--json]`: the gate as a CLI over .vtt, scene .xml or .json
+  cues; exit 1 on findings, 2 on unreadable input.
+- `tools/timings_diff.py A B [--threshold 0.15] [--json]`: sentences and words whose start or end moved by more than
+  the threshold, for the simple format `[{"sentence", "text", "words": [[word, start, end]]}]` and the Lula
+  `timings-v2.json` shape; exit 1 when anything moved.
+
+### Picture checks for integer-grid pixel-art films
+
+Adds checks that need no render, from the Lula 3.0.0 reviews (a framing defect in scene 11a survived four human reads).
+Additive: no existing default's output changes; the golden tests are unaffected.
+
+Added
+- `pnkit.pixel` (standard library only): `view_outside(set_w, set_h, grid_w, grid_h, zoom, cx, cy, anchor=None)` returns
+  the region a zoom/pan view shows and how much of it lies outside the set (Lula 11a: `zoom(2, 276, 76)` on a 320-column
+  set, 22.5 % outside; `zoom(2, 240, 76)` clean); `figure_cut(sprite_h, crop_row, occluded=False)` finds a crop between
+  35 % and 85 % of the sprite height with nothing over the cut; `plate_line_breaks(lines)` finds a line ending in ":" or
+  an arrow and a value orphaned from its label ("2003: 12,4% → 2010:" / "6,7%"); `scale_off_grid(scale)` finds a scale
+  that is not a positive whole number.
+- `tools/flat_field.py`: empty-background and flat-field findings on rendered frames, with the frame paths. Thresholds
+  (`--empty-frac`, `--strip-cols`, `--flat-frac`) are parameters whose defaults were judged by eye on about 12 frames of
+  one film; this is not a precision study. Needs Pillow, imported at run time with a clear message when missing.
+- `tools/instance_clock.py`: flags an `<instance>` with no `start` whose symbol reads `time` in a `condition` (its first
+  frame is on the absolute clock). `tools/gate.py` runs it and fails on a finding; a scene without the problem gets the
+  same output as before.
+- Tests: `tests/test_pixel.py`, `tests/test_picture_tools.py`, with the Lula 11a cases and the fixture
+  `tests/fixtures/lula_11a_instance_clock.scene.xml`.
+
+### Before a render batch
+
+Added
+- `pnkit.files`: approved files are write-once. `write_once(path, data)` raises `WriteOnceError` (a
+  `FileExistsError`) when the path exists, dangling symlinks included, and creates it atomically otherwise;
+  `next_free(path, suffix="-v")` gives the path itself when free, else `-v2`, `-v3`, ...; `write_next` writes to the
+  first free path. Found when a re-run overwrote Lula's owner-approved score excerpt.
+- `tools/cue_drift.py`: compares a score's word-tied cue markers (`find`, `edge`, `time`) with the film's current word
+  timings and exits 1 when any marker is more than `--tol` (default 0.10 s) off, its phrase is gone or its scene is
+  gone. `--format lula` reads the Lula score's `c.at("text", frac)` markers in `make_score.py` against the score's and
+  the film's timings files and also fails on a changed scene voice start. Found when 10 of Lula's 37 markers sat
+  0.1-0.49 s from their words after a re-voice.
+- `tools/vm_preflight.py`: a pre-batch check of the render VMs through `tools/vm/vmrun.sh` (or `--runner`): reachability,
+  free disk, who holds or waits on `~/heavy.lock`, each host's CPU model (warns when they differ) and, with
+  `--scene --times --render-cmd`, a cross-VM determinism probe that renders the same frames on every host and reports the
+  hosts whose sha256 disagree. One table plus a JSON report; exit 1 on an unreachable host, low disk, a failed render or
+  a disagreement. Found when the Lula package rebuild matched 26 of 32 segments and the 6 that differed were exactly the
+  ones rendered on style3, the only Intel CPU.
+- README: layout and a "Before a render batch" section.
+
 ## 0.6.0 — 2026-10-02 — captions: no cue ahead of the voice
 
 Changes what `pnkit.captions` writes (cue start and end times, and where a few cues are cut), so by the rule above
