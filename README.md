@@ -38,6 +38,8 @@ pnkit/            the package; vendored into projects as film/vendor/pnkit/
   audio.py        a film's sound cues, held to the audio-design rule: Cues (sfx, ambience, check, assets, tracks,
                   bake_beds), retired, tail_ok, scene_cues, scene_tail_violations
   data/sfx_library.json  the channel's palette (AudioForge cues and tools/foley.py's files) and the retired cues
+  files.py        approved files are write-once: write_once (raises WriteOnceError if the path exists), next_free
+                  (excerpt.wav -> excerpt-v2.wav), write_next (write_once to the first free path)
 kit.json          the catalog: every component, its parameters and the guide rules it satisfies
 tools/sync.py     vendor pnkit into a project and write its lock
 tools/check_lock.py   verify a project's vendored copy against its lock
@@ -45,6 +47,8 @@ tools/gate.py     validate --deny-warnings, eval at probe times (E05/E06), flash
 tools/vo_probe.py how Kokoro reads a line, heard back by Whisper, with internal pauses (voice venv)
 tools/foley.py    synthesise the palette's own sounds into sfx/custom (struck bodies, filtered noise; voice venv)
 tools/tail_check.py   measure an encoded film's ending: cues, held pure tone, glide, decay (voice venv)
+tools/cue_drift.py    word-tied score markers against the film's current word timings; exit 1 over --tol (0.10 s)
+tools/vm_preflight.py  before a batch: reachability, free disk, who holds ~/heavy.lock, CPU model, cross-VM frame hashes
 tests/            unit tests (python3 -m unittest discover -s tests) and the golden test (tests/golden/)
 ```
 
@@ -102,6 +106,25 @@ tests/            unit tests (python3 -m unittest discover -s tests) and the gol
    and variant. It
    reports override and target errors (E05, E06), which validate does not see. It also reports whether the
    flash check is on. A scene can validate clean and still fail the gate.
+
+## Before a render batch
+
+Three habits from the Lula 3.0.0 film, each with a tool or helper here.
+
+- **Is the score still on the words?** After any re-voice or retime, run `python3 tools/cue_drift.py --markers
+  markers.json --timings words.json` (format in the tool's docstring; `--format lula` reads the Lula score's
+  `make_score.py` against two timings files). It exits 1 when a marker sits more than 0.10 s from its words. Lula's score
+  had 10 of 37 markers 0.1-0.49 s off after a re-voice and nothing said so.
+- **Do the hosts render the same bytes?** Run `python3 tools/vm_preflight.py [HOSTS] --min-free-gb 20`, with `--scene`,
+  `--times 1,5,9` and `--render-cmd 'TEMPLATE'` to render the same frames on every host and compare their sha256. It also
+  reports free disk, who holds or waits on `~/heavy.lock`, and each host's CPU model, and warns when the models differ. The
+  Lula package rebuild matched 26 of 32 segments; the 6 that differed were the ones rendered on style3, the only Intel
+  CPU. Re-rendering on style3 reproduced the published bytes, so the engine is deterministic per host, not across CPU
+  models: do not split a film that must rebuild byte for byte across them without this check. The tool goes through
+  `tools/vm/vmrun.sh` by default (`--runner` or `PNKIT_VM_RUNNER` to change it) and its tests use a fake runner only.
+- **Never overwrite an approved file.** A tool that writes a file the owner approved uses `pnkit.files.write_once`, or
+  `write_next` to put the new version beside it with a `-v2` suffix. Lula's approved score excerpt was once replaced by a
+  re-run.
 
 ## Library first: rule text for the production guide (draft)
 
