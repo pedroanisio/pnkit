@@ -14,6 +14,9 @@
 3. Whether the document's photosensitivity check is on: the engine checks flashes at encode only when the
    scene's <metadata> holds an <accessibility> element whose flashCheck is not "off" (XSD default "warn").
 
+A further check runs only to report a fault: an <instance> with no `start` whose symbol reads `time` in a `condition`
+(tools/instance_clock.py), which shows an arbitrary first frame. Clean scenes print nothing for it.
+
 Exit status 0 when all three pass, 1 otherwise, 2 when the engine cannot be run. Nothing here uses the GPU.
 """
 import argparse, json, os, re, shutil, subprocess, sys, xml.etree.ElementTree as ET
@@ -22,6 +25,19 @@ from concurrent.futures import ThreadPoolExecutor
 DEFAULT_ENGINE = os.path.expanduser("~/.local/share/scene-render/v013/engine/target/release/scene-render")
 DIAG = re.compile(r"^(error|warning)\[(\w+)\]: (.*)$")
 OVERRIDE_CODES = {"E05", "E06"}
+
+
+def instance_clock_findings(scene):
+    """tools/instance_clock.py's findings for the scene; [] when clean or when the XML cannot be parsed
+    (validate reports that)"""
+    here = os.path.dirname(os.path.abspath(__file__))
+    if here not in sys.path:
+        sys.path.insert(0, here)
+    import instance_clock
+    try:
+        return instance_clock.lint(scene)
+    except ET.ParseError:
+        return []
 
 
 def engine(path=None):
@@ -111,12 +127,13 @@ def main():
     overrides = [(e, d) for e, d in e_errors if d[1] in OVERRIDE_CODES]
     e_ok = all(e["exit"] == 0 for e in evals) and not e_errors
     f_on, f_desc = flash_state(acc)
-    ok = v_ok and e_ok and f_on
+    clock = instance_clock_findings(args.scene)
+    ok = v_ok and e_ok and f_on and not clock
 
     if args.json:
         print(json.dumps({"scene": args.scene, "ok": ok, "validate": {"ok": v_ok, "diagnostics": v_diags},
                           "eval": evals, "override_errors": len(overrides), "flashCheck": {"on": f_on, "state": f_desc,
-                          "accessibility": acc}}, indent=1))
+                          "accessibility": acc}, **({"instance_clock": clock} if clock else {})}, indent=1))
     else:
         print(f"gate {args.scene}")
         print(f"  validate --deny-warnings: {'PASS' if v_ok else 'FAIL'}")
@@ -131,6 +148,10 @@ def main():
             for sev, code, msg, loc in e["diagnostics"]:
                 print(f"      {sev}[{code}] {msg}" + (f"  ({loc})" if loc else ""))
         print(f"  flash check: {'ON' if f_on else 'OFF'}: {f_desc}")
+        if clock:
+            print(f"  instance clock: FAIL ({len(clock)} instance(s) without start whose symbol reads time)")
+            for line in clock:
+                print(f"    {line}")
         print(f"gate: {'PASS' if ok else 'FAIL'}")
     sys.exit(0 if ok else 1)
 

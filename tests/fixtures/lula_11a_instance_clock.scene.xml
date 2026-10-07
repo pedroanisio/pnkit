@@ -1,0 +1,14 @@
+<scene>
+ <symbols>
+  <symbol id="walker" width="8" height="8">
+   <group id="f0" condition="Math.max(0,Math.floor(time*4.0))%2==0"><shape id="a" shape="rect" width="8" height="8"/></group>
+   <group id="f1" condition="Math.max(0,Math.floor(time*4.0))%2==1"><shape id="b" shape="rect" width="8" height="8"/></group>
+  </symbol>
+  <symbol id="still" width="8" height="8"><shape id="c" shape="rect" width="8" height="8"/></symbol>
+ </symbols>
+ <group id="shot" start="773.25">
+  <instance id="crowd1" symbol="walker" x="0" y="0"/>
+  <instance id="crowd2" symbol="walker" x="9" y="0" start="773.25"/>
+  <instance id="sign" symbol="still" x="18" y="0"/>
+ </group>
+</scene>

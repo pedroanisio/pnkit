@@ -35,6 +35,9 @@ pnkit/            the package; vendored into projects as film/vendor/pnkit/
   figure.py       an articulated 3D figure (stand/walk/run/crouch/kneel-fire/prone) built from mesh.py's bones
   vo.py           the narration dictionary: speak, hazards, rules, entries, asr_aliases, asr_normalise
   data/vo_lexicon.json   its data by language (en, pt-br): respellings, rules, Whisper aliases, each with a source
+  pixel.py        build-time checks for integer-grid pixel-art films: view_outside (a zoom/pan view past the set),
+                  figure_cut (a sprite cut through the torso), plate_line_breaks (a label parted from its value),
+                  scale_off_grid (a scale that breaks the pixel grid)
   audio.py        a film's sound cues, held to the audio-design rule: Cues (sfx, ambience, check, assets, tracks,
                   bake_beds), retired, tail_ok, scene_cues, scene_tail_violations
   data/sfx_library.json  the channel's palette (AudioForge cues and tools/foley.py's files) and the retired cues
@@ -45,6 +48,8 @@ tools/gate.py     validate --deny-warnings, eval at probe times (E05/E06), flash
 tools/vo_probe.py how Kokoro reads a line, heard back by Whisper, with internal pauses (voice venv)
 tools/foley.py    synthesise the palette's own sounds into sfx/custom (struck bodies, filtered noise; voice venv)
 tools/tail_check.py   measure an encoded film's ending: cues, held pure tone, glide, decay (voice venv)
+tools/flat_field.py   flat or empty picture on rendered frames of a pixel-art film (Pillow; thresholds judged by eye)
+tools/instance_clock.py   an <instance> with no `start` whose symbol reads `time` in a condition (also run by gate.py)
 tests/            unit tests (python3 -m unittest discover -s tests) and the golden test (tests/golden/)
 ```
 
@@ -102,6 +107,26 @@ tests/            unit tests (python3 -m unittest discover -s tests) and the gol
    and variant. It
    reports override and target errors (E05, E06), which validate does not see. It also reports whether the
    flash check is on. A scene can validate clean and still fail the gate.
+
+### Pixel-art films
+
+For films drawn on an integer grid (Lula 3.0.0: 320 x 180 cells, 6 x 6 pixels each) the picture can be wrong in ways
+the validator, the gate and a human read of the build all miss. Lula's scene 11a showed 22 % of the frame as flat
+background (`zoom(2, 276, 76)` on a 320-column set; `zoom(2, 240, 76)` is clean), and four reads did not see it. Run
+the checks at two points:
+
+- **At build time, before any render**, from the project's scene builder, on every shot and every plate:
+  `pnkit.pixel.view_outside` (a zoom/pan view that leaves the set), `figure_cut` (a sprite cropped between 35 % and
+  85 % of its height with nothing over the cut), `plate_line_breaks` (a line ending in ":" or an arrow, a value
+  orphaned from its label) and `scale_off_grid` (a scale that is not a whole number). Fail the build on a finding, or
+  waive it in the project with a reason. pnkit takes numbers, not the project's context, so the project calls these
+  where it places a zoom, an actor or a plate.
+- **On the first rendered frame of each shot** (a still is enough): `python3 ~/videos/lib/tools/flat_field.py --bg
+  '#rrggbb' frame.png ...` reports an empty background or a flat field with the frame path. Its thresholds were judged
+  by eye on about 12 frames of one film; they are parameters, not a measured precision. A pass is not proof.
+
+`tools/gate.py` also reports an `<instance>` with no `start` whose symbol reads `time` in a `condition` (its first
+frame sits on the film's absolute clock, so a crowd pops at the cut); the line appears only when there is one.
 
 ## Library first: rule text for the production guide (draft)
 
