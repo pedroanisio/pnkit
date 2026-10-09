@@ -1,0 +1,24 @@
+<?xml version='1.0' encoding='utf-8'?>
+<scene version="1.2">
+  <project width="1080" height="1920" fps="24" duration="3.5" background="#0B1520" motionBlur="false" seed="20261002" />
+  <styles>
+    <textStyle id="pn-heading" fontAsset="pn-archivo" size="64" weight="700" variation="wght 700, wdth 75" />
+    <textStyle id="pn-subtitle" fontAsset="pn-archivo" size="36" weight="400" variation="wght 400, wdth 90" />
+  </styles>
+  <assets>
+    <font id="pn-archivo" src="../assets/archivo.ttf" family="Archivo" weight="400" license="OFL-1.1" />
+    <text id="titleAsset" text="O MOVIMENTO TEM CAMINHO" fontFile="../assets/archivo.ttf" size="64" color="#F4EFE4" width="888" height="180" style="pn-heading" weight="700" />
+    <text id="subAsset" text="SVG path / constant speed / autoOrient" fontFile="../assets/archivo.ttf" size="36" color="#A8BCCB" width="888" height="130" style="pn-subtitle" />
+    <text id="footAsset" text="PALS / ENGINE ATLAS" fontFile="../assets/archivo.ttf" size="23" color="#A8BCCB" width="888" height="50" />
+  </assets>
+  <composition>
+    <shape id="route" shape="path" width="1080" height="1600" path="M 170 1280 C 220 650 820 650 900 1280" fill="#00000000" stroke="#436B7D" strokeWidth="5" />
+    <shape id="vehicle" shape="path" width="100" height="68" path="M 0 0 L 100 34 L 0 68 L 20 34 Z" fill="#EBC282" anchorX="50" anchorY="34">
+      <motionPath path="M 170 1280 C 220 650 820 650 900 1280" start="0" end="3.5" constantSpeed="true" autoOrient="true" />
+    </shape>
+    <layer id="title" asset="titleAsset" x="96" y="205" />
+    <shape id="accentRule" shape="rect" x="96" y="400" width="94" height="5" fill="#E8BC79" />
+    <layer id="sub" asset="subAsset" x="96" y="440" />
+    <layer id="footer" asset="footAsset" x="96" y="1720" />
+  </composition>
+</scene>

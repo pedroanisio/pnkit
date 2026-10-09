@@ -1,0 +1,26 @@
+   Compiling num-traits v0.2.19
+   Compiling libm v0.2.16
+   Compiling bytemuck v1.25.2
+   Compiling half v2.7.1
+   Compiling raw-cpuid v11.6.0
+   Compiling regex-syntax v0.8.11
+   Compiling smallvec v1.16.2
+   Compiling png v0.18.1
+   Compiling qoi v0.4.1
+   Compiling tiff v0.11.3
+   Compiling num-complex v0.4.6
+   Compiling moxcms v0.8.1
+   Compiling regex-automata v0.4.18
+   Compiling pulp v0.22.3
+   Compiling regex v1.13.1
+   Compiling exr v1.74.2
+   Compiling image v0.25.10
+   Compiling sr-model v0.1.2 (/home/pals/videos/ENGINE-ATLAS/work/linebreaks-source/crates/sr-model)
+    Finished `test` profile [unoptimized + debuginfo] target(s) in 9.99s
+     Running tests/caption_lines.rs (/home/pals/.cache/cx-engine-linebreaks-target/debug/deps/caption_lines-edea2a0b18327f35)
+
+running 1 test
+test caption_line_break_policy_has_a_compatible_default_and_checked_opt_in ... ok
+
+test result: ok. 1 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.00s
+

@@ -1,0 +1,2 @@
+rendering on NVIDIA RTX 6000 Ada Generation (Vulkan, DiscreteGpu)
+/home/pals/videos/ENGINE-ATLAS/25-glsl-volume/clip.mp4: frame 84/84 (100.0 %), 74.9 frames/s, about 0 s left; last 1 s: 74.9 frames/s, per frame evaluate 0 ms, render 2 ms, GPU wait 0 ms, encoder 4 ms, CPU 28 %

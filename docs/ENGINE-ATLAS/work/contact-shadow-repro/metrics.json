@@ -1,0 +1,86 @@
+[
+  {
+    "kind": "full",
+    "region": "road-mid",
+    "box": [
+      220,
+      800,
+      850,
+      1200
+    ],
+    "mean_luma_off": 34.40095724761905,
+    "mean_luma_on": 22.493478065079362,
+    "mean_abs_difference": 11.125623015873016,
+    "fraction_changed_over_8": 0.24542460317460318
+  },
+  {
+    "kind": "full",
+    "region": "road-near",
+    "box": [
+      220,
+      1250,
+      850,
+      1440
+    ],
+    "mean_luma_off": 26.742289010860482,
+    "mean_luma_on": 26.742289010860482,
+    "mean_abs_difference": 0.0,
+    "fraction_changed_over_8": 0.0
+  },
+  {
+    "kind": "full",
+    "region": "sky-control",
+    "box": [
+      200,
+      80,
+      850,
+      200
+    ],
+    "mean_luma_off": 107.64740328205129,
+    "mean_luma_on": 107.64740328205129,
+    "mean_abs_difference": 0.0,
+    "fraction_changed_over_8": 0.0
+  },
+  {
+    "kind": "minimal",
+    "region": "road-mid",
+    "box": [
+      220,
+      800,
+      850,
+      1200
+    ],
+    "mean_luma_off": 125.54874293253967,
+    "mean_luma_on": 99.58596932460317,
+    "mean_abs_difference": 23.99704232804233,
+    "fraction_changed_over_8": 0.415
+  },
+  {
+    "kind": "minimal",
+    "region": "road-near",
+    "box": [
+      220,
+      1250,
+      850,
+      1440
+    ],
+    "mean_luma_off": 119.0183468922306,
+    "mean_luma_on": 119.0183468922306,
+    "mean_abs_difference": 0.0,
+    "fraction_changed_over_8": 0.0
+  },
+  {
+    "kind": "minimal",
+    "region": "sky-control",
+    "box": [
+      200,
+      80,
+      850,
+      200
+    ],
+    "mean_luma_off": 25.774200000000004,
+    "mean_luma_on": 25.774200000000004,
+    "mean_abs_difference": 0.0,
+    "fraction_changed_over_8": 0.0
+  }
+]

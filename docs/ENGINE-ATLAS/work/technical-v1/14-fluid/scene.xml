@@ -1,0 +1,18 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<scene version="1.2">
+<project width="1080" height="1920" fps="24" duration="3.5" background="#0B1520" motionBlur="false" seed="20261002"/>
+<assets><text id="titleAsset" text="O fluxo se encontra" fontFile="../assets/atlas.ttf" size="64" color="#F4EFE4" width="888" height="180"/>
+<text id="subAsset" text="Stable fluids / fontes / vorticidade" fontFile="../assets/atlas.ttf" size="28" color="#A8BCCB" width="888" height="100"/>
+<text id="footAsset" text="PALS / ENGINE ATLAS" fontFile="../assets/atlas.ttf" size="23" color="#A8BCCB" width="888" height="50"/></assets>
+
+<composition><fluid id="flow" x="130" y="650" width="820" height="900" resolution="112" vorticity="4" buoyancy="80" dissipation="0.18" iterations="32">
+<fluidSource x="250" y="760" radius="42" color="#F5BC72" density="5" velocityX="100" velocityY="-230"/>
+<fluidSource x="570" y="760" radius="42" color="#49C7BB" density="5" velocityX="-100" velocityY="-230"/>
+</fluid>
+<layer id="title" asset="titleAsset" x="96" y="205"/>
+<shape id="accentRule" shape="rect" x="96" y="400" width="94" height="5" fill="#E8BC79"/>
+<layer id="sub" asset="subAsset" x="96" y="440"/>
+<layer id="footer" asset="footAsset" x="96" y="1720"/>
+</composition>
+
+</scene>

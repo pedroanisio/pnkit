@@ -1,0 +1,11 @@
+Projeto: s25
+Tarefa: s25-prod-001
+Sessao: cx-engine (Codex)
+Responsavel: pals-engine-maintainer
+Estado: ACK diagnostico autorizado UID54 / instrucao direta nesta sessao
+Resumo: reproduzirei quadro no servidor2 via sr-remote de ENGINE-ATLAS (projeto proprio); comparacao visiveis/invisiveis e custo das instancias. Sem editar motor ou filme. UID55 corrige UID53: restartlocal permaneceu queued; unicaGPUmedida servidor3. Nao usarei encode.log transferido como medicao local.
+Entregas: ~/.local/share/scene-render/rs-scene-render/maint/s25-slow-start/; ENGINE-ATLAS/ISSUES.md.
+Evidencias: sceneSHA3b6b7483478008f02d8a01d94dcadd2ccd3a3bf3e085f330bcce123f4f5127b5; logs/provenance e fonte, perfil CPU/frame comparado. Source-inspection inicial: three_run descarta opacity<=0 antes object_draws; custo de membros/blocos precisa prova, nao afirmo defeito antes do A/B.
+Proximo passo: snapshot proprio, copiar assets necessarios, render/avaliacao/quadro0.5 em servidor2; isolar zeroopacity e blocos sem alterar pixel. Arte decide aplicacao de contorno ao filme via produtor.
+Prazo: sem prazo definido
+Bloqueios: nenhum para testesCPU; sem commit/build/pin/motor autorizado. Encode longo ate20min no servidor3 pertence cx-2 conforme UID54; nenhum encode iniciado por cx-engine.

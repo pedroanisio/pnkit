@@ -1,0 +1,252 @@
+[
+  {
+    "slug": "01-pbr-key-rim",
+    "samples": [
+      0.25,
+      1.75,
+      3.25
+    ],
+    "subject_region_mean_absolute_difference": 3.782780170440674,
+    "limitation": "Frame difference confirms change, not perceptual motion quality."
+  },
+  {
+    "slug": "02-hdri-ao-ssr",
+    "samples": [
+      0.25,
+      1.75,
+      3.25
+    ],
+    "subject_region_mean_absolute_difference": 0.41336295008659363,
+    "limitation": "Frame difference confirms change, not perceptual motion quality."
+  },
+  {
+    "slug": "03-dof-focus-pull",
+    "samples": [
+      0.25,
+      1.75,
+      3.25
+    ],
+    "subject_region_mean_absolute_difference": 2.3720428943634033,
+    "limitation": "Frame difference confirms change, not perceptual motion quality."
+  },
+  {
+    "slug": "04-25d-parallax",
+    "samples": [
+      0.25,
+      1.75,
+      3.25
+    ],
+    "subject_region_mean_absolute_difference": 34.2378044128418,
+    "limitation": "Frame difference confirms change, not perceptual motion quality."
+  },
+  {
+    "slug": "06-materials",
+    "samples": [
+      0.25,
+      1.75,
+      3.25
+    ],
+    "subject_region_mean_absolute_difference": 5.966641902923584,
+    "limitation": "Frame difference confirms change, not perceptual motion quality."
+  },
+  {
+    "slug": "07-particles-path-alpha",
+    "samples": [
+      0.25,
+      1.75,
+      3.25
+    ],
+    "subject_region_mean_absolute_difference": 7.19550085067749,
+    "limitation": "Frame difference confirms change, not perceptual motion quality."
+  },
+  {
+    "slug": "08-grade-lut-look",
+    "samples": [
+      0.25,
+      1.75,
+      3.25
+    ],
+    "subject_region_mean_absolute_difference": 5.644397735595703,
+    "limitation": "Frame difference confirms change, not perceptual motion quality."
+  },
+  {
+    "slug": "09-deformers",
+    "samples": [
+      0.25,
+      1.75,
+      3.25
+    ],
+    "subject_region_mean_absolute_difference": 0.9044759273529053,
+    "limitation": "Frame difference confirms change, not perceptual motion quality."
+  },
+  {
+    "slug": "10-skeleton-skin",
+    "samples": [
+      0.25,
+      1.75,
+      3.25
+    ],
+    "subject_region_mean_absolute_difference": 14.399604797363281,
+    "limitation": "Frame difference confirms change, not perceptual motion quality."
+  },
+  {
+    "slug": "11-puppet-pins",
+    "samples": [
+      0.25,
+      1.75,
+      3.25
+    ],
+    "subject_region_mean_absolute_difference": 10.265897750854492,
+    "limitation": "Frame difference confirms change, not perceptual motion quality."
+  },
+  {
+    "slug": "12-rigid-physics",
+    "samples": [
+      0.25,
+      1.75,
+      3.25
+    ],
+    "subject_region_mean_absolute_difference": 12.174015998840332,
+    "limitation": "Frame difference confirms change, not perceptual motion quality."
+  },
+  {
+    "slug": "13-soft-physics",
+    "samples": [
+      0.25,
+      1.75,
+      3.25
+    ],
+    "subject_region_mean_absolute_difference": 48.516963958740234,
+    "limitation": "Frame difference confirms change, not perceptual motion quality."
+  },
+  {
+    "slug": "14-fluid",
+    "samples": [
+      0.25,
+      1.75,
+      3.25
+    ],
+    "subject_region_mean_absolute_difference": 9.716194152832031,
+    "limitation": "Frame difference confirms change, not perceptual motion quality."
+  },
+  {
+    "slug": "15-flock",
+    "samples": [
+      0.25,
+      1.75,
+      3.25
+    ],
+    "subject_region_mean_absolute_difference": 12.770992279052734,
+    "limitation": "Frame difference confirms change, not perceptual motion quality."
+  },
+  {
+    "slug": "16-slime",
+    "samples": [
+      0.25,
+      1.75,
+      3.25
+    ],
+    "subject_region_mean_absolute_difference": 19.800559997558594,
+    "limitation": "Frame difference confirms change, not perceptual motion quality."
+  },
+  {
+    "slug": "17-erosion",
+    "samples": [
+      0.25,
+      1.75,
+      3.25
+    ],
+    "subject_region_mean_absolute_difference": 10.16125202178955,
+    "limitation": "Frame difference confirms change, not perceptual motion quality."
+  },
+  {
+    "slug": "18-gaussian-splats",
+    "samples": [
+      0.25,
+      1.75,
+      3.25
+    ],
+    "subject_region_mean_absolute_difference": 44.31565475463867,
+    "limitation": "Frame difference confirms change, not perceptual motion quality."
+  },
+  {
+    "slug": "19-motion-path",
+    "samples": [
+      0.25,
+      1.75,
+      3.25
+    ],
+    "subject_region_mean_absolute_difference": 0.8262003064155579,
+    "limitation": "Frame difference confirms change, not perceptual motion quality."
+  },
+  {
+    "slug": "20-text-animators",
+    "samples": [
+      0.25,
+      1.75,
+      3.25
+    ],
+    "subject_region_mean_absolute_difference": 5.743360996246338,
+    "limitation": "Frame difference confirms change, not perceptual motion quality."
+  },
+  {
+    "slug": "21-motivated-transitions",
+    "samples": [
+      0.25,
+      1.75,
+      3.25
+    ],
+    "subject_region_mean_absolute_difference": 56.41142654418945,
+    "limitation": "Frame difference confirms change, not perceptual motion quality."
+  },
+  {
+    "slug": "22-audio-reactive",
+    "samples": [
+      0.25,
+      1.75,
+      3.25
+    ],
+    "subject_region_mean_absolute_difference": 11.104374885559082,
+    "limitation": "Frame difference confirms change, not perceptual motion quality."
+  },
+  {
+    "slug": "23-native-map-relief",
+    "samples": [
+      0.25,
+      1.75,
+      3.25
+    ],
+    "subject_region_mean_absolute_difference": 8.73653793334961,
+    "limitation": "Frame difference confirms change, not perceptual motion quality."
+  },
+  {
+    "slug": "24-animated-charts",
+    "samples": [
+      0.25,
+      1.75,
+      3.25
+    ],
+    "subject_region_mean_absolute_difference": 7.456409931182861,
+    "limitation": "Frame difference confirms change, not perceptual motion quality."
+  },
+  {
+    "slug": "25-glsl-volume",
+    "samples": [
+      0.25,
+      1.75,
+      3.25
+    ],
+    "subject_region_mean_absolute_difference": 3.3450379371643066,
+    "limitation": "Frame difference confirms change, not perceptual motion quality."
+  },
+  {
+    "slug": "26-rich-2d-count",
+    "samples": [
+      0.25,
+      1.75,
+      3.25
+    ],
+    "subject_region_mean_absolute_difference": 44.977699279785156,
+    "limitation": "Frame difference confirms change, not perceptual motion quality."
+  }
+]

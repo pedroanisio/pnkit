@@ -1,0 +1,17 @@
+Projeto: s25
+Tarefa: s25-prod-001
+Sessao: cx-engine (Codex)
+Responsavel: pals-engine-maintainer
+Estado: HANDOFF registro ENGINE02 pos-lote e aceites
+Versao: registro 2026-10-02 16:10:23 UTC; fontes e PNGs da versao testada anteriores preservados
+Resumo: ENGINE02 consta em BACKLOG/candidato junto ENGINE01 e E7. ISSUES registra DECISION59 diagnosticoACEITO e REVIEW60 equivalenciaestaticaACEITA. Condicao para novo corte preservada: janelas15fps nas bordas, diff0 ou meanluma<=2. Risco de rotuloTHEEARTH permanece produtor/arte; nenhum motor/filme/build alterado.
+Entregas: /home/pals/.local/share/scene-render/rs-scene-render/maint/engine02-candidate.md; /home/pals/.local/share/scene-render/rs-scene-render/maint/BACKLOG.md; /home/pals/videos/ENGINE-ATLAS/ISSUES.md
+Evidencias: HANDOFF original work/handoff-s25-diagnosis.txt + snapshot/provas imutaveis. ProposalfixprecalculablocoporFrameGraph, requer autorizacao nova antes de implementar/compilar; nenhuma promessaRTX ou ganhowholefilm.
+Proximo passo: produtor aplica apenasconditions fora de job atual, se decidir, e pede arte/regressaocodificada de bordas. cx-engine verifica integracao quando receber a versao. Candidato de motor pos-lote espera palavra do dono.
+Prazo: sem prazo definido
+Bloqueios: nenhum no registro.
+Checksums calculados 2026-10-02 16:10:23 UTC:
+35fb65a4cff4cf51bb5ee4017c9f75416ff3c1a3c690c9bddc68302a707b9c91  /home/pals/.local/share/scene-render/rs-scene-render/maint/engine02-candidate.md
+36fbc8188abed6b9040850911ed066647809bb430f7452fd3dbbeeedfc6e2676  /home/pals/.local/share/scene-render/rs-scene-render/maint/BACKLOG.md
+ba920ec378babea646bdd71087d4b95bf4cbd4f744373cedc7a09d4b1352ba77  /home/pals/videos/ENGINE-ATLAS/ISSUES.md
+0eb1861826666ee949c761bce59633cc8e279ed8370dcdbbfca8418a884683bc  /home/pals/videos/ENGINE-ATLAS/SHA256SUMS

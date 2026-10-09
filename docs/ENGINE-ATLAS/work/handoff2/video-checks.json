@@ -1,0 +1,477 @@
+[
+  {
+    "slug": "01-pbr-key-rim",
+    "video": {
+      "programs": [],
+      "streams": [
+        {
+          "width": 1080,
+          "height": 1920,
+          "r_frame_rate": "24/1",
+          "nb_read_frames": "84"
+        }
+      ],
+      "format": {
+        "duration": "3.500000"
+      }
+    },
+    "technical_pass": true,
+    "strict_clean": true
+  },
+  {
+    "slug": "02-hdri-ao-ssr",
+    "video": {
+      "programs": [],
+      "streams": [
+        {
+          "width": 1080,
+          "height": 1920,
+          "r_frame_rate": "24/1",
+          "nb_read_frames": "84"
+        }
+      ],
+      "format": {
+        "duration": "3.500000"
+      }
+    },
+    "technical_pass": true,
+    "strict_clean": true
+  },
+  {
+    "slug": "03-dof-focus-pull",
+    "video": {
+      "programs": [],
+      "streams": [
+        {
+          "width": 1080,
+          "height": 1920,
+          "r_frame_rate": "24/1",
+          "nb_read_frames": "84"
+        }
+      ],
+      "format": {
+        "duration": "3.500000"
+      }
+    },
+    "technical_pass": true,
+    "strict_clean": true
+  },
+  {
+    "slug": "04-25d-parallax",
+    "video": {
+      "programs": [],
+      "streams": [
+        {
+          "width": 1080,
+          "height": 1920,
+          "r_frame_rate": "24/1",
+          "nb_read_frames": "84"
+        }
+      ],
+      "format": {
+        "duration": "3.500000"
+      }
+    },
+    "technical_pass": true,
+    "strict_clean": true
+  },
+  {
+    "slug": "06-materials",
+    "video": {
+      "programs": [],
+      "streams": [
+        {
+          "width": 1080,
+          "height": 1920,
+          "r_frame_rate": "24/1",
+          "nb_read_frames": "84"
+        }
+      ],
+      "format": {
+        "duration": "3.500000"
+      }
+    },
+    "technical_pass": true,
+    "strict_clean": true
+  },
+  {
+    "slug": "07-particles-path-alpha",
+    "video": {
+      "programs": [],
+      "streams": [
+        {
+          "width": 1080,
+          "height": 1920,
+          "r_frame_rate": "24/1",
+          "nb_read_frames": "84"
+        }
+      ],
+      "format": {
+        "duration": "3.500000"
+      }
+    },
+    "technical_pass": true,
+    "strict_clean": true
+  },
+  {
+    "slug": "08-grade-lut-look",
+    "video": {
+      "programs": [],
+      "streams": [
+        {
+          "width": 1080,
+          "height": 1920,
+          "r_frame_rate": "24/1",
+          "nb_read_frames": "84"
+        }
+      ],
+      "format": {
+        "duration": "3.500000"
+      }
+    },
+    "technical_pass": true,
+    "strict_clean": true
+  },
+  {
+    "slug": "09-deformers",
+    "video": {
+      "programs": [],
+      "streams": [
+        {
+          "width": 1080,
+          "height": 1920,
+          "r_frame_rate": "24/1",
+          "nb_read_frames": "84"
+        }
+      ],
+      "format": {
+        "duration": "3.500000"
+      }
+    },
+    "technical_pass": true,
+    "strict_clean": true
+  },
+  {
+    "slug": "10-skeleton-skin",
+    "video": {
+      "programs": [],
+      "streams": [
+        {
+          "width": 1080,
+          "height": 1920,
+          "r_frame_rate": "24/1",
+          "nb_read_frames": "84"
+        }
+      ],
+      "format": {
+        "duration": "3.500000"
+      }
+    },
+    "technical_pass": true,
+    "strict_clean": true
+  },
+  {
+    "slug": "11-puppet-pins",
+    "video": {
+      "programs": [],
+      "streams": [
+        {
+          "width": 1080,
+          "height": 1920,
+          "r_frame_rate": "24/1",
+          "nb_read_frames": "84"
+        }
+      ],
+      "format": {
+        "duration": "3.500000"
+      }
+    },
+    "technical_pass": true,
+    "strict_clean": true
+  },
+  {
+    "slug": "12-rigid-physics",
+    "video": {
+      "programs": [],
+      "streams": [
+        {
+          "width": 1080,
+          "height": 1920,
+          "r_frame_rate": "24/1",
+          "nb_read_frames": "84"
+        }
+      ],
+      "format": {
+        "duration": "3.500000"
+      }
+    },
+    "technical_pass": true,
+    "strict_clean": true
+  },
+  {
+    "slug": "13-soft-physics",
+    "video": {
+      "programs": [],
+      "streams": [
+        {
+          "width": 1080,
+          "height": 1920,
+          "r_frame_rate": "24/1",
+          "nb_read_frames": "84"
+        }
+      ],
+      "format": {
+        "duration": "3.500000"
+      }
+    },
+    "technical_pass": true,
+    "strict_clean": true
+  },
+  {
+    "slug": "14-fluid",
+    "video": {
+      "programs": [],
+      "streams": [
+        {
+          "width": 1080,
+          "height": 1920,
+          "r_frame_rate": "24/1",
+          "nb_read_frames": "84"
+        }
+      ],
+      "format": {
+        "duration": "3.500000"
+      }
+    },
+    "technical_pass": true,
+    "strict_clean": true
+  },
+  {
+    "slug": "15-flock",
+    "video": {
+      "programs": [],
+      "streams": [
+        {
+          "width": 1080,
+          "height": 1920,
+          "r_frame_rate": "24/1",
+          "nb_read_frames": "84"
+        }
+      ],
+      "format": {
+        "duration": "3.500000"
+      }
+    },
+    "technical_pass": true,
+    "strict_clean": true
+  },
+  {
+    "slug": "16-slime",
+    "video": {
+      "programs": [],
+      "streams": [
+        {
+          "width": 1080,
+          "height": 1920,
+          "r_frame_rate": "24/1",
+          "nb_read_frames": "84"
+        }
+      ],
+      "format": {
+        "duration": "3.500000"
+      }
+    },
+    "technical_pass": true,
+    "strict_clean": true
+  },
+  {
+    "slug": "17-erosion",
+    "video": {
+      "programs": [],
+      "streams": [
+        {
+          "width": 1080,
+          "height": 1920,
+          "r_frame_rate": "24/1",
+          "nb_read_frames": "84"
+        }
+      ],
+      "format": {
+        "duration": "3.500000"
+      }
+    },
+    "technical_pass": true,
+    "strict_clean": true
+  },
+  {
+    "slug": "18-gaussian-splats",
+    "video": {
+      "programs": [],
+      "streams": [
+        {
+          "width": 1080,
+          "height": 1920,
+          "r_frame_rate": "24/1",
+          "nb_read_frames": "84"
+        }
+      ],
+      "format": {
+        "duration": "3.500000"
+      }
+    },
+    "technical_pass": true,
+    "strict_clean": true
+  },
+  {
+    "slug": "19-motion-path",
+    "video": {
+      "programs": [],
+      "streams": [
+        {
+          "width": 1080,
+          "height": 1920,
+          "r_frame_rate": "24/1",
+          "nb_read_frames": "84"
+        }
+      ],
+      "format": {
+        "duration": "3.500000"
+      }
+    },
+    "technical_pass": true,
+    "strict_clean": true
+  },
+  {
+    "slug": "20-text-animators",
+    "video": {
+      "programs": [],
+      "streams": [
+        {
+          "width": 1080,
+          "height": 1920,
+          "r_frame_rate": "24/1",
+          "nb_read_frames": "84"
+        }
+      ],
+      "format": {
+        "duration": "3.500000"
+      }
+    },
+    "technical_pass": true,
+    "strict_clean": true
+  },
+  {
+    "slug": "21-motivated-transitions",
+    "video": {
+      "programs": [],
+      "streams": [
+        {
+          "width": 1080,
+          "height": 1920,
+          "r_frame_rate": "24/1",
+          "nb_read_frames": "84"
+        }
+      ],
+      "format": {
+        "duration": "3.500000"
+      }
+    },
+    "technical_pass": true,
+    "strict_clean": true
+  },
+  {
+    "slug": "22-audio-reactive",
+    "video": {
+      "programs": [],
+      "streams": [
+        {
+          "width": 1080,
+          "height": 1920,
+          "r_frame_rate": "24/1",
+          "nb_read_frames": "84"
+        }
+      ],
+      "format": {
+        "duration": "3.500000"
+      }
+    },
+    "technical_pass": true,
+    "strict_clean": true
+  },
+  {
+    "slug": "23-native-map-relief",
+    "video": {
+      "programs": [],
+      "streams": [
+        {
+          "width": 1080,
+          "height": 1920,
+          "r_frame_rate": "24/1",
+          "nb_read_frames": "84"
+        }
+      ],
+      "format": {
+        "duration": "3.500000"
+      }
+    },
+    "technical_pass": true,
+    "strict_clean": true
+  },
+  {
+    "slug": "24-animated-charts",
+    "video": {
+      "programs": [],
+      "streams": [
+        {
+          "width": 1080,
+          "height": 1920,
+          "r_frame_rate": "24/1",
+          "nb_read_frames": "84"
+        }
+      ],
+      "format": {
+        "duration": "3.500000"
+      }
+    },
+    "technical_pass": true,
+    "strict_clean": true
+  },
+  {
+    "slug": "25-glsl-volume",
+    "video": {
+      "programs": [],
+      "streams": [
+        {
+          "width": 1080,
+          "height": 1920,
+          "r_frame_rate": "24/1",
+          "nb_read_frames": "84"
+        }
+      ],
+      "format": {
+        "duration": "3.500000"
+      }
+    },
+    "technical_pass": true,
+    "strict_clean": true
+  },
+  {
+    "slug": "26-rich-2d-count",
+    "video": {
+      "programs": [],
+      "streams": [
+        {
+          "width": 1080,
+          "height": 1920,
+          "r_frame_rate": "24/1",
+          "nb_read_frames": "84"
+        }
+      ],
+      "format": {
+        "duration": "3.500000"
+      }
+    },
+    "technical_pass": true,
+    "strict_clean": true
+  }
+]

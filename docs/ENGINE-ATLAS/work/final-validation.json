@@ -1,0 +1,132 @@
+[
+  {
+    "slug": "01-pbr-key-rim",
+    "exit": 0,
+    "output": "valid /home/pals/videos/ENGINE-ATLAS/01-pbr-key-rim/scene.xml: 0 error(s), 0 warning(s)\n"
+  },
+  {
+    "slug": "02-hdri-ao-ssr",
+    "exit": 0,
+    "output": "valid /home/pals/videos/ENGINE-ATLAS/02-hdri-ao-ssr/scene.xml: 0 error(s), 0 warning(s)\n"
+  },
+  {
+    "slug": "03-dof-focus-pull",
+    "exit": 0,
+    "output": "valid /home/pals/videos/ENGINE-ATLAS/03-dof-focus-pull/scene.xml: 0 error(s), 0 warning(s)\n"
+  },
+  {
+    "slug": "04-25d-parallax",
+    "exit": 0,
+    "output": "valid /home/pals/videos/ENGINE-ATLAS/04-25d-parallax/scene.xml: 0 error(s), 0 warning(s)\n"
+  },
+  {
+    "slug": "05-pathtrace-hero",
+    "exit": 0,
+    "output": "valid /home/pals/videos/ENGINE-ATLAS/05-pathtrace-hero/scene.xml: 0 error(s), 0 warning(s)\n"
+  },
+  {
+    "slug": "06-materials",
+    "exit": 0,
+    "output": "valid /home/pals/videos/ENGINE-ATLAS/06-materials/scene.xml: 0 error(s), 0 warning(s)\n"
+  },
+  {
+    "slug": "07-particles-path-alpha",
+    "exit": 0,
+    "output": "valid /home/pals/videos/ENGINE-ATLAS/07-particles-path-alpha/scene.xml: 0 error(s), 0 warning(s)\n"
+  },
+  {
+    "slug": "08-grade-lut-look",
+    "exit": 0,
+    "output": "valid /home/pals/videos/ENGINE-ATLAS/08-grade-lut-look/scene.xml: 0 error(s), 0 warning(s)\n"
+  },
+  {
+    "slug": "09-deformers",
+    "exit": 0,
+    "output": "valid /home/pals/videos/ENGINE-ATLAS/09-deformers/scene.xml: 0 error(s), 0 warning(s)\n"
+  },
+  {
+    "slug": "10-skeleton-skin",
+    "exit": 0,
+    "output": "valid /home/pals/videos/ENGINE-ATLAS/10-skeleton-skin/scene.xml: 0 error(s), 0 warning(s)\n"
+  },
+  {
+    "slug": "11-puppet-pins",
+    "exit": 0,
+    "output": "valid /home/pals/videos/ENGINE-ATLAS/11-puppet-pins/scene.xml: 0 error(s), 0 warning(s)\n"
+  },
+  {
+    "slug": "12-rigid-physics",
+    "exit": 0,
+    "output": "valid /home/pals/videos/ENGINE-ATLAS/12-rigid-physics/scene.xml: 0 error(s), 0 warning(s)\n"
+  },
+  {
+    "slug": "13-soft-physics",
+    "exit": 0,
+    "output": "valid /home/pals/videos/ENGINE-ATLAS/13-soft-physics/scene.xml: 0 error(s), 0 warning(s)\n"
+  },
+  {
+    "slug": "14-fluid",
+    "exit": 0,
+    "output": "valid /home/pals/videos/ENGINE-ATLAS/14-fluid/scene.xml: 0 error(s), 0 warning(s)\n"
+  },
+  {
+    "slug": "15-flock",
+    "exit": 0,
+    "output": "valid /home/pals/videos/ENGINE-ATLAS/15-flock/scene.xml: 0 error(s), 0 warning(s)\n"
+  },
+  {
+    "slug": "16-slime",
+    "exit": 0,
+    "output": "valid /home/pals/videos/ENGINE-ATLAS/16-slime/scene.xml: 0 error(s), 0 warning(s)\n"
+  },
+  {
+    "slug": "17-erosion",
+    "exit": 0,
+    "output": "valid /home/pals/videos/ENGINE-ATLAS/17-erosion/scene.xml: 0 error(s), 0 warning(s)\n"
+  },
+  {
+    "slug": "18-gaussian-splats",
+    "exit": 0,
+    "output": "valid /home/pals/videos/ENGINE-ATLAS/18-gaussian-splats/scene.xml: 0 error(s), 0 warning(s)\n"
+  },
+  {
+    "slug": "19-motion-path",
+    "exit": 0,
+    "output": "valid /home/pals/videos/ENGINE-ATLAS/19-motion-path/scene.xml: 0 error(s), 0 warning(s)\n"
+  },
+  {
+    "slug": "20-text-animators",
+    "exit": 0,
+    "output": "valid /home/pals/videos/ENGINE-ATLAS/20-text-animators/scene.xml: 0 error(s), 0 warning(s)\n"
+  },
+  {
+    "slug": "21-motivated-transitions",
+    "exit": 0,
+    "output": "valid /home/pals/videos/ENGINE-ATLAS/21-motivated-transitions/scene.xml: 0 error(s), 0 warning(s)\n"
+  },
+  {
+    "slug": "22-audio-reactive",
+    "exit": 0,
+    "output": "valid /home/pals/videos/ENGINE-ATLAS/22-audio-reactive/scene.xml: 0 error(s), 0 warning(s)\n"
+  },
+  {
+    "slug": "23-native-map-relief",
+    "exit": 0,
+    "output": "valid /home/pals/videos/ENGINE-ATLAS/23-native-map-relief/scene.xml: 0 error(s), 0 warning(s)\n"
+  },
+  {
+    "slug": "24-animated-charts",
+    "exit": 0,
+    "output": "valid /home/pals/videos/ENGINE-ATLAS/24-animated-charts/scene.xml: 0 error(s), 0 warning(s)\n"
+  },
+  {
+    "slug": "25-glsl-volume",
+    "exit": 0,
+    "output": "valid /home/pals/videos/ENGINE-ATLAS/25-glsl-volume/scene.xml: 0 error(s), 0 warning(s)\n"
+  },
+  {
+    "slug": "26-rich-2d-count",
+    "exit": 0,
+    "output": "valid /home/pals/videos/ENGINE-ATLAS/26-rich-2d-count/scene.xml: 0 error(s), 0 warning(s)\n"
+  }
+]

@@ -1,0 +1,12 @@
+Projeto: s25
+Tarefa: s25-prod-001
+Sessao: cx-engine (Codex)
+Responsavel: pals-engine-maintainer
+Estado: diagnosticoCPU parcial comprovado; contorno sendo testado
+Versao: copia mesma sceneSHA3b6b7483478008f02d8a01d94dcadd2ccd3a3bf3e085f330bcce123f4f5127b5
+Resumo: t0.5 full FrameGraph3921 objetos3D,3872 com world_opacity0. Render strict49 mesh draws/2317104triangulos; retirar3872 invisiveis na copia mantem49draws/triangles e RGBAbyteigual (maxdelta0). Invisiveis NAO chegam ao draw GPU. Full bench6frames warmed: CPUplanning/submission239.499ms vspruned7.365ms; eval12.388vs0.101ms. TrabalhoGPUllvmpipe~1137vs1164ms semelhante.
+Entregas: ENGINE-ATLAS/work/s25-repro/full/pruned.scene.xml e full/pruned-bench.log,compare.json.
+Evidencias: fonte three_members escaneia todos irmaos para cada object3D, incluindo worldopacity0; three_run so depois rejeita opacity0 no object_draws. Forte causa CPU de enumeracao repetida, nao desenhar invisiveis. Source objectsinstances expande nodes e nao batch nativo de uma drawcall.
+Proximo passo: contorno candidate condition para excluir nodes opacidadezero antes render, mantendo ordem/bloco global3D; comparar graphsvisiveis e PNGs em tempos/limites. Nao reduzir subdivisao nem mudarcamera/material; 34 torus256 visiveis da parede sao custoGPUadicional da imagem aprovada. Arte/producer decidem aplicar apos evidencias; nenhum job GPU meu.
+Prazo: sem prazo definido
+Bloqueios: nao extrapolo fps software paraRTX, nem alego medicao localGPU aposUID55.

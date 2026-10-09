@@ -1,0 +1,18 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<scene version="1.2">
+<project width="1080" height="1920" fps="24" duration="3.5" background="#0B1520" motionBlur="false" seed="20261002"/>
+<assets><text id="titleAsset" text="A atmosfera tem origem" fontFile="../assets/atlas.ttf" size="64" color="#F4EFE4" width="888" height="180"/>
+<text id="subAsset" text="Poeira no caminho / bokeh no alpha" fontFile="../assets/atlas.ttf" size="28" color="#A8BCCB" width="888" height="100"/>
+<text id="footAsset" text="PALS / ENGINE ATLAS" fontFile="../assets/atlas.ttf" size="23" color="#A8BCCB" width="888" height="50"/><image id="ringAlpha" src="../assets/ring-alpha.png" width="320" height="320"/></assets>
+
+<composition><shape id="orbit" shape="path" path="M 160 1180 C 160 750 910 750 910 1180 C 910 1500 160 1500 160 1180 Z" width="1080" height="1600" fill="#00000000" stroke="#436779" strokeWidth="3"/>
+<layer id="ring" asset="ringAlpha" x="380" y="920" opacity="0.3"/>
+<particleEmitter id="dust" preset="dust" x="0" y="0" emitterShape="path" emitterPath="M 160 1180 C 160 750 910 750 910 1180 C 910 1500 160 1500 160 1180 Z" rate="110" lifetime="6" speed="22" size="4" color="#D1E7EA" opacity="0.55" preroll="3" seed="11"/>
+<particleEmitter id="bokeh" preset="bokeh" x="380" y="920" emitterShape="asset-alpha" emitterAsset="ringAlpha" rate="12" lifetime="4" speed="45" spread="360" size="14" sizeEnd="12" sizeVariance="5" color="#EDC68E" opacity="0.25" opacityEnd="0" preroll="2" seed="12"/>
+<layer id="title" asset="titleAsset" x="96" y="205"/>
+<shape id="accentRule" shape="rect" x="96" y="400" width="94" height="5" fill="#E8BC79"/>
+<layer id="sub" asset="subAsset" x="96" y="440"/>
+<layer id="footer" asset="footAsset" x="96" y="1720"/>
+</composition>
+
+</scene>

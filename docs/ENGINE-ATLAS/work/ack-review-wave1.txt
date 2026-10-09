@@ -1,0 +1,11 @@
+Projeto: motor
+Tarefa: engine-atlas-001
+Sessao: cx-engine (Codex), pals-engine-maintainer
+Estado: ACK — correção da vitrine
+Versao: atlas-wave1, REVIEW UID21
+Resumo: aceito V1–V4 e a ordem 01/03/06/08. As 26 cenas técnicas já estão renderizadas; não vou chamar essa versão de vitrine aceita. Primeiro entrego a 26 (96 peças) com a câmera corrigida para sua revisão; depois substituo os assuntos, piso, tipografia e comparações da primeira leva e aplico Archivo/subtítulos >=36 à segunda.
+Artefato 06: a quina é compatível com o box de papel que eu mesmo coloquei atrás do vidro para evidenciar refração. Vou retirar esse objeto e comparar, registrando autoria versus defeito de motor só conforme a evidência. As esferas assentadas incorretamente também serão substituídas por objetos reconhecíveis.
+Entregas previstas: cenas nativas de engrenagem com key/rim lateral forte; DOF com profundidade e foco mensurável; colher/copo/folha dobrada/pano; look com antes/depois. Preservo a primeira versão em work/ antes de sobrescrever.
+Próximo passo: render e comparação remotos; HANDOFF de versão e hashes novos na mesma conversa.
+Prazo: sem novo prazo acordado.
+Bloqueios: nenhum. Motor/binários/branches intactos; movimento/escuta permanecem UNASSESSED.

@@ -1,0 +1,54 @@
+== 2026-10-02 07:09:13Z sr-encode3 film.scene.xml --hw auto (agent pals-49) -> pals@143.110.214.121
+07:09:15Z pushed (started 07:09:13Z); queueing the encode on pals@143.110.214.121
+sr-encode: submitted film.scene.xml --hw auto (new process session, no memory limit)
+  queue:    /home/pals/.local/share/scene-render/bin/sr-gpu --status
+  progress: tail -f /home/pals/videos/shorts/s25-one-bacterium-forty-four-hours/work/encode.log | tr '\r' '\n'
+  result:   cat /home/pals/videos/shorts/s25-one-bacterium-forty-four-hours/work/encode_rate.txt     (or: /home/pals/videos/tools/sr-encode --status /home/pals/videos/shorts/s25-one-bacterium-forty-four-hours/film.scene.xml)
+  wait:     /home/pals/videos/tools/sr-encode --wait /home/pals/videos/shorts/s25-one-bacterium-forty-four-hours/film.scene.xml
+  stop:     /home/pals/videos/tools/sr-encode --stop /home/pals/videos/shorts/s25-one-bacterium-forty-four-hours/film.scene.xml
+
+== 2026-10-02 07:09:15Z sr-encode film.scene.xml --hw auto (agent pals-49, short lane)
+07:09:18Z attempt 1: lock taken, engine starting (scene-render-876da9b)
+07:09:33Z attempt 1: ended 15 s after the start, before the rate check
+  rendering on NVIDIA RTX 6000 Ada Generation (Vulkan, DiscreteGpu)
+  wrote /home/pals/videos/shorts/s25-one-bacterium-forty-four-hours/out/one-bacterium-forty-four-hours.mp4 (3 file(s), h264_nvenc)
+    render adapter: NVIDIA RTX 6000 Ada Generation (Vulkan, DiscreteGpu)
+    1464 frames 1080x1920 at 30 fps in 12.88 s: 124.2 frames/s (evaluate 0.01 s, render 15.61 s of which decode wait 0.00 s and vector geometry 13.29 s, GPU/readback blocked 0.40 s, encoder blocked 1.27 s), 1 pass(es), 2 segments at once (stage times summed over them)
+    audio: -14.5 LUFS integrated, -3.0 dBTP true peak, mixed in 0.36 s
+07:09:33Z encode ended: exit 0, 15 s under the lock, peak RSS 830 MB, peak GPU memory 1676 MiB, 30 threads
+== 07:09:33Z done, exit 0
+
+07:09:34Z remote sr-encode ended, exit 0
+== 07:09:34Z done, exit 0
+== 2026-10-02 15:43:58Z sr-encode3 film.scene.xml --hw nvenc --parallel 1 --strict --no-upload --quality final --json -o out/one-bacterium-forty-four-hours.mp4 (agent cx-2) -> pals@143.110.214.121
+15:44:02Z pushed (started 15:43:58Z); queueing the encode on pals@143.110.214.121
+Route: premium; decision: lote24-visual-gate-001
+sr-encode: submitted film.scene.xml --hw nvenc --parallel 1 --strict --no-upload --quality final --json -o out/one-bacterium-forty-four-hours.mp4 (new process session, no memory limit)
+  queue:    /home/pals/.local/share/scene-render/bin/sr-gpu --status
+  progress: tail -f /home/pals/videos/shorts/s25-one-bacterium-forty-four-hours/work/encode.log | tr '\r' '\n'
+  result:   cat /home/pals/videos/shorts/s25-one-bacterium-forty-four-hours/work/encode_rate.txt     (or: /home/pals/videos/tools/sr-encode --status /home/pals/videos/shorts/s25-one-bacterium-forty-four-hours/film.scene.xml)
+  wait:     /home/pals/videos/tools/sr-encode --wait /home/pals/videos/shorts/s25-one-bacterium-forty-four-hours/film.scene.xml
+  stop:     /home/pals/videos/tools/sr-encode --stop /home/pals/videos/shorts/s25-one-bacterium-forty-four-hours/film.scene.xml
+== 2026-10-02 15:44:02Z sr-encode film.scene.xml --hw nvenc --parallel 1 --strict --no-upload --quality final --json -o out/one-bacterium-forty-four-hours.mp4 (agent cx-2, short lane)
+Route: premium; decision: lote24-visual-gate-001
+15:44:05Z attempt 1: lock taken, engine starting (scene-render-premium)
+15:44:48Z attempt 1: 2.2 frames/s 31 s after the first frames (frame 80, 43 s after the start); engine CPU 104 %, 17 threads, RSS 1047 MB, GPU memory 1560 MiB
+15:44:48Z slow start (under 5 frames/s): stopping this attempt
+15:44:52Z attempt 2: lock taken, engine starting (scene-render-premium)
+Terminated
+Terminated
+15:45:15Z stopped
+15:45:16Z the previous cut is back at /home/pals/videos/shorts/s25-one-bacterium-forty-four-hours/out/one-bacterium-forty-four-hours.mp4; what this encode wrote is /home/pals/videos/shorts/s25-one-bacterium-forty-four-hours/work/encode.failed.one-bacterium-forty-four-hours.mp4
+== 15:45:16Z done, exit 143
+
+15:45:16Z remote sr-encode ended, exit 143
+== 15:45:17Z done, exit 143
+== 2026-10-02 15:48:57Z sr-encode3 film.scene.xml --hw nvenc --parallel 1 --strict --no-upload --quality final --json -o out/one-bacterium-forty-four-hours.mp4 (agent cx-2) -> pals@143.110.214.121
+15:48:58Z pushed (started 15:48:57Z); queueing the encode on pals@143.110.214.121
+Route: premium; decision: lote24-visual-gate-001
+sr-encode: submitted film.scene.xml --hw nvenc --parallel 1 --strict --no-upload --quality final --json -o out/one-bacterium-forty-four-hours.mp4 (new process session, no memory limit)
+  queue:    /home/pals/.local/share/scene-render/bin/sr-gpu --status
+  progress: tail -f /home/pals/videos/shorts/s25-one-bacterium-forty-four-hours/work/encode.log | tr '\r' '\n'
+  result:   cat /home/pals/videos/shorts/s25-one-bacterium-forty-four-hours/work/encode_rate.txt     (or: /home/pals/videos/tools/sr-encode --status /home/pals/videos/shorts/s25-one-bacterium-forty-four-hours/film.scene.xml)
+  wait:     /home/pals/videos/tools/sr-encode --wait /home/pals/videos/shorts/s25-one-bacterium-forty-four-hours/film.scene.xml
+  stop:     /home/pals/videos/tools/sr-encode --stop /home/pals/videos/shorts/s25-one-bacterium-forty-four-hours/film.scene.xml

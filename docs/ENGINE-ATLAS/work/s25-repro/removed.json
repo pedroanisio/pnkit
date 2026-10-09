@@ -1,0 +1,274 @@
+[
+  {
+    "id": "generation-2",
+    "instances": 2
+  },
+  {
+    "id": "generation-core-2",
+    "instances": 2
+  },
+  {
+    "id": "generation-4",
+    "instances": 4
+  },
+  {
+    "id": "generation-core-4",
+    "instances": 4
+  },
+  {
+    "id": "generation-8",
+    "instances": 8
+  },
+  {
+    "id": "generation-core-8",
+    "instances": 8
+  },
+  {
+    "id": "generation-16",
+    "instances": 16
+  },
+  {
+    "id": "generation-core-16",
+    "instances": 16
+  },
+  {
+    "id": "generation-32",
+    "instances": 32
+  },
+  {
+    "id": "generation-core-32",
+    "instances": 32
+  },
+  {
+    "id": "generation-64",
+    "instances": 64
+  },
+  {
+    "id": "generation-core-64",
+    "instances": 64
+  },
+  {
+    "id": "cellsA",
+    "instances": 850
+  },
+  {
+    "id": "cellsB",
+    "instances": 850
+  },
+  {
+    "id": "coresA",
+    "instances": 850
+  },
+  {
+    "id": "coresB",
+    "instances": 850
+  },
+  {
+    "id": "septaA",
+    "instances": 85
+  },
+  {
+    "id": "septaB",
+    "instances": 85
+  },
+  {
+    "id": "mass-shell",
+    "instances": 1
+  },
+  {
+    "id": "mass-fill",
+    "instances": 1
+  },
+  {
+    "id": "mass-tick-1",
+    "instances": 1
+  },
+  {
+    "id": "mass-tick-2",
+    "instances": 1
+  },
+  {
+    "id": "mass-tick-3",
+    "instances": 1
+  },
+  {
+    "id": "mass-tick-4",
+    "instances": 1
+  },
+  {
+    "id": "mass-tick-5",
+    "instances": 1
+  },
+  {
+    "id": "mass-tick-6",
+    "instances": 1
+  },
+  {
+    "id": "mass-tick-7",
+    "instances": 1
+  },
+  {
+    "id": "mass-tick-8",
+    "instances": 1
+  },
+  {
+    "id": "mass-tick-9",
+    "instances": 1
+  },
+  {
+    "id": "named-ring-9",
+    "instances": 1
+  },
+  {
+    "id": "mass-tick-10",
+    "instances": 1
+  },
+  {
+    "id": "mass-tick-11",
+    "instances": 1
+  },
+  {
+    "id": "mass-tick-12",
+    "instances": 1
+  },
+  {
+    "id": "mass-tick-13",
+    "instances": 1
+  },
+  {
+    "id": "mass-tick-14",
+    "instances": 1
+  },
+  {
+    "id": "mass-tick-15",
+    "instances": 1
+  },
+  {
+    "id": "named-ring-15",
+    "instances": 1
+  },
+  {
+    "id": "mass-tick-16",
+    "instances": 1
+  },
+  {
+    "id": "mass-tick-17",
+    "instances": 1
+  },
+  {
+    "id": "mass-tick-18",
+    "instances": 1
+  },
+  {
+    "id": "named-ring-18",
+    "instances": 1
+  },
+  {
+    "id": "mass-tick-19",
+    "instances": 1
+  },
+  {
+    "id": "mass-tick-20",
+    "instances": 1
+  },
+  {
+    "id": "mass-tick-21",
+    "instances": 1
+  },
+  {
+    "id": "mass-tick-22",
+    "instances": 1
+  },
+  {
+    "id": "mass-tick-23",
+    "instances": 1
+  },
+  {
+    "id": "mass-tick-24",
+    "instances": 1
+  },
+  {
+    "id": "mass-tick-25",
+    "instances": 1
+  },
+  {
+    "id": "mass-tick-26",
+    "instances": 1
+  },
+  {
+    "id": "mass-tick-27",
+    "instances": 1
+  },
+  {
+    "id": "mass-tick-28",
+    "instances": 1
+  },
+  {
+    "id": "mass-tick-29",
+    "instances": 1
+  },
+  {
+    "id": "mass-tick-30",
+    "instances": 1
+  },
+  {
+    "id": "mass-tick-31",
+    "instances": 1
+  },
+  {
+    "id": "mass-tick-32",
+    "instances": 1
+  },
+  {
+    "id": "mass-tick-33",
+    "instances": 1
+  },
+  {
+    "id": "mass-tick-34",
+    "instances": 1
+  },
+  {
+    "id": "mass-tick-35",
+    "instances": 1
+  },
+  {
+    "id": "mass-tick-36",
+    "instances": 1
+  },
+  {
+    "id": "mass-tick-37",
+    "instances": 1
+  },
+  {
+    "id": "mass-tick-38",
+    "instances": 1
+  },
+  {
+    "id": "mass-tick-39",
+    "instances": 1
+  },
+  {
+    "id": "mass-tick-40",
+    "instances": 1
+  },
+  {
+    "id": "named-ring-40",
+    "instances": 1
+  },
+  {
+    "id": "earth-symbol-38.012",
+    "instances": 1
+  },
+  {
+    "id": "earth-halo-38.012",
+    "instances": 1
+  },
+  {
+    "id": "earth-symbol-33.729",
+    "instances": 1
+  },
+  {
+    "id": "earth-halo-33.729",
+    "instances": 1
+  }
+]

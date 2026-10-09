@@ -142,8 +142,9 @@
   </assets>
 
   <symbols>
-    <!-- The brand mark: the orange right triangle of the logo, right angle at bottom-left. -->
-    <symbol id="pn-notch" name="Notch" width="64" height="64" duration="1">
+    <!-- The brand mark: the orange right triangle of the logo, right angle at bottom-left.
+         It sits flush on the frame's left edge by design, so it is forced outside the safe area (SA02). -->
+    <symbol id="pn-notch" name="Notch" width="64" height="64" duration="1" safeAreaForce="true">
       <shape id="pn-notch-shape" shape="path" width="64" height="64" path="M0 0 L0 64 L64 64 Z"
              fill="var(--pn-orange)" tags="logo"/>
     </symbol>

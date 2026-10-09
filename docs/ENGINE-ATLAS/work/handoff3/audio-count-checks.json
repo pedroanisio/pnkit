@@ -1,0 +1,42 @@
+{
+  "visible_count": {
+    "checks": "26-rich-2d-count/count-check.json",
+    "pass_check": true
+  },
+  "audio_reactive": {
+    "samples": [
+      {
+        "time": 0.125,
+        "circle_pixels": 145971
+      },
+      {
+        "time": 0.333333,
+        "circle_pixels": 234164
+      },
+      {
+        "time": 1.125,
+        "circle_pixels": 210055
+      },
+      {
+        "time": 1.833333,
+        "circle_pixels": 234169
+      },
+      {
+        "time": 2.333333,
+        "circle_pixels": 145973
+      },
+      {
+        "time": 2.583333,
+        "circle_pixels": 234107
+      },
+      {
+        "time": 3.333333,
+        "circle_pixels": 154322
+      }
+    ],
+    "area_ratio": 1.604215905899117,
+    "decoded_audio_samples": 168960,
+    "rms": 0.026183260968454358,
+    "pass_check": true
+  }
+}

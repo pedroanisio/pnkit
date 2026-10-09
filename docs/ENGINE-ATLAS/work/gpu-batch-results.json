@@ -1,0 +1,131 @@
+{
+  "total_seconds": 41.026994848994946,
+  "results": [
+    {
+      "slug": "04-25d-parallax",
+      "scene_sha256": "4c11ffcd2a7e0e6344ca4700a49880f4ff524062e8f6bb36cb5b76335c0852ae",
+      "render_fps": 55.187463967308176,
+      "seconds": 1.562533846
+    },
+    {
+      "slug": "06-materials",
+      "scene_sha256": "85d5fce29aa1855ac7a7f9cffec0c883ee30d5f6baeaafcd479ff3277ccfa372",
+      "render_fps": 56.800328019730486,
+      "seconds": 1.540903036
+    },
+    {
+      "slug": "07-particles-path-alpha",
+      "scene_sha256": "1339fac0e1ff84bfd239c6251cf36e73ce84d26ae9b10f31f23a9460c5bd2f6c",
+      "render_fps": 56.838465353478064,
+      "seconds": 1.5236534800000001
+    },
+    {
+      "slug": "08-grade-lut-look",
+      "scene_sha256": "1341a22593ff34031a4eae5ac54bb9338dc1bbedba321b633853194db2edd661",
+      "render_fps": 55.966316896041384,
+      "seconds": 1.557123003
+    },
+    {
+      "slug": "09-deformers",
+      "scene_sha256": "253fe4a742b8f02d92111955bb3190fc57bad9f83df7ac76f6902647eafe935a",
+      "render_fps": 61.09635839730726,
+      "seconds": 1.412865941
+    },
+    {
+      "slug": "10-skeleton-skin",
+      "scene_sha256": "4a45366c25f2f7e6638ccbc3940583ad1778519ee9fbe6d2dfafd8d043775548",
+      "render_fps": 60.71949066027758,
+      "seconds": 1.443125139
+    },
+    {
+      "slug": "11-puppet-pins",
+      "scene_sha256": "7badc2beb301117a12a275088d3fc2bf32146f68c5da1e30a00fb807b517da7b",
+      "render_fps": 51.856953327651155,
+      "seconds": 1.65795585
+    },
+    {
+      "slug": "12-rigid-physics",
+      "scene_sha256": "6cc4c191fb29875dc97bd7cefc1405b93bf27712e93ef51cbe9011a1bfcb2393",
+      "render_fps": 62.46651576308206,
+      "seconds": 1.381894403
+    },
+    {
+      "slug": "13-soft-physics",
+      "scene_sha256": "347e286644851bac42b72ece0f31df9b86f1014545ee3c9ecbb157549e663327",
+      "render_fps": 60.9305782285108,
+      "seconds": 1.418223496
+    },
+    {
+      "slug": "14-fluid",
+      "scene_sha256": "ae7053f1b2614656b41dadad241df5543eae91919d111b9feac5d1a810b1cbc3",
+      "render_fps": 32.14059439581688,
+      "seconds": 2.649618592
+    },
+    {
+      "slug": "15-flock",
+      "scene_sha256": "2aa9ba4580fd6d63026006dd04b84d0d4fcbb94386da6584d3b5afc932d2630a",
+      "render_fps": 60.86846005787304,
+      "seconds": 1.421790641
+    },
+    {
+      "slug": "16-slime",
+      "scene_sha256": "eaa32a96a7df30d4deaadd3567c59d90d642faf9d9719b53a14e255bb2e24933",
+      "render_fps": 34.97508559978366,
+      "seconds": 2.438492001
+    },
+    {
+      "slug": "17-erosion",
+      "scene_sha256": "64c5dffff897a5ccf75e62fb9500134b9deb8f0b8c76cab973e7c749fa6db0a0",
+      "render_fps": 51.71659740274064,
+      "seconds": 1.6600347640000002
+    },
+    {
+      "slug": "18-gaussian-splats",
+      "scene_sha256": "1b342f91d85c6105b10e685e967fd48a3729104c7ce12960d482e8ac22f9621d",
+      "render_fps": 59.927462472458096,
+      "seconds": 1.445158285
+    },
+    {
+      "slug": "19-motion-path",
+      "scene_sha256": "5f84c235acb453b3a172097a674346ad5fe2a92f59a74cd31202fc105bcdb8ce",
+      "render_fps": 62.09418681474754,
+      "seconds": 1.390540107
+    },
+    {
+      "slug": "20-text-animators",
+      "scene_sha256": "bdf0d6dcd52d2843174c03d152404df7cfe05fe5d391903f17af97e93c10765d",
+      "render_fps": 61.61115914047325,
+      "seconds": 1.402820382
+    },
+    {
+      "slug": "21-motivated-transitions",
+      "scene_sha256": "4a98e1bd987bf6ae476213871e34997ff53f61cd30d79ad79e35f64a4ca96e34",
+      "render_fps": 61.43930871158059,
+      "seconds": 1.406383168
+    },
+    {
+      "slug": "22-audio-reactive",
+      "scene_sha256": "206af694ca888e8d48c0e142073d4ee69d447afde49d819e59a40eb059998582",
+      "render_fps": 63.081362388519736,
+      "seconds": 1.439030323
+    },
+    {
+      "slug": "23-native-map-relief",
+      "scene_sha256": "614661b1200380c95f105cd4cbae444177aebd6d70707804e8158360cea52129",
+      "render_fps": 54.96171429795392,
+      "seconds": 1.572795122
+    },
+    {
+      "slug": "24-animated-charts",
+      "scene_sha256": "07ae77705649bff5fa4322be7163f9872e86be63a1d144dec6cf470814559d30",
+      "render_fps": 60.64615541588961,
+      "seconds": 1.425037374
+    },
+    {
+      "slug": "25-glsl-volume",
+      "scene_sha256": "94b0142f1fb65ea7bc330496384b8a59e59dc9dad44374d568caef57ddfb9974",
+      "render_fps": 60.26051260945093,
+      "seconds": 1.430357136
+    }
+  ]
+}

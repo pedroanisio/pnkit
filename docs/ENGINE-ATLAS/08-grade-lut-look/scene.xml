@@ -1,0 +1,55 @@
+<?xml version='1.0' encoding='utf-8'?>
+<scene version="1.2">
+  <project width="1080" height="1920" fps="24" duration="3.5" background="#0B1520" motionBlur="false" seed="20261002" />
+  <styles>
+    <textStyle id="pn-heading" fontAsset="pn-archivo" size="64" weight="700" variation="wght 700, wdth 75" />
+    <textStyle id="pn-subtitle" fontAsset="pn-archivo" size="36" weight="400" variation="wght 400, wdth 90" />
+  </styles>
+  <colorManagement workingSpace="linear-srgb" toneMapping="agx" exposure="0.3" looks="grade">
+    <look id="grade" src="../assets/showcase-amber-teal.cube" space="srgb" mix="1" />
+  </colorManagement>
+  <assets>
+    <font id="pn-archivo" src="../assets/archivo.ttf" family="Archivo" weight="400" license="OFL-1.1" />
+    <text id="titleAsset" text="O LOOK MUDA A LEITURA" style="pn-heading" fontFile="../assets/archivo.ttf" size="64" weight="700" color="#F4EFE4" width="888" height="180" />
+    <text id="subAsset" text="Óptica / antes e depois do LUT" style="pn-subtitle" fontFile="../assets/archivo.ttf" size="36" color="#A8BCCB" width="888" height="130" />
+    <text id="footAsset" text="PALS / ENGINE ATLAS" fontFile="../assets/archivo.ttf" size="23" color="#A8BCCB" width="888" height="50" />
+  </assets>
+  <materials>
+    <material id="floorMat" baseColor="#141C20" roughness="0.55" />
+    <material id="steel" baseColor="#BBCBD3" metallic="1" roughness="0.24" doubleSided="true" />
+    <material id="brass" baseColor="#C99848" metallic="1" roughness="0.22" />
+    <material id="glass" baseColor="#E6F7F5" transmission="1" roughness="0.025" ior="1.48" thickness="8" attenuationColor="#8ACEC2" attenuationDistance="450" />
+    <material id="water" baseColor="#C6E9EF" transmission="1" roughness="0.03" ior="1.33" thickness="100" attenuationColor="#428F9D" attenuationDistance="250" />
+    <material id="paper" baseColor="#EFE0BF" baseColorMap="../assets/paper.png" roughness="0.96" doubleSided="true" />
+    <material id="cloth" baseColor="#407E83" baseColorMap="../assets/weave.png" roughness="0.9" sheenColor="#AED6C9" sheenRoughness="0.5" doubleSided="true" />
+    <material id="black" baseColor="#070B10" roughness="0.12" />
+    <material id="ivory" baseColor="#ECE0BF" roughness="0.45" />
+    <material id="teal" baseColor="#32A89B" roughness="0.3" clearcoat="0.25" />
+  </materials>
+  <composition>
+    <camera id="cam" x="540" y="450" z="-1050" pitch="-35" fov="42" far="100000" ambientOcclusion="true" aoRadius="35" aoIntensity="1.25">
+      <animate property="x">
+        <key time="0" value="520" interpolation="sine-in-out" />
+        <key time="3.5" value="560" />
+      </animate>
+    </camera>
+    <object3D id="floor" primitive="box" width="200000" height="30" depth="200000" x="540" y="1440" z="0" material="floorMat" castShadow="false" />
+    <object3D id="barrel" primitive="cylinder" radius="170" height="270" segments="96" x="540" y="1252" z="0" rotationX="90" material="steel" />
+    <object3D id="ring0" primitive="torus" radius="166" height="15" segments="96" x="540" y="1252" z="-130" rotationX="90" material="brass" />
+    <object3D id="ring1" primitive="torus" radius="166" height="15" segments="96" x="540" y="1252" z="-60" rotationX="90" material="brass" />
+    <object3D id="ring2" primitive="torus" radius="166" height="15" segments="96" x="540" y="1252" z="30" rotationX="90" material="brass" />
+    <object3D id="ring3" primitive="torus" radius="166" height="15" segments="96" x="540" y="1252" z="110" rotationX="90" material="brass" />
+    <object3D id="lens" primitive="cylinder" radius="149" height="12" segments="96" x="540" y="1252" z="-145" rotationX="90" material="teal" />
+    <object3D id="iris" primitive="cylinder" radius="45" height="8" segments="96" x="540" y="1252" z="-155" rotationX="90" material="black" />
+    <layer id="title" asset="titleAsset" x="96" y="205" />
+    <shape id="rule" shape="rect" x="96" y="400" width="94" height="5" fill="#E8BC79" />
+    <layer id="sub" asset="subAsset" x="96" y="440" />
+    <layer id="footer" asset="footAsset" x="96" y="1720" />
+  </composition>
+  <lights>
+    <light id="ambient" type="ambient" intensity="0.07" color="#B7C8D4" />
+    <light id="key" type="point" x="-200" y="400" z="-600" intensity="200" colorTemperature="4300" castShadow="true" shadowMapSize="2048" shadowSoftness="1.5" contactShadows="false" />
+    <light id="rim" type="point" x="950" y="700" z="600" intensity="650" color="#72CFE4" />
+    <light id="dome" type="dome" environment="../assets/studio.hdr" intensity="0.32" />
+  </lights>
+</scene>

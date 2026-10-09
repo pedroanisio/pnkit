@@ -1,0 +1,74 @@
+[
+  {
+    "time": 0.083333,
+    "pieces": 12,
+    "expected": 12,
+    "selected": 0,
+    "density": 365,
+    "pass_check": true
+  },
+  {
+    "time": 0.291667,
+    "pieces": 24,
+    "expected": 24,
+    "selected": 0,
+    "density": 365,
+    "pass_check": true
+  },
+  {
+    "time": 0.5,
+    "pieces": 36,
+    "expected": 36,
+    "selected": 0,
+    "density": 365,
+    "pass_check": true
+  },
+  {
+    "time": 0.708333,
+    "pieces": 48,
+    "expected": 48,
+    "selected": 0,
+    "density": 365,
+    "pass_check": true
+  },
+  {
+    "time": 0.916667,
+    "pieces": 60,
+    "expected": 60,
+    "selected": 0,
+    "density": 365,
+    "pass_check": true
+  },
+  {
+    "time": 1.125,
+    "pieces": 72,
+    "expected": 72,
+    "selected": 0,
+    "density": 365,
+    "pass_check": true
+  },
+  {
+    "time": 1.333333,
+    "pieces": 84,
+    "expected": 84,
+    "selected": 0,
+    "density": 365,
+    "pass_check": true
+  },
+  {
+    "time": 1.541667,
+    "pieces": 96,
+    "expected": 96,
+    "selected": 0,
+    "density": 365,
+    "pass_check": true
+  },
+  {
+    "time": 3.25,
+    "pieces": 96,
+    "expected": 96,
+    "selected": 23,
+    "density": 365,
+    "pass_check": true
+  }
+]

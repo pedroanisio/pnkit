@@ -1,0 +1,18 @@
+{
+  "stream": {
+    "codec_name": "h264",
+    "width": 1080,
+    "height": 1920,
+    "r_frame_rate": "24/1",
+    "duration": "3.500000",
+    "nb_read_frames": "84"
+  },
+  "decode_errors": "",
+  "source": "84 native cargo-test-library renderer frames, h264_nvenc via sr-gpu",
+  "sample_times": [
+    0.25,
+    1.75,
+    3.25
+  ],
+  "playback": "not directly watched; sampled encoded frames inspected"
+}

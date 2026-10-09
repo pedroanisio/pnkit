@@ -1,0 +1,21 @@
+<?xml version='1.0' encoding='utf-8'?>
+<scene version="1.2">
+  <project width="1080" height="1920" fps="24" duration="3.5" background="#0B1520" motionBlur="false" seed="20261002" />
+  <styles>
+    <textStyle id="pn-heading" fontAsset="pn-archivo" size="64" weight="700" variation="wght 700, wdth 75" />
+    <textStyle id="pn-subtitle" fontAsset="pn-archivo" size="36" weight="400" variation="wght 400, wdth 90" />
+  </styles>
+  <assets>
+    <font id="pn-archivo" src="../assets/archivo.ttf" family="Archivo" weight="400" license="OFL-1.1" />
+    <text id="titleAsset" text="O RELEVO GUARDA O FLUXO" fontFile="../assets/archivo.ttf" size="64" color="#F4EFE4" width="888" height="180" style="pn-heading" weight="700" />
+    <text id="subAsset" text="Droplet erosion / terreno procedural" fontFile="../assets/archivo.ttf" size="36" color="#A8BCCB" width="888" height="130" style="pn-subtitle" />
+    <text id="footAsset" text="PALS / ENGINE ATLAS" fontFile="../assets/archivo.ttf" size="23" color="#A8BCCB" width="888" height="50" />
+  </assets>
+  <composition>
+    <erosion id="land" x="130" y="680" width="820" height="900" resolution="192" droplets="16000" seed="5" relief="1.8" sunAzimuth="315" colorLow="#244952" colorHigh="#DFC58D" />
+    <layer id="title" asset="titleAsset" x="96" y="205" />
+    <shape id="accentRule" shape="rect" x="96" y="400" width="94" height="5" fill="#E8BC79" />
+    <layer id="sub" asset="subAsset" x="96" y="440" />
+    <layer id="footer" asset="footAsset" x="96" y="1720" />
+  </composition>
+</scene>

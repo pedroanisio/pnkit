@@ -1,0 +1,135 @@
+[
+  {
+    "slug": "01-pbr-key-rim",
+    "video": {
+      "programs": [],
+      "streams": [
+        {
+          "width": 1080,
+          "height": 1920,
+          "r_frame_rate": "24/1",
+          "nb_read_frames": "84"
+        }
+      ],
+      "format": {
+        "duration": "3.500000"
+      }
+    },
+    "technical_pass": true,
+    "strict_clean": true
+  },
+  {
+    "slug": "02-hdri-ao-ssr",
+    "video": {
+      "programs": [],
+      "streams": [
+        {
+          "width": 1080,
+          "height": 1920,
+          "r_frame_rate": "24/1",
+          "nb_read_frames": "84"
+        }
+      ],
+      "format": {
+        "duration": "3.500000"
+      }
+    },
+    "technical_pass": true,
+    "strict_clean": true
+  },
+  {
+    "slug": "03-dof-focus-pull",
+    "video": {
+      "programs": [],
+      "streams": [
+        {
+          "width": 1080,
+          "height": 1920,
+          "r_frame_rate": "24/1",
+          "nb_read_frames": "84"
+        }
+      ],
+      "format": {
+        "duration": "3.500000"
+      }
+    },
+    "technical_pass": true,
+    "strict_clean": true
+  },
+  {
+    "slug": "04-25d-parallax",
+    "video": {
+      "programs": [],
+      "streams": [
+        {
+          "width": 1080,
+          "height": 1920,
+          "r_frame_rate": "24/1",
+          "nb_read_frames": "84"
+        }
+      ],
+      "format": {
+        "duration": "3.500000"
+      }
+    },
+    "technical_pass": true,
+    "strict_clean": true
+  },
+  {
+    "slug": "06-materials",
+    "video": {
+      "programs": [],
+      "streams": [
+        {
+          "width": 1080,
+          "height": 1920,
+          "r_frame_rate": "24/1",
+          "nb_read_frames": "84"
+        }
+      ],
+      "format": {
+        "duration": "3.500000"
+      }
+    },
+    "technical_pass": true,
+    "strict_clean": true
+  },
+  {
+    "slug": "07-particles-path-alpha",
+    "video": {
+      "programs": [],
+      "streams": [
+        {
+          "width": 1080,
+          "height": 1920,
+          "r_frame_rate": "24/1",
+          "nb_read_frames": "84"
+        }
+      ],
+      "format": {
+        "duration": "3.500000"
+      }
+    },
+    "technical_pass": true,
+    "strict_clean": true
+  },
+  {
+    "slug": "08-grade-lut-look",
+    "video": {
+      "programs": [],
+      "streams": [
+        {
+          "width": 1080,
+          "height": 1920,
+          "r_frame_rate": "24/1",
+          "nb_read_frames": "84"
+        }
+      ],
+      "format": {
+        "duration": "3.500000"
+      }
+    },
+    "technical_pass": true,
+    "strict_clean": true
+  }
+]

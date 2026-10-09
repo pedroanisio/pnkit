@@ -1,0 +1,34 @@
+{
+  "snapshot_utc": "2026-10-02 15:50:47 UTC",
+  "source_scene": "/home/pals/videos/shorts/s25-one-bacterium-forty-four-hours/film.scene.xml",
+  "scene_sha256": "3b6b7483478008f02d8a01d94dcadd2ccd3a3bf3e085f330bcce123f4f5127b5",
+  "assets": [
+    {
+      "src": "fonts/Archivo-wdth-wght.ttf",
+      "sha256": "0e094a7d3c7c4c25cf1310c4b30014f1dae9332220b1c2c88f4fa996f0b05053"
+    },
+    {
+      "src": "vo/s25.wav",
+      "sha256": "ea09c435ccc863d31a0f321d2f2a954e7b6239b5b9bac933b9de60ba7b3e487f"
+    },
+    {
+      "src": "music/score.wav",
+      "sha256": "1186c2d475643016ccf228e18c5c05584e30b43f5cf9131cfaa8c3bc67aa8006"
+    },
+    {
+      "src": "assets/real/earth_apollo17_blue_marble_nasa.jpg",
+      "sha256": "51049ed4e34514880bfbe39d34e2dd2c56e31f55919e7f4f0b34ef1698cb9f50"
+    },
+    {
+      "src": "assets/real/ecoli_dividing_cdc_phil7137.jpg",
+      "sha256": "9d0e61cd0de01cde2acc5b246d2b4bff5cabf8ecdeb05b4ed8561bde27955b75"
+    },
+    {
+      "src": "assets/generated/earth-disc.obj",
+      "sha256": "aae6dc477e586a6c5a7890e6fccbfc18f5a9d2235400266d1df8d99ba009b8ba"
+    }
+  ],
+  "gpu_provenance": "Only server3 measured; local queued/cancelled per UID55.",
+  "pin": "scene-render-premium",
+  "pin_sha256": "f4b4b95bf192bedf12af9f3897c7aadb8a8be887a8d380aafc6010aa25f35679"
+}

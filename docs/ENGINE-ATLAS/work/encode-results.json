@@ -1,0 +1,187 @@
+[
+  {
+    "slug": "01-pbr-key-rim",
+    "exit": 0,
+    "queue_and_wall_seconds": 7.946,
+    "report": {
+      "path": "/home/pals/videos/ENGINE-ATLAS/01-pbr-key-rim/clip.mp4",
+      "files": [
+        "/home/pals/videos/ENGINE-ATLAS/01-pbr-key-rim/clip.mp4"
+      ],
+      "frames": 84,
+      "size": [
+        1080,
+        1920
+      ],
+      "fps": 24.0,
+      "encoder": "h264_nvenc",
+      "render_adapter": {
+        "name": "NVIDIA RTX 6000 Ada Generation",
+        "backend": "Vulkan",
+        "device_type": "DiscreteGpu",
+        "software": false
+      },
+      "quality": "final",
+      "seconds": 1.475215956,
+      "render_fps": 58.72743077219549,
+      "stage_seconds": [
+        0.000468896,
+        0.29161134400000005,
+        0.019398354999999996,
+        0.29783804500000033
+      ],
+      "decode_wait_seconds": 0.0,
+      "vector_seconds": 0.06333481400000002,
+      "audio_seconds": 8.023e-06,
+      "loudness": null,
+      "true_peak": null,
+      "unsupported": [],
+      "accessibility": [],
+      "warnings": [],
+      "evaluation_warnings": [],
+      "uploads": [],
+      "passes": 1,
+      "segments": 1
+    }
+  },
+  {
+    "slug": "02-hdri-ao-ssr",
+    "exit": 0,
+    "queue_and_wall_seconds": 5.035,
+    "report": {
+      "path": "/home/pals/videos/ENGINE-ATLAS/02-hdri-ao-ssr/clip.mp4",
+      "files": [
+        "/home/pals/videos/ENGINE-ATLAS/02-hdri-ao-ssr/clip.mp4"
+      ],
+      "frames": 84,
+      "size": [
+        1080,
+        1920
+      ],
+      "fps": 24.0,
+      "encoder": "h264_nvenc",
+      "render_adapter": {
+        "name": "NVIDIA RTX 6000 Ada Generation",
+        "backend": "Vulkan",
+        "device_type": "DiscreteGpu",
+        "software": false
+      },
+      "quality": "final",
+      "seconds": 1.604961865,
+      "render_fps": 54.39869872510121,
+      "stage_seconds": [
+        0.006637053999999999,
+        0.3056248660000001,
+        0.021668381000000007,
+        0.29694275500000006
+      ],
+      "decode_wait_seconds": 0.0,
+      "vector_seconds": 0.06830695799999999,
+      "audio_seconds": 7.259e-06,
+      "loudness": null,
+      "true_peak": null,
+      "unsupported": [],
+      "accessibility": [],
+      "warnings": [],
+      "evaluation_warnings": [],
+      "uploads": [],
+      "passes": 1,
+      "segments": 1
+    }
+  },
+  {
+    "slug": "03-dof-focus-pull",
+    "exit": 0,
+    "queue_and_wall_seconds": 49.3,
+    "report": {
+      "path": "/home/pals/videos/ENGINE-ATLAS/03-dof-focus-pull/clip.mp4",
+      "files": [
+        "/home/pals/videos/ENGINE-ATLAS/03-dof-focus-pull/clip.mp4"
+      ],
+      "frames": 84,
+      "size": [
+        1080,
+        1920
+      ],
+      "fps": 24.0,
+      "encoder": "h264_nvenc",
+      "render_adapter": {
+        "name": "NVIDIA RTX 6000 Ada Generation",
+        "backend": "Vulkan",
+        "device_type": "DiscreteGpu",
+        "software": false
+      },
+      "quality": "final",
+      "seconds": 1.527626434,
+      "render_fps": 56.673649062637075,
+      "stage_seconds": [
+        0.0003827289999999999,
+        0.27685774699999993,
+        0.019959878000000004,
+        0.28545801399999987
+      ],
+      "decode_wait_seconds": 0.0,
+      "vector_seconds": 0.06576131999999998,
+      "audio_seconds": 4.347e-06,
+      "loudness": null,
+      "true_peak": null,
+      "unsupported": [],
+      "accessibility": [],
+      "warnings": [],
+      "evaluation_warnings": [],
+      "uploads": [],
+      "passes": 1,
+      "segments": 1
+    }
+  },
+  {
+    "slug": "04-25d-parallax",
+    "exit": 0,
+    "queue_and_wall_seconds": 53.53,
+    "report": {
+      "path": "/home/pals/videos/ENGINE-ATLAS/04-25d-parallax/clip.mp4",
+      "files": [
+        "/home/pals/videos/ENGINE-ATLAS/04-25d-parallax/clip.mp4"
+      ],
+      "frames": 84,
+      "size": [
+        1080,
+        1920
+      ],
+      "fps": 24.0,
+      "encoder": "h264_nvenc",
+      "render_adapter": {
+        "name": "NVIDIA RTX 6000 Ada Generation",
+        "backend": "Vulkan",
+        "device_type": "DiscreteGpu",
+        "software": false
+      },
+      "quality": "final",
+      "seconds": 1.6221179989999999,
+      "render_fps": 52.89006199242277,
+      "stage_seconds": [
+        0.014641323999999999,
+        0.282903945,
+        0.019350476000000005,
+        0.3116028770000002
+      ],
+      "decode_wait_seconds": 0.0,
+      "vector_seconds": 0.07143801399999994,
+      "audio_seconds": 1.1568e-05,
+      "loudness": null,
+      "true_peak": null,
+      "unsupported": [],
+      "accessibility": [],
+      "warnings": [],
+      "evaluation_warnings": [],
+      "uploads": [],
+      "passes": 1,
+      "segments": 1
+    }
+  },
+  {
+    "slug": "06-materials",
+    "exit": 0,
+    "queue_and_wall_seconds": 4.986
+  }
+]

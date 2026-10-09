@@ -1,0 +1,2 @@
+warning: rendering on a software adapter (llvmpipe (LLVM 20.1.2, 256 bits), Vulkan): expect renders many times slower than on a GPU; `scene-render gpus` lists the adapters found and SR_GPU_ADAPTER picks one
+wrote /home/pals/videos/ENGINE-ATLAS/26-rich-2d-count/still.png (t = 3.0000 s, 34 draws)

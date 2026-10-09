@@ -1,0 +1,6 @@
+{
+  "source": "/home/pals/videos/ENGINE-ATLAS/work/technical-v1/06-materials/scene.xml",
+  "sha256": "57c9d104ea8f3f7463f482597ca2becdb9dac4239fefdd67a8796522e1c069a2",
+  "removed_node": "<object3D id=\"behindGlass\" primitive=\"box\" width=\"250\" height=\"240\" depth=\"20\" x=\"760\" y=\"890\" z=\"350\" material=\"paperMat\" />",
+  "finding": "The rectangle is an authored behindGlass box, not evidence of an engine artifact."
+}

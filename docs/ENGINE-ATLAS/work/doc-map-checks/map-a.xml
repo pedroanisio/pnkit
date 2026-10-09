@@ -1,0 +1,25 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<scene version="1.2">
+<project width="1080" height="1920" fps="24" duration="3.5" background="#0B1520" motionBlur="false" seed="20261002"/>
+<assets><text id="titleAsset" text="O mapa tem relevo" fontFile="../../assets/atlas.ttf" size="64" color="#F4EFE4" width="888" height="180"/>
+<text id="subAsset" text="Map nativo / Terrarium / terreno sintético" fontFile="../../assets/atlas.ttf" size="28" color="#A8BCCB" width="888" height="100"/>
+<text id="footAsset" text="PALS / ENGINE ATLAS" fontFile="../../assets/atlas.ttf" size="23" color="#A8BCCB" width="888" height="50"/><geo id="island" src="../../assets/toy-island.geojson"/>
+<tiles id="dem" src="../../assets/synthetic-hill.pmtiles" attribution="Elevação sintética de teste rs-scene-render"/>
+<map id="terrainMap" width="820" height="820" projection="web-mercator" centerLon="0" centerLat="0" zoom="11" background="#58AFA3"><geoLayer geo="island" fill="#9BC6AC" stroke="#E8D19C" strokeWidth="4"/><route points="-0.06,-0.04 0.06,0.04" stroke="#E8C27E" strokeWidth="8"/><pin lon="0" lat="0" radius="10"/></map></assets>
+<materials><material id="ceramic" baseColor="#26B8AC" roughness="0.3" clearcoat="0.35"/>
+<material id="gold" baseColor="#E8BC79" metallic="1" roughness="0.22"/>
+<material id="floorMat" baseColor="#26394B" roughness="0.45"/>
+<material id="glassMat" baseColor="#D8F5FF" transmission="1" roughness="0.025" ior="1.48" thickness="65" attenuationColor="#67CBD5" attenuationDistance="350"/>
+<material id="paperMat" baseColor="#E5D9BA" baseColorMap="../../assets/paper.png" roughness="0.94"/>
+<material id="clothMat" baseColor="#73B7C1" baseColorMap="../../assets/weave.png" roughness="0.82" sheenColor="#BBF5FF" sheenRoughness="0.55"/></materials>
+<composition><camera id="cam" fov="42" x="540" y="750" z="-1400" pitch="-7" ></camera><object3D id="floor" primitive="box" width="2400" height="30" depth="2200" x="540" y="1330" z="360" material="floorMat"/><object3D id="terrain" primitive="map" map="terrainMap" terrain="dem" exaggeration="3" resolution="96" textureSize="768" x="540" y="1080" z="50" rotationX="-65"><animate property="rotationY"><key time="0" value="-12" interpolation="sine-in-out"/><key time="3.5" value="12"/></animate></object3D>
+<layer id="title" asset="titleAsset" x="96" y="205"/>
+<shape id="accentRule" shape="rect" x="96" y="400" width="94" height="5" fill="#E8BC79"/>
+<layer id="sub" asset="subAsset" x="96" y="440"/>
+<layer id="footer" asset="footAsset" x="96" y="1720"/>
+</composition><lights><light id="ambient" type="ambient" intensity="0.11" color="#AACBDD"/>
+<light id="key" type="point" x="-250" y="200" z="-650" intensity="130" colorTemperature="4400" castShadow="true" shadowMapSize="1024" shadowSoftness="1.5" contactShadows="false" contactShadowLength="50"/>
+<light id="rim" type="point" x="1100" y="650" z="350" intensity="80" colorTemperature="9000"/>
+<light id="front" type="point" x="640" y="600" z="-900" intensity="65"/></lights>
+
+</scene>

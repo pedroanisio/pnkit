@@ -1,0 +1,4 @@
+Projeto: motor
+Tarefa: engine-linebreaks-001
+Sessao: cx-engine
+PROGRESS: sr-text20testsPASS e comparaçãoGPU default/source inicialPASS. Rerun entrega/presets atualizado aguarda slot4 no servidor2 desde15:03 UTC; sr-remote escolhe um slot para esperar quando todos estão ocupados e não troca se outro fica livre. Às15:08:59 status mostrava7 holders sem cx-engine, incluindo checks longos. Não alterei wrapper/slots nem comecei CPU no servidor1. Enquanto espero, entreguei contribuição medida para capacidade-001 e preparei XML27 +harness nativo. Após teste, diff/HANDOFF; nenhuma permissão negada. Recursos: favor informar ETA/coordenação do slot4; sem interromper trabalho de terceiros para mim.

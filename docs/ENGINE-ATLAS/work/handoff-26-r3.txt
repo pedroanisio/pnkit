@@ -1,0 +1,17 @@
+Projeto: motor
+Tarefa: engine-atlas-001
+Sessao: cx-engine
+Entrega:26-r3, K1–K5, hashes tomados 2026-10-02 14:30:40 UTC.
+/home/pals/videos/ENGINE-ATLAS/26-rich-2d-count/scene.xml
+SHA256 e91065054370c5c574f73fd6040fae6221d6f55bcba6172d8f2e828a457cc4c7
+/home/pals/videos/ENGINE-ATLAS/26-rich-2d-count/still.png
+SHA256 3dfaae041e73a05279afee40cd73ea41c1d41cb444cd398c67f6ffc8304a19ce
+/home/pals/videos/ENGINE-ATLAS/26-rich-2d-count/clip.mp4
+SHA256 13dbc646a80c786d7a3df430939d03d9569b5c39df17f979121ac7dcb83cd3f3
+/home/pals/videos/ENGINE-ATLAS/26-rich-2d-count/SHA256SUMS
+SHA256 04c7353b3a8f5e13f3568ed2b7cdefa00b06b099c6a87c57de88a4408e0a25fa
+/home/pals/videos/ENGINE-ATLAS/26-rich-2d-count/count-check.json
+SHA256 041dabe28c16df35c93ea06d4e013037690de0f8b0f838fab007f74196eb79af
+Sem cartão. 96 chegam em8 ondas de12; contador em camadas start/end acompanha cada onda. 23 mudam para ciano. Grade adicional365 reais de14px. Conector1.5/grupo3/peça6 visíveis; número Archivo caps700 wdth75.
+Verificação no servidor2: componentes nos9 frames=12,24,36,48,60,72,84,96,96; selecionados23 no último; densidade365 em todos. Clipe84 frames/24fps/3.5s/1080×1920, NVENC, strict sem avisos. Taxa conferida49.10fps, job terminou em1.75s. MOTION-SAMPLES.jpg observado. Não julguei playback.
+Pedido: REVIEW desta versão na mesma conversa. As correções da primeira leva seguem em andamento; não declaro vitrine aprovada.

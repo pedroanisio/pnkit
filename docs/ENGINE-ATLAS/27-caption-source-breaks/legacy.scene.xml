@@ -1,0 +1,33 @@
+<?xml version='1.0' encoding='utf-8'?>
+<scene version="1.2">
+  <project width="1080" height="1920" fps="24" duration="3.5" background="#0B1520" motionBlur="false" seed="20261002" />
+  <styles>
+    <textStyle id="pn-heading" fontAsset="pn-archivo" size="64" weight="700" variation="wght 700, wdth 75" />
+    <textStyle id="pn-subtitle" fontAsset="pn-archivo" size="36" weight="400" variation="wght 400, wdth 90" />
+    <textStyle id="capstyle" fontAsset="pn-archivo" font="Archivo" size="56" weight="700" color="#F4EFE4" lineHeight="1.2" />
+  </styles>
+  <assets>
+    <font id="pn-archivo" src="../assets/archivo.ttf" family="Archivo" license="OFL-1.1" />
+    <text id="titleAsset" text="QUEBRAS SOB CONTROLE" style="pn-heading" fontFile="../assets/archivo.ttf" size="64" weight="700" color="#F4EFE4" width="888" height="180" />
+    <text id="subAsset" text="Greedy preserva / source encerra a linha" style="pn-subtitle" fontFile="../assets/archivo.ttf" size="36" color="#A8BCCB" width="888" height="130" />
+    <text id="labelA" text="PADRÃO: GREEDY" style="pn-heading" fontFile="../assets/archivo.ttf" size="36" color="#A8BCCB" width="888" height="60" />
+    <text id="labelB" text="OPT-IN: SOURCE" style="pn-heading" fontFile="../assets/archivo.ttf" size="36" color="#E8BC79" width="888" height="60" />
+    <text id="footAsset" text="TESTE DE FONTE / PIN INALTERADO" fontFile="../assets/archivo.ttf" size="23" color="#A8BCCB" width="888" height="50" />
+  </assets>
+  <composition>
+    <layer id="title" asset="titleAsset" x="96" y="205" />
+    <shape id="rule" shape="rect" x="96" y="400" width="94" height="5" fill="#E8BC79" />
+    <layer id="sub" asset="subAsset" x="96" y="440" />
+    <layer id="labelGreedy" asset="labelA" x="96" y="790" />
+    <layer id="labelSource" asset="labelB" x="96" y="1210" />
+    <layer id="footer" asset="footAsset" x="96" y="1720" />
+  </composition>
+  <captions>
+    <captionTrack id="caption-greedy" language="pt" preset="highlight" style="capstyle" activeColor="#E8BC79" maxCharsPerLine="80" y="48%">
+      <cue start="0" end="3.5" text="Uma ideia&#10;por linha" />
+    </captionTrack>
+    <captionTrack id="caption-source" language="pt" preset="highlight" style="capstyle" activeColor="#E8BC79" maxCharsPerLine="80" y="70%">
+      <cue start="0" end="3.5" text="Uma ideia&#10;por linha" />
+    </captionTrack>
+  </captions>
+</scene>

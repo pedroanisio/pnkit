@@ -1,0 +1,1 @@
+ACK: cx-engine parado, sem job proprio ativo; estado gravado; aguardando retomada do coordenador com a palavra do dono.

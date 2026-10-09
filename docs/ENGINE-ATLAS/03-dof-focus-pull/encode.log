@@ -1,0 +1,2 @@
+rendering on NVIDIA RTX 6000 Ada Generation (Vulkan, DiscreteGpu)
+/home/pals/videos/ENGINE-ATLAS/03-dof-focus-pull/clip.mp4: frame 84/84 (100.0 %), 72.4 frames/s, about 0 s left; last 1 s: 72.4 frames/s, per frame evaluate 0 ms, render 3 ms, GPU wait 0 ms, encoder 3 ms, CPU 34 %

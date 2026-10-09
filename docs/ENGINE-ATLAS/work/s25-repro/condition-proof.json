@@ -1,0 +1,142 @@
+{
+  "graph_checks": [
+    {
+      "t": 0,
+      "visible_objects": 47,
+      "full_objects": 3921,
+      "condition_objects": 49
+    },
+    {
+      "t": 0.5,
+      "visible_objects": 49,
+      "full_objects": 3921,
+      "condition_objects": 49
+    },
+    {
+      "t": 13.19,
+      "visible_objects": 39,
+      "full_objects": 3921,
+      "condition_objects": 45
+    },
+    {
+      "t": 13.24,
+      "visible_objects": 43,
+      "full_objects": 3921,
+      "condition_objects": 43
+    },
+    {
+      "t": 14,
+      "visible_objects": 43,
+      "full_objects": 3921,
+      "condition_objects": 43
+    },
+    {
+      "t": 16.555,
+      "visible_objects": 39,
+      "full_objects": 3921,
+      "condition_objects": 51
+    },
+    {
+      "t": 21.5,
+      "visible_objects": 103,
+      "full_objects": 3921,
+      "condition_objects": 103
+    },
+    {
+      "t": 23.826,
+      "visible_objects": 167,
+      "full_objects": 3921,
+      "condition_objects": 3737
+    },
+    {
+      "t": 24,
+      "visible_objects": 3737,
+      "full_objects": 3921,
+      "condition_objects": 3737
+    },
+    {
+      "t": 24.326,
+      "visible_objects": 3609,
+      "full_objects": 3921,
+      "condition_objects": 3609
+    },
+    {
+      "t": 25.3,
+      "visible_objects": 3618,
+      "full_objects": 3921,
+      "condition_objects": 3618
+    },
+    {
+      "t": 33.8,
+      "visible_objects": 3636,
+      "full_objects": 3921,
+      "condition_objects": 3636
+    },
+    {
+      "t": 37.9,
+      "visible_objects": 3657,
+      "full_objects": 3921,
+      "condition_objects": 3657
+    },
+    {
+      "t": 38.012,
+      "visible_objects": 3617,
+      "full_objects": 3921,
+      "condition_objects": 3620
+    },
+    {
+      "t": 39,
+      "visible_objects": 3617,
+      "full_objects": 3921,
+      "condition_objects": 3617
+    },
+    {
+      "t": 40.122,
+      "visible_objects": 3609,
+      "full_objects": 3921,
+      "condition_objects": 3617
+    },
+    {
+      "t": 44,
+      "visible_objects": 3609,
+      "full_objects": 3921,
+      "condition_objects": 3609
+    },
+    {
+      "t": 49,
+      "visible_objects": 3609,
+      "full_objects": 3921,
+      "condition_objects": 3609
+    },
+    {
+      "t": 51.9,
+      "visible_objects": 3609,
+      "full_objects": 3921,
+      "condition_objects": 3609
+    },
+    {
+      "t": 52,
+      "visible_objects": 39,
+      "full_objects": 3921,
+      "condition_objects": 3609
+    }
+  ],
+  "pixel_checks": [
+    {
+      "t": 0.5,
+      "rgba_max_delta": 0,
+      "different_components": 0
+    },
+    {
+      "t": 14,
+      "rgba_max_delta": 0,
+      "different_components": 0
+    },
+    {
+      "t": 39,
+      "rgba_max_delta": 0,
+      "different_components": 0
+    }
+  ],
+  "scope": "Pinned premium on llvmpipe server2; condition scene is a copy; original film unchanged. GPU throughput for workaround not measured."
+}

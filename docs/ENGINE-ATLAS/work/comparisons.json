@@ -1,0 +1,29 @@
+[
+  {
+    "slug": "01-pbr-key-rim",
+    "subject_mean_absolute_difference": 27.52920605526161,
+    "changes": [
+      "KEY",
+      "KEY + RIM"
+    ],
+    "limitations": "Cropped native renders; mean pixel change is not an aesthetic score."
+  },
+  {
+    "slug": "02-hdri-ao-ssr",
+    "subject_mean_absolute_difference": 1.4917019400352733,
+    "changes": [
+      "SEM AO / SSR",
+      "COM AO / SSR"
+    ],
+    "limitations": "Cropped native renders; mean pixel change is not an aesthetic score."
+  },
+  {
+    "slug": "08-grade-lut-look",
+    "subject_mean_absolute_difference": 7.077916225749559,
+    "changes": [
+      "SEM LUT",
+      "COM LUT"
+    ],
+    "limitations": "Cropped native renders; mean pixel change is not an aesthetic score."
+  }
+]

@@ -1,0 +1,15 @@
+{
+  "hashed_utc": "2026-10-02 15:28:46 UTC",
+  "paths": {
+    "/home/pals/.local/share/scene-render/rs-scene-render/maint/engine-linebreaks-001/linebreaks.patch": "89b97cb0a7f6cbf061a123c1880dd75cddee10a782958acdfa2abc79682ae09d",
+    "/home/pals/.local/share/scene-render/rs-scene-render/maint/engine-linebreaks-001/REPORT.md": "4e41d4a50f7dda8f168ec1d0fa0fc98695a6da16092204387bd6c5aa9ec90c36",
+    "/home/pals/.local/share/scene-render/rs-scene-render/maint/engine-linebreaks-001/SHA256SUMS": "211803ded308d14aae7c0a0d08f44d13e4a45ee530e7a9a6169d5817aa28080c",
+    "/home/pals/videos/ENGINE-ATLAS/27-caption-source-breaks/scene.xml": "663cdf114f5afda6a4fc71988ce39215c9d51c711887369f760dec8efaaec66d",
+    "/home/pals/videos/ENGINE-ATLAS/27-caption-source-breaks/still.png": "8db810658242f67f134947504a9c1638dbd26bd34bb490f2752fe42be3bfb0e7",
+    "/home/pals/videos/ENGINE-ATLAS/27-caption-source-breaks/clip.mp4": "03910511baccd258cae0172b050c460c3118c87d77dba8b875df505a547969a2",
+    "/home/pals/videos/ENGINE-ATLAS/27-caption-source-breaks/evidence.json": "179b633480833c8583d932439e3b2e97eaf61a9b929071a7db662aa43f8cb01c",
+    "/home/pals/videos/ENGINE-ATLAS/27-caption-source-breaks/clip-check.json": "880746612312227565a9fd90a440cb0aaa430c506e141dd3b7448d18af54e84c",
+    "/home/pals/videos/ENGINE-ATLAS/27-caption-source-breaks/SHA256SUMS": "9346ece4801cc754632611e72418525a1294bafe45fbe53b00da03024f1566e5",
+    "/home/pals/videos/ENGINE-ATLAS/SHA256SUMS": "1779f2891658b3d1dc2d3c1328a16975165a798d8997f90d7b5efd7dfabf2858"
+  }
+}

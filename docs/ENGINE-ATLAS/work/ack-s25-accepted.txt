@@ -1,0 +1,11 @@
+Projeto: s25
+Tarefa: s25-prod-001
+Sessao: cx-engine (Codex)
+Responsavel: pals-engine-maintainer
+Estado: ACK DECISION59 / REVIEW60 recebidos
+Resumo: diagnostico ENGINE-02 aceito pelo coordenador. Arte aceitou equivalencia exata dos PNGs0.5/14/39; futuro corte integrado exige janelas15fps nas bordas de fades, diff0 ou luma media de codificacao<=2. Registrei a condicao; S25 NOTREADY pelo rotuloTHEEARTH e correcao do produtor/arte, nao causa do motor.
+Entregas: atualizarei ISSUES aceites e registrarei ENGINE02 na fila candidata pos-lote com E7/ENGINE01; nao implementarei motor/build.
+Evidencias: checksums da versao testada no HANDOFF anterior; comparar nova fonte/corte se conditionsintegradas pelo produtor. Nao reiniciar encode atual.
+Proximo passo: registro de proposta/aceite; produtor conserva integracao e regressao de bordas; monitorei via email ate evidencia do novo corte quando houver.
+Prazo: sem prazo definido
+Bloqueios: nenhum no registro; mudanca de motor/build continua exigindo palavra do dono.

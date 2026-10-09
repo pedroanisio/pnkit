@@ -1,0 +1,33 @@
+Projeto: motor
+Tarefa: engine-linebreaks-001
+Sessao: cx-engine (Codex)
+Responsavel: pals-engine-maintainer
+Estado: implementado e testado; HANDOFF para revisao, sem integracao/build
+Versao: diff8 arquivos / branch cx-engine/linebreaks-source; hash abaixo
+Resumo: lineBreaks="source" encerra uma linha na newline da cue. Limits maxCharsPerLine/maxWordsPerLine/maxLines continuam aplicados; default greedy preservado. Timings, indices karaoke/highlight/boxed-word, filtro de palavras e cortes/remarcacoes reversas preservam linhas e palavra ativa.
+Entregas:
+- Worktree /home/pals/src/rs-scene-render-linebreaks-cx-engine, base61f29dac0d109d4c1fcee00dd5cd4f91cec0e531: base limpa mais recente com fix de cauda aprovado, evita alteracoes nao commitadas da arvore premium. Nao foi integrada.
+- Patch testado, REPORT e logs: /home/pals/.local/share/scene-render/rs-scene-render/maint/engine-linebreaks-001/
+- Atlas27: /home/pals/videos/ENGINE-ATLAS/27-caption-source-breaks/README.md; scene.xml, still.png, clip.mp4, evidence.json, clip-check.json e controle legacy.scene.xml.
+- Root index tem apendice de desenvolvimento separado dos26 recursos do pin. Versao26 entregue permanece congelada em work/handoff3.
+Evidencias:
+- Server2 via sr-remote: sr-text20 tests PASS; sr-model schema1 PASS; sr-deliver caption8 PASS; sr-gpu text9 PASS; native test harness1 PASS. Clippy quatro crates afetados, all-targets -Dwarnings PASS. Fmt/diff checks PASS.
+- Controle sem atributo: render fonte testado vs premium fixado em t=1,75s, RGBA max0 / componentes diferentes0. Pixels default/greedy/newline->espaco iguais em classic/highlight/karaoke/one-word, tempos0,25/1,75/3,25s. Source altera tres presets e preserva one-word. Limites, blanklines/CRLF, span temporal e palavra ativa tambem testados.
+- Atlas27:84 frames nativos da biblioteca em cargo test, cada frame stats.errors/unsupported vazios; video3,5s/24fps/1080x1920,84 frames decodificados, nenhum erro. NVENC doPNG por sr-gpu: log0,51s para84 frames, speed6,58x; verificado no primeiro minuto. Nao e encode de um novo CLI.
+- Still e tres amostras codificadas vistos; sem escuta/playback, sem score de publicacao. Nao se realizou bateria completa de rollout/workspace/dois filmes, porque nao se anuncia build candidato.
+Limites: nao houve commit/push/cargo build scene-render nem alteracao dos pins; somente bibliotecas/testes compilados. Source ainda nao pode ser usado em filme com pin atual; requer decisao posterior de integracao/build/adocao. Newline XML deve ser &#10;. Blanklines ignoradas e palavras individuais indivisiveis como antes.
+Proximo passo: coordenador/cx-build revisar diff/evidencias na mesma conversa, obter a palavra do dono antes de commit/build; mantenho propriedade ate aceite exato. pals-improvement recebe cc para registrar.
+Prazo: sem prazo definido
+Bloqueios: nenhum na entrega. Waiter antigo proprio cancelado apos os testes finais PASS; nenhum job alheio interrompido.
+Checksums, calculados 2026-10-02 15:28:46 UTC:
+89b97cb0a7f6cbf061a123c1880dd75cddee10a782958acdfa2abc79682ae09d  /home/pals/.local/share/scene-render/rs-scene-render/maint/engine-linebreaks-001/linebreaks.patch
+4e41d4a50f7dda8f168ec1d0fa0fc98695a6da16092204387bd6c5aa9ec90c36  /home/pals/.local/share/scene-render/rs-scene-render/maint/engine-linebreaks-001/REPORT.md
+211803ded308d14aae7c0a0d08f44d13e4a45ee530e7a9a6169d5817aa28080c  /home/pals/.local/share/scene-render/rs-scene-render/maint/engine-linebreaks-001/SHA256SUMS
+663cdf114f5afda6a4fc71988ce39215c9d51c711887369f760dec8efaaec66d  /home/pals/videos/ENGINE-ATLAS/27-caption-source-breaks/scene.xml
+8db810658242f67f134947504a9c1638dbd26bd34bb490f2752fe42be3bfb0e7  /home/pals/videos/ENGINE-ATLAS/27-caption-source-breaks/still.png
+03910511baccd258cae0172b050c460c3118c87d77dba8b875df505a547969a2  /home/pals/videos/ENGINE-ATLAS/27-caption-source-breaks/clip.mp4
+179b633480833c8583d932439e3b2e97eaf61a9b929071a7db662aa43f8cb01c  /home/pals/videos/ENGINE-ATLAS/27-caption-source-breaks/evidence.json
+880746612312227565a9fd90a440cb0aaa430c506e141dd3b7448d18af54e84c  /home/pals/videos/ENGINE-ATLAS/27-caption-source-breaks/clip-check.json
+9346ece4801cc754632611e72418525a1294bafe45fbe53b00da03024f1566e5  /home/pals/videos/ENGINE-ATLAS/27-caption-source-breaks/SHA256SUMS
+1779f2891658b3d1dc2d3c1328a16975165a798d8997f90d7b5efd7dfabf2858  /home/pals/videos/ENGINE-ATLAS/SHA256SUMS
+Pin verificado 2026-10-02 15:29:41 UTC: f4b4b95bf192bedf12af9f3897c7aadb8a8be887a8d380aafc6010aa25f35679  /home/pals/.local/share/scene-render/bin/scene-render-premium

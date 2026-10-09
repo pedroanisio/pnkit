@@ -1,0 +1,40 @@
+Projeto: s25
+Tarefa: s25-prod-001
+Sessao: cx-engine (Codex)
+Responsavel: pals-engine-maintainer
+Estado: HANDOFF diagnostico reproduzido / contorno de cena testado, nao aplicado ao filme
+Versao: copia original sceneSHA3b6b7483478008f02d8a01d94dcadd2ccd3a3bf3e085f330bcce123f4f5127b5, pinSHAf4b4b95bf192bedf12af9f3897c7aadb8a8be887a8d380aafc6010aa25f35679; checados 2026-10-02 16:05:28 UTC
+Resumo (a): opacidadezero NAO produz drawGPU. Defeito de desempenho: milhares de nodes transparentes ainda encarecem o planejamento do compositor. A/B t0.5 tem3921objects3D/3872zero; tanto full como pruned desenham49meshes/2317104triangles, pixelsRGBAidenticos. Planning239.499→7.365ms removendo sozero. Fonte mostra three_members reescaneando irmaos para cada3D antes de firstmember, descarteopacitysoantes object_draws; causa quadratica consistente, sem perfil callstackRTX. Native instances expande um FrameNode por copia, nao batchingGPUunico.
+Resumo (b): contorno hoje em condition.scene.xml / conditions.json: so addcondition derivados dos intervalos/expressoes de opacity. Preserva1700cells, nucleos,septos, materiais,camera,indices,bloco/ordem3D e animacoes; elimina nodestransparentes do FrameGraph no trecho invisivel. Cullingantesrender via condition, sem agrupar em outra pass nem reduzir subdivisions/quantidade.
+Entregas:
+- /home/pals/videos/ENGINE-ATLAS/work/s25-repro/REPORT.md e DIAGNOSIS.json, reprofull/pruned/condition, scripts/logs/assets e20comparacoesgrafo.
+- /home/pals/videos/ENGINE-ATLAS/ISSUES.md ENGINE-02 registrado; notas espelhadas /home/pals/.local/share/scene-render/rs-scene-render/maint/s25-slow-start.
+Evidencias:
+- CPUserver2 Vulkanllvmpipe via sr-remote proprioENGINE-ATLAS. 6frames warmed15..20,1080x1920finalstrict. Full medianCPUplanning239.499ms /eval12.388ms; condition7.972ms /eval10.182ms. Mesmos49draws/triangles. SoftwareGPU~1137vs1150ms, portanto nao30x FPS: render1379.963→1159.609ms noSW.
+-20tempos (inclui rampas/bordas e coloniaativa) mantem objetos3Dpositivos e valores identicos. PNGs fullvscondition0.5/14/39s maxRGBA0, componentesdiferentes0, vistos completos; strict errors/unsupported vazios.
+- Ainda3600objects ativos na colonia; contorno melhora principalmente abertura/invisiveis, sem promessa de acelerar trechoativo.34torussegments256 sao geometria visiblecara; baixarsegmentsmudariaimagem, nao propus.
+- UID55 corrigiu UID53: soGPU3medido, localqueued/cancelled. UID56 producer temencode longo autorizadonaserver3; NAO interrompi nem modifiquei fonte/out/job, e nao peço restart no meio.
+- Nenhum motor/binario/gate/filme modificado, nenhum commit/build/push/jobGPUexecutado. Grafo20tempos/pixels3quadrosnao substituem regressao completa do novocorte; sem playback/escuta; FPSRTXdocontorno nao medido.
+Proximo passo: Arte conferir equivalencia da copia testada; produtor integrar APENAS conditions se aceitar (fora do encodevigente), validar nova fonte+quadros+encode; resources medirRTXagendado. Se nao integrar, encode longo atual autorizado continua solucao. Mantenhoownershipdiagnostico ateaceiteexato. Futurofixcalculablocouma vezporframe (proposta apenas), sem alterar motor agora.
+Prazo: sem prazo definido
+Bloqueios: nenhum para diagnosticoentregue; aplicacao requer arte/producer, nenhuma nova permissao solicitada nesta sessao.
+Checksums calculados 2026-10-02 16:05:28 UTC:
+f02a4977252e499db53e9026290a1a8e280b9e5aacee8b7e29943a9c482852ec  /home/pals/videos/ENGINE-ATLAS/work/s25-repro/REPORT.md
+f05d8ee1d4d97efacf26c7754b992be29984da377acda39c5897aa021a1aa1db  /home/pals/videos/ENGINE-ATLAS/work/s25-repro/DIAGNOSIS.json
+e628aa832b2b4d16d56ef1bcbb2ffd28fb83b15f1caa89a57407952a8024b058  /home/pals/videos/ENGINE-ATLAS/work/s25-repro/source.json
+dc88492faf2bf69e42df9d0e7007b17f615bea65023c16dc592ff2f58880fe48  /home/pals/videos/ENGINE-ATLAS/work/s25-repro/condition.scene.xml
+999aa0003dc6b442b52b0fa5caf7c99e354856d88f3adff97029092959330b63  /home/pals/videos/ENGINE-ATLAS/work/s25-repro/conditions.json
+9dcd686c2ec287d5248a8cac5144e782568f08abfdef534ad43bf1dde26e1d50  /home/pals/videos/ENGINE-ATLAS/work/s25-repro/condition-proof.json
+1627d7ddc1586e800f48074029ac312dc19d0c1c371de8e9b5967f2ed3b56be7  /home/pals/videos/ENGINE-ATLAS/work/s25-repro/compare.json
+b42bf63439816de2532980bf4516fd11cae2a705cd7bc90d1b0d57e6d2a9f568  /home/pals/videos/ENGINE-ATLAS/work/s25-repro/full-bench.log
+30e0193a04257ee0e816ec368bbff8669b1499a01b069eabf9edd1921c56797f  /home/pals/videos/ENGINE-ATLAS/work/s25-repro/pruned-bench.log
+1b88d257a2646f4d88661e4d9f80a4ef6f25cc19f15074ca467bb36c84cc09df  /home/pals/videos/ENGINE-ATLAS/work/s25-repro/condition-bench.log
+092b3baeb6b8acce260e83e9f821a4ef117c13c7a9b40c3a5b6d1a14684cb7cf  /home/pals/videos/ENGINE-ATLAS/work/s25-repro/full-0.5.png
+092b3baeb6b8acce260e83e9f821a4ef117c13c7a9b40c3a5b6d1a14684cb7cf  /home/pals/videos/ENGINE-ATLAS/work/s25-repro/condition-0.5.png
+7e1f37fc671310690f9d1d4517cc7003a297eec7dfe8e145361ff06ce33a91ad  /home/pals/videos/ENGINE-ATLAS/work/s25-repro/full-14.png
+7e1f37fc671310690f9d1d4517cc7003a297eec7dfe8e145361ff06ce33a91ad  /home/pals/videos/ENGINE-ATLAS/work/s25-repro/condition-14.png
+bdcc8d7201f25523140bb9169f88a579d6f2f82ea516cff55935daa53ed624c3  /home/pals/videos/ENGINE-ATLAS/work/s25-repro/full-39.png
+bdcc8d7201f25523140bb9169f88a579d6f2f82ea516cff55935daa53ed624c3  /home/pals/videos/ENGINE-ATLAS/work/s25-repro/condition-39.png
+245119e15ff79f614fadacbafb1648619730ee38cac666691a73f36c7d4c4889  /home/pals/videos/ENGINE-ATLAS/work/s25-repro/SHA256SUMS
+33426291348b7fe5b9821a43a280f1e0261f23f92a602eaa4d6261655ad5d9da  /home/pals/videos/ENGINE-ATLAS/ISSUES.md
+245119e15ff79f614fadacbafb1648619730ee38cac666691a73f36c7d4c4889  /home/pals/.local/share/scene-render/rs-scene-render/maint/s25-slow-start/SHA256SUMS

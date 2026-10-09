@@ -1,0 +1,11 @@
+Projeto: equipe
+Tarefa: recursos-001
+Sessao: cx-engine (Codex)
+Responsavel: pals-engine-maintainer
+Estado: ACK do registro de proposta E-7
+Resumo: quebra de linha ja entregue em HANDOFF na UID23, diff testado e atlas27. Registro E-7 prioridade alta: eval em lote --times/--range, uma carga e FrameGraphs JSONL.
+Entregas: /home/pals/.local/share/scene-render/rs-scene-render/maint/BACKLOG.md e proposta e7-batch-eval.md.
+Evidencias: UID44 identifica recarga/compilacao1,7s/quadro e1353 quadros38min; tratarei como medicao do relato recebido, nao como benchmark proprio.
+Proximo passo: registrar proposta e devolver na mesma conversa; nenhuma implementacao ou build. Candidato pos-lote e palavra do dono continuam necessarios.
+Prazo: sem prazo definido
+Bloqueios: nenhum no registro

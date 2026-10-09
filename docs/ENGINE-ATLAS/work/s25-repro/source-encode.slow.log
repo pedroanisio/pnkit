@@ -1,0 +1,5 @@
+rendering on NVIDIA RTX 6000 Ada Generation (Vulkan, DiscreteGpu)
+out/one-bacterium-forty-four-hours.mp4: frame 14/1530 (0.9 %), 1.3 frames/s, about 1128 s left; last 10 s: 1.3 frames/s, per frame evaluate 1 ms, render 647 ms, GPU wait 0 ms, encoder 0 ms, CPU 100 %
+out/one-bacterium-forty-four-hours.mp4: frame 36/1530 (2.4 %), 1.8 frames/s, about 851 s left; last 10 s: 2.2 frames/s, per frame evaluate 0 ms, render 458 ms, GPU wait 0 ms, encoder 0 ms, CPU 104 %
+out/one-bacterium-forty-four-hours.mp4: frame 58/1530 (3.8 %), 1.9 frames/s, about 777 s left; last 10 s: 2.2 frames/s, per frame evaluate 0 ms, render 459 ms, GPU wait 0 ms, encoder 0 ms, CPU 104 %
+out/one-bacterium-forty-four-hours.mp4: frame 80/1530 (5.2 %), 2.0 frames/s, about 740 s left; last 10 s: 2.2 frames/s, per frame evaluate 0 ms, render 462 ms, GPU wait 0 ms, encoder 0 ms, CPU 104 %

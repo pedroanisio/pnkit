@@ -1,0 +1,141 @@
+name: ci
+on: [push, pull_request]
+permissions:
+  contents: read
+env:
+  SR_GPU_BACKEND: vulkan
+  CARGO_BUILD_JOBS: 2
+jobs:
+  msrv:
+    runs-on: ubuntu-24.04
+    steps:
+      - uses: actions/checkout@v4
+      - uses: dtolnay/rust-toolchain@1.90.0
+      - run: cargo check --workspace --all-targets --locked
+  test:
+    runs-on: ubuntu-24.04
+    steps:
+      - uses: actions/checkout@v4
+      - uses: ./.github/actions/setup
+      - run: python3 tools/check_release_hygiene.py --all
+      - run: cargo fmt --all --check
+      - run: cargo clippy --workspace --all-targets -- -D warnings
+      - run: cargo test --workspace --locked --no-fail-fast -- --test-threads=1
+      - run: python3 -m unittest discover -s tools/tests -v
+        if: always()
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: test-diagnostics
+          path: |
+            target/environment/
+            target/golden-output/
+          if-no-files-found: warn
+  evidence:
+    runs-on: ubuntu-24.04
+    steps:
+      - uses: actions/checkout@v4
+      - uses: ./.github/actions/setup
+      - run: cargo build --locked --release -p scene-render
+      - run: python3 tools/evidence.py target/evidence
+      - run: python3 tools/evidence.py target/review --manifest tools/evidence/review.json --clips
+        if: success() || failure()
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: visual-evidence
+          path: |
+            target/environment/
+            target/evidence/
+            target/review/
+          if-no-files-found: warn
+  performance-gate:
+    # the renderer before and after this change, benched alternately on the same runner:
+    # a fixture more than 15% slower fails (tools/perf_gate.py)
+    runs-on: ubuntu-24.04
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+      - uses: ./.github/actions/setup
+      - id: base
+        run: |
+          base="${{ github.event.pull_request.base.sha || github.event.before }}"
+          if [ -n "$base" ] && [ "$base" != 0000000000000000000000000000000000000000 ] && git cat-file -e "$base^{commit}" 2>/dev/null; then
+            echo "sha=$base" >> "$GITHUB_OUTPUT"
+          else
+            echo "no base commit to compare against"
+          fi
+      - if: steps.base.outputs.sha
+        run: |
+          git worktree add "$RUNNER_TEMP/base" "${{ steps.base.outputs.sha }}"
+          cargo build --locked --release -p scene-render
+          (cd "$RUNNER_TEMP/base" && cargo build --locked --release -p scene-render)
+      - if: steps.base.outputs.sha
+        run: python3 tools/perf_gate.py "$RUNNER_TEMP/base/target/release/scene-render" target/release/scene-render --json target/perf-gate.json
+      - if: always() && steps.base.outputs.sha
+        uses: actions/upload-artifact@v4
+        with:
+          name: performance-gate
+          path: target/perf-gate.json
+          if-no-files-found: warn
+  performance:
+    runs-on: ubuntu-24.04
+    steps:
+      - uses: actions/checkout@v4
+      - uses: ./.github/actions/setup
+      - run: cargo test --release --test perf
+      - run: cargo build --release && target/release/scene-render eval tests/corpus/valid/kitchen-sink.scene.xml --bench
+      # smoke run: three transformed, feathered-mask image layers, rendered for a few frames
+      - run: python3 tools/perf_layers.py /tmp/perf_layers && target/release/scene-render render /tmp/perf_layers/perf_layers.scene.xml --bench --frames 0..3
+      # smoke run: four decoded 1080p60 layers, mixed audio, H.264 + AAC
+      - run: python3 tools/perf_video.py /tmp/perf_video --duration 1 && target/release/scene-render encode /tmp/perf_video/perf_video.scene.xml --hw software --end 0.25
+      - run: ffprobe -v error -show_entries stream=codec_name -of csv=p=0 /tmp/perf_video/perf_video.mp4 | grep -qx h264
+      # smoke run: 2,000 stroked shapes with trim paths and a 30-bone skinned rig
+      - run: python3 tools/perf_vector.py /tmp/perf_vector --duration 1 && target/release/scene-render encode /tmp/perf_vector/perf_vector.scene.xml --hw software --end 0.1
+      - run: ffprobe -v error -show_entries stream=codec_name -of csv=p=0 /tmp/perf_vector/perf_vector.mp4 | grep -qx h264
+      # smoke run: animated text layers and a karaoke caption track, H.264
+      - run: python3 tools/perf_text.py /tmp/perf_text --duration 1 && target/release/scene-render encode /tmp/perf_text/perf_text.scene.xml --hw software --end 0.1
+      - run: ffprobe -v error -show_entries stream=codec_name -of csv=p=0 /tmp/perf_text/perf_text.mp4 | grep -qx h264
+      # smoke run: 8 effects, a transition and 16-sample motion blur on two moving layers
+      - run: python3 tools/perf_effects.py /tmp/perf_effects --duration 1 && target/release/scene-render render /tmp/perf_effects/perf_effects.scene.xml --bench --frames 0..4
+      # smoke run: 207,936 triangles, 4 shadowed spot lights, transmission and depth of field at 1080p
+      - run: python3 tools/perf_3d.py /tmp/perf_3d --duration 1 && target/release/scene-render render /tmp/perf_3d/perf_3d.scene.xml --bench --frames 0..4
+      # smoke run: 200 rigid bodies, two soft bodies and three emitters at 1080p
+      - run: python3 tools/perf_physics.py /tmp/perf_physics --duration 2 && target/release/scene-render render /tmp/perf_physics/perf_physics.scene.xml --bench --frames 60..64
+      # 10-minute smoke run of the parser, evaluator and expression compiler; the fuzzer accepts a longer --seconds for extended runs
+      - run: cargo run --release -p sr-fuzz -- --seconds 600
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: performance-environment
+          path: |
+            target/environment/
+            /tmp/perf_*/*.scene.xml
+          if-no-files-found: warn
+  oracle:
+    runs-on: ubuntu-24.04
+    steps:
+      - uses: actions/checkout@v4
+      - uses: ./.github/actions/setup
+      - run: python3 tools/build_corpus.py && git diff --exit-code tests/corpus
+      - run: cargo build --release && python3 tools/oracle_diff.py 2000 1
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: oracle-environment
+          path: |
+            target/environment/
+            target/oracle*/
+          if-no-files-found: warn
+  portability:
+    strategy:
+      fail-fast: false
+      matrix:
+        os: [macos-14, windows-2022]
+    runs-on: ${{ matrix.os }}
+    steps:
+      - uses: actions/checkout@v4
+      - uses: dtolnay/rust-toolchain@stable
+      - run: cargo check --workspace --all-targets --locked
+      - run: cargo test -p sr-model -p sr-eval -p sr-resolve --lib --locked

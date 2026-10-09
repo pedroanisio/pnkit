@@ -1,0 +1,72 @@
+[
+  {
+    "slug": "01-pbr-key-rim",
+    "samples": [
+      0.25,
+      1.75,
+      3.25
+    ],
+    "subject_region_mean_absolute_difference": 5.905239582061768,
+    "limitation": "Frame difference confirms change, not perceptual motion quality."
+  },
+  {
+    "slug": "02-hdri-ao-ssr",
+    "samples": [
+      0.25,
+      1.75,
+      3.25
+    ],
+    "subject_region_mean_absolute_difference": 7.029159069061279,
+    "limitation": "Frame difference confirms change, not perceptual motion quality."
+  },
+  {
+    "slug": "03-dof-focus-pull",
+    "samples": [
+      0.25,
+      1.75,
+      3.25
+    ],
+    "subject_region_mean_absolute_difference": 2.7438321113586426,
+    "limitation": "Frame difference confirms change, not perceptual motion quality."
+  },
+  {
+    "slug": "04-25d-parallax",
+    "samples": [
+      0.25,
+      1.75,
+      3.25
+    ],
+    "subject_region_mean_absolute_difference": 31.996849060058594,
+    "limitation": "Frame difference confirms change, not perceptual motion quality."
+  },
+  {
+    "slug": "06-materials",
+    "samples": [
+      0.25,
+      1.75,
+      3.25
+    ],
+    "subject_region_mean_absolute_difference": 0.482986718416214,
+    "limitation": "Frame difference confirms change, not perceptual motion quality."
+  },
+  {
+    "slug": "07-particles-path-alpha",
+    "samples": [
+      0.25,
+      1.75,
+      3.25
+    ],
+    "subject_region_mean_absolute_difference": 2.97544527053833,
+    "limitation": "Frame difference confirms change, not perceptual motion quality."
+  },
+  {
+    "slug": "08-grade-lut-look",
+    "samples": [
+      0.25,
+      1.75,
+      3.25
+    ],
+    "subject_region_mean_absolute_difference": 5.239019870758057,
+    "limitation": "Frame difference confirms change, not perceptual motion quality."
+  }
+]

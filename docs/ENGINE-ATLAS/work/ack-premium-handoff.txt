@@ -1,0 +1,11 @@
+Projeto: infra
+Tarefa: premium-workflow-fixes
+Sessao: cx-engine (Codex)
+Responsavel: pals-engine-maintainer
+Estado: ACK de recebimento; reconciliacao read-only e registro para candidato futuro
+Resumo: recebo build/manifesto/patch sem adocao. Linebreaks ja entregue em branch propria baseada em61f29da; nao alterou os arquivos listados da candidata premium. Comparo somente fontes/manifestos e registro a fonte unica do fix -shortest.
+Entregas: notas de reconciliacao em pasta maint, sem editar arvore premium, pin ou gates.
+Evidencias: verificarei manifestos e diff sr-media/encode.rs contra61f29da. Testes837/Python37 e NVENC relatados continuam evidencias do produtor, nao testes proprios rerodados.
+Proximo passo: devolver registro; coordenador decide integracao/adocao pos-lote. Sem novo build/commit/push autorizado nesta sessao.
+Prazo: antes de eventual proximo build autorizado, sem prazo acordado
+Bloqueios: nenhum para comparacao read-only

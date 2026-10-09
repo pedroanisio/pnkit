@@ -1,0 +1,15 @@
+    Finished `test` profile [unoptimized + debuginfo] target(s) in 0.08s
+     Running unittests src/lib.rs (/home/pals/.cache/cx-engine-linebreaks-target/debug/deps/sr_deliver-e097bfe263e79367)
+
+running 8 tests
+test captions::tests::cues_keep_the_words_inside_the_span_at_output_times ... ok
+test captions::tests::a_cue_appears_once_per_segment_and_backwards_maps_swap ... ok
+test captions::tests::held_remap_omits_skipped_cues_and_keeps_each_visible_hold ... ok
+test captions::tests::freeze_keeps_active_cues_and_words_for_the_segment ... ok
+test captions::tests::reversing_remap_repeats_cues_and_word_timings ... ok
+test captions::tests::transcriptions_follow_the_selected_unmuted_audio ... ok
+test captions::tests::source_line_breaks_follow_trimmed_and_reversed_words ... ok
+test captions::tests::eased_revisits_and_short_holds_follow_the_actual_remap ... ok
+
+test result: ok. 8 passed; 0 failed; 0 ignored; 0 measured; 20 filtered out; finished in 0.00s
+

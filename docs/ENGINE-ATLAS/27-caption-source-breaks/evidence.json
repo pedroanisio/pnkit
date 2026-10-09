@@ -1,0 +1,24 @@
+{
+  "stages": [
+    {
+      "stage": "deliver-final",
+      "exit": 0,
+      "seconds": 0.10469332100183237
+    },
+    {
+      "stage": "gpu-final",
+      "exit": 0,
+      "seconds": 14.700519001009525
+    },
+    {
+      "stage": "clippy",
+      "exit": 0,
+      "seconds": 0.9898736210016068
+    }
+  ],
+  "frames": 84,
+  "legacy_pin_rgba_max_difference": 0,
+  "legacy_pin_different_components": 0,
+  "legacy_pin_mean_absolute_difference": 0.0,
+  "scope": "Native source test-library frames versus unchanged premium pinned render for document with no lineBreaks attribute. No candidate CLI build."
+}

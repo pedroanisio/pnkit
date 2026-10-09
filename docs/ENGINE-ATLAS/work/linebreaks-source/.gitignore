@@ -1,0 +1,4 @@
+/target
+*.pyc
+_tmp/
+.agent-tasks/

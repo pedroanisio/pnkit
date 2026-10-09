@@ -1,0 +1,201 @@
+{
+  "hashed_utc": "2026-10-02 16:03:56 UTC",
+  "original_scene_sha256": "3b6b7483478008f02d8a01d94dcadd2ccd3a3bf3e085f330bcce123f4f5127b5",
+  "pin_sha256": "f4b4b95bf192bedf12af9f3897c7aadb8a8be887a8d380aafc6010aa25f35679",
+  "metrics": {
+    "full": {
+      "median_render_ms": 1379.963,
+      "median_cpu_planning_submission_ms": 239.499,
+      "median_evaluation_ms": 12.388,
+      "median_software_gpu_ms": 1136.764,
+      "objects3d": 49,
+      "triangles": 2317104,
+      "frames": 6
+    },
+    "pruned": {
+      "median_render_ms": 1172.259,
+      "median_cpu_planning_submission_ms": 7.365,
+      "median_evaluation_ms": 0.101,
+      "median_software_gpu_ms": 1163.853,
+      "objects3d": 49,
+      "triangles": 2317104,
+      "frames": 6
+    },
+    "condition": {
+      "median_render_ms": 1159.609,
+      "median_cpu_planning_submission_ms": 7.972,
+      "median_evaluation_ms": 10.182,
+      "median_software_gpu_ms": 1150.486,
+      "objects3d": 49,
+      "triangles": 2317104,
+      "frames": 6
+    }
+  },
+  "opening_framegraph": {
+    "objects3d": 3921,
+    "world_opacity_zero": 3872,
+    "visible": 49
+  },
+  "pixel_delta_pruned": {
+    "batches": [
+      {
+        "name": "full",
+        "elapsed": 12.8744002070016
+      },
+      {
+        "name": "pruned",
+        "elapsed": 11.244167434007977
+      }
+    ],
+    "frame0_5_rgba_max_delta": 0,
+    "different_components": 0,
+    "mean_delta": 0.0
+  },
+  "condition_proof": {
+    "graph_checks": [
+      {
+        "t": 0,
+        "visible_objects": 47,
+        "full_objects": 3921,
+        "condition_objects": 49
+      },
+      {
+        "t": 0.5,
+        "visible_objects": 49,
+        "full_objects": 3921,
+        "condition_objects": 49
+      },
+      {
+        "t": 13.19,
+        "visible_objects": 39,
+        "full_objects": 3921,
+        "condition_objects": 45
+      },
+      {
+        "t": 13.24,
+        "visible_objects": 43,
+        "full_objects": 3921,
+        "condition_objects": 43
+      },
+      {
+        "t": 14,
+        "visible_objects": 43,
+        "full_objects": 3921,
+        "condition_objects": 43
+      },
+      {
+        "t": 16.555,
+        "visible_objects": 39,
+        "full_objects": 3921,
+        "condition_objects": 51
+      },
+      {
+        "t": 21.5,
+        "visible_objects": 103,
+        "full_objects": 3921,
+        "condition_objects": 103
+      },
+      {
+        "t": 23.826,
+        "visible_objects": 167,
+        "full_objects": 3921,
+        "condition_objects": 3737
+      },
+      {
+        "t": 24,
+        "visible_objects": 3737,
+        "full_objects": 3921,
+        "condition_objects": 3737
+      },
+      {
+        "t": 24.326,
+        "visible_objects": 3609,
+        "full_objects": 3921,
+        "condition_objects": 3609
+      },
+      {
+        "t": 25.3,
+        "visible_objects": 3618,
+        "full_objects": 3921,
+        "condition_objects": 3618
+      },
+      {
+        "t": 33.8,
+        "visible_objects": 3636,
+        "full_objects": 3921,
+        "condition_objects": 3636
+      },
+      {
+        "t": 37.9,
+        "visible_objects": 3657,
+        "full_objects": 3921,
+        "condition_objects": 3657
+      },
+      {
+        "t": 38.012,
+        "visible_objects": 3617,
+        "full_objects": 3921,
+        "condition_objects": 3620
+      },
+      {
+        "t": 39,
+        "visible_objects": 3617,
+        "full_objects": 3921,
+        "condition_objects": 3617
+      },
+      {
+        "t": 40.122,
+        "visible_objects": 3609,
+        "full_objects": 3921,
+        "condition_objects": 3617
+      },
+      {
+        "t": 44,
+        "visible_objects": 3609,
+        "full_objects": 3921,
+        "condition_objects": 3609
+      },
+      {
+        "t": 49,
+        "visible_objects": 3609,
+        "full_objects": 3921,
+        "condition_objects": 3609
+      },
+      {
+        "t": 51.9,
+        "visible_objects": 3609,
+        "full_objects": 3921,
+        "condition_objects": 3609
+      },
+      {
+        "t": 52,
+        "visible_objects": 39,
+        "full_objects": 3921,
+        "condition_objects": 3609
+      }
+    ],
+    "pixel_checks": [
+      {
+        "t": 0.5,
+        "rgba_max_delta": 0,
+        "different_components": 0
+      },
+      {
+        "t": 14,
+        "rgba_max_delta": 0,
+        "different_components": 0
+      },
+      {
+        "t": 39,
+        "rgba_max_delta": 0,
+        "different_components": 0
+      }
+    ],
+    "scope": "Pinned premium on llvmpipe server2; condition scene is a copy; original film unchanged. GPU throughput for workaround not measured."
+  },
+  "renderer_source_evidence": {
+    "three_members": "Each object3D invokes a sibling-block scan before first-member check; source excludes world opacity only later before object_draws. Quadratic repeated scan is consistent with measured CPU overhead; no NVIDIA call-stack profile collected.",
+    "instances": "program.rs expands object3D instances into one FrameNode per copy; no single draw call GPU batching promised."
+  },
+  "gpu_provenance": "Only RTX server3 measured per UID55; local restart queued/cancelled. Workaround NVIDIA throughput NOT measured. Producer authorized long encode belongs cx-2 per UID54/56."
+}

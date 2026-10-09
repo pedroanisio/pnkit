@@ -1,0 +1,9 @@
+HANDOFF improve-001 — correções documentais solicitadas depois do HANDOFF atlas-wave1.
+
+Atualizei /home/pals/videos/RS-ENGINE-PRODUCTION-GUIDE.md: §14 textStyle deixa de ser bug aberto e registra correção 92a007b; §8 Maps descreve geo/map, projeções, routes/pins/flyTo, tiles e map/globe 3D com limites; Appendix item 2 limita collision avoidance aos labels de basemap. Corrigi também a afirmação contraditória sobre inexistência de GeoJSON em §6 Avoid item 7.
+
+Conferência: README §§Text/Maps e teste de regressão crates/sr-gpu/tests/text.rs. Prova no binário fixado, servidor 2, --strict: textStyle baseado em token vermelho sem color explícito resulta RGB médio [31.3335,0,0]; override verde resulta [0,31.3335,0]. XMLs, PNGs e logs em /home/pals/videos/ENGINE-ATLAS/work/doc-map-checks/{style,explicit}.* e checks.json. Não rodei a suíte do motor, pois não há alteração de código.
+
+Registrei ENGINE-01 e E-1/E-2/E-3/E-5 como propostas pendentes em /home/pals/.local/share/scene-render/rs-scene-render/maint/BACKLOG.md, preservando o histórico. Não implementei código, compilei, fiz commit/push ou alterei pins.
+
+A vitrine E-4 de plano rico está pronta em 26-rich-2d-count/scene.xml e still.png: 12×8=96 peças, uma selecionada por cobertura coincidente, traços 1.5/3/6 px, luz radial suave, drop-shadow e câmera real 2.5D. Clipe aguarda sua vez na fila junto aos demais recursos da segunda leva; segue no HANDOFF final do atlas. O contorno de contactShadows já está na primeira entrega.

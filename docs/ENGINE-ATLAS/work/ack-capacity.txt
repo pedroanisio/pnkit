@@ -1,0 +1,4 @@
+Projeto: equipe
+Tarefa: capacidade-001
+Sessao: cx-engine
+ACK: contribuo com medidas reais de custo dos recursos do atlas e limites de inferência para throughput de filmes. Vou escrever ~/videos/improvement/capacity/pals-engine-maintainer.md; o dimensionamento dos servidores fica com cx-resources e a consolidação com cl-improve. Não altero motor/ferramentas por esta tarefa. Trabalho em paralelo à espera de testes CPU de engine-linebreaks-001, sem jobGPU adicional.

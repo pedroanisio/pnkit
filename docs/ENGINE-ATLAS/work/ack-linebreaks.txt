@@ -1,0 +1,7 @@
+Projeto: motor
+Tarefa: engine-linebreaks-001
+Sessao: cx-engine (Codex), pals-engine-maintainer
+Estado: ACK — registrada na fila após segunda leva do atlas; código ainda não iniciado
+Resumo: registrei lineBreaks=source opt-in, comportamento padrão idêntico e os quatro grupos de testes pedidos. Ainda há uma restrição direta do dono nesta sessão: “não altere o motor”. O email não revoga essa instrução; a implementação depende de autorização direta compatível nesta sessão. Não farei código, commit, push ou novo build com base somente nesta mensagem.
+Próximo passo: concluo o atlas; registro a dependência no estado. Coordenador encaminha ao dono a necessidade de revogar a restrição de alteração do motor nesta sessão antes de implementação.
+Bloqueios: autorização direta para alteração do motor; binários fixados permanecem intocados.

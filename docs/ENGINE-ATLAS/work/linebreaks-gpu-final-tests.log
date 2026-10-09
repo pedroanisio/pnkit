@@ -1,0 +1,17 @@
+   Compiling sr-gpu v0.1.2 (/home/pals/videos/ENGINE-ATLAS/work/linebreaks-source/crates/sr-gpu)
+    Finished `test` profile [unoptimized + debuginfo] target(s) in 0.94s
+     Running tests/text.rs (/home/pals/.cache/cx-engine-linebreaks-target/debug/deps/text-047aa4c4cae0336d)
+
+running 9 tests
+test caption_source_words_keep_breaks_when_profanity_is_filtered ... ok
+test unreadable_font_assets_are_reported ... ok
+test text_charts_codes_formulas_and_captions ... ok
+test text_animators_move_variable_font_axes ... ok
+test font_assets_are_loaded_even_though_no_layer_references_them ... ok
+test text_takes_its_colour_from_its_style_when_it_sets_none ... ok
+test per_character_blur_spreads_glyphs ... ok
+test text_animators_move_characters ... ok
+test caption_source_newlines_are_opt_in_and_default_pixels_stay_identical ... ok
+
+test result: ok. 9 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 13.68s
+

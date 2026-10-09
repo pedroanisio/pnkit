@@ -1,0 +1,17 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<scene version="1.2">
+<project width="1080" height="1920" fps="24" duration="3.5" background="#0B1520" motionBlur="false" seed="20261002"/>
+<assets><text id="titleAsset" text="O dado ocupa a tela" fontFile="../assets/atlas.ttf" size="64" color="#F4EFE4" width="888" height="180"/>
+<text id="subAsset" text="Chart / progress / valores de demonstração" fontFile="../assets/atlas.ttf" size="28" color="#A8BCCB" width="888" height="100"/>
+<text id="footAsset" text="PALS / ENGINE ATLAS" fontFile="../assets/atlas.ttf" size="23" color="#A8BCCB" width="888" height="50"/><chart id="barChart" kind="column" width="820" height="360" labels="A,B,C,D" showAxes="true" showValues="true"><series name="Demo" values="12 24 48 72" color="#42BEAC"/><animate property="progress"><key time="0.1" value="0" interpolation="sine-in-out"/><key time="2.8" value="1"/></animate></chart>
+<chart id="lineChart" kind="line" width="820" height="320" labels="0,1,2,3,4" showAxes="true"><series name="Demo" values="2 5 9 16 26" color="#E3BD7D"/><animate property="progress"><key time="0.1" value="0" interpolation="sine-in-out"/><key time="2.8" value="1"/></animate></chart></assets>
+
+<composition><layer id="bars" asset="barChart" x="130" y="700"/>
+<layer id="curve" asset="lineChart" x="130" y="1170"/>
+<layer id="title" asset="titleAsset" x="96" y="205"/>
+<shape id="accentRule" shape="rect" x="96" y="400" width="94" height="5" fill="#E8BC79"/>
+<layer id="sub" asset="subAsset" x="96" y="440"/>
+<layer id="footer" asset="footAsset" x="96" y="1720"/>
+</composition>
+
+</scene>

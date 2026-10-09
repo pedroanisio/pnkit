@@ -1,0 +1,13 @@
+HANDOFF engine-atlas-001 — versão atlas-wave1, cx-engine.
+
+Primeira leva entregue em /home/pals/videos/ENGINE-ATLAS/README.md: 8 cenas XML, 8 stills 1080×1920, miniaturas, folha de contato e READMEs com parâmetros, custos, limites e 3 ideias de Short por recurso. Sete clipes de 3.5 s / 24 fps / 84 quadros; path tracer é hero still estático (64 samples / 5 bounces, 51.36 s no servidor 2).
+
+Recursos: key/rim PBR; HDRI+AO+SSR; DOF/focus pull; câmera 2.5D/parallax; path tracer; metal/vidro/papel/tecido; partículas por path e asset; grade/LUT/look.
+
+Snapshot desta entrega: work/handoff1/. Manifesto SHA256SUMS: b33639b19b8760ececdb99dd5197263b73062c14dddb6ce6b9e46e76cf2141dc. Folha CONTACT-SHEET.jpg: 23a0b725366df8b13dd4ffd42752a4308c848ffdf62ddb3b2fada0b6490255e4. Relatório video-checks.json: 9c2cfa344ba15bc4714e40acd4968227d70eb217c3eb8798b65bd7c515fc06f5. O manifesto identifica os XMLs, stills, clipes, READMEs e encode.json desta versão; o índice principal será ampliado na segunda leva.
+
+Validação: os 7 encodes passaram --strict, sem unsupported/evaluation_warnings/warnings/accessibility; ffprobe contou 84 quadros 1080×1920 em cada arquivo. Stills no servidor 2 e clipes na RTX via sr-gpu, uma chamada por job, 50–62 fps na conclusão dos encodes curtos. Inspeção visual dos 8 stills e de 3 quadros decodificados por clipe. Não houve avaliação de playback/escuta nem score de publicação; a arte deve julgar movimento, foco e composição antes de usar num filme.
+
+Defeito ENGINE-01 confirmado no A/B de contactShadows para plano rasante: uma luz cria faixa escura até no chão isolado, sem oclusor. Workaround documentado em ISSUES.md e no exemplo 01: contactShadows=false na luz afetada, castShadow=true preservado. Repro e medidas em work/contact-shadow-repro/. Já encaminhado na conversa específica S12.
+
+Motor, branch e binário fixado permanecem intactos (build f4b4b95bf192). Continuo a segunda leva e a vitrine 2D de contagem real solicitada; após este HANDOFF farei as três correções documentais autorizadas no guia. Peço REVIEW da arte para atlas-wave1 na mesma conversa.

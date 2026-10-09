@@ -1,0 +1,314 @@
+[
+  {
+    "id": "generation-1",
+    "condition": "(time >= 0 && time <= 13.19)"
+  },
+  {
+    "id": "generation-core-1",
+    "condition": "(time >= 0 && time <= 13.19)"
+  },
+  {
+    "id": "generation-2",
+    "condition": "(time >= 13.19 && time <= 16.555)"
+  },
+  {
+    "id": "generation-core-2",
+    "condition": "(time >= 13.19 && time <= 16.555)"
+  },
+  {
+    "id": "generation-4",
+    "condition": "(time >= 16.555 && time <= 18.126)"
+  },
+  {
+    "id": "generation-core-4",
+    "condition": "(time >= 16.555 && time <= 18.126)"
+  },
+  {
+    "id": "generation-8",
+    "condition": "(time >= 18.126 && time <= 20.776)"
+  },
+  {
+    "id": "generation-core-8",
+    "condition": "(time >= 18.126 && time <= 20.776)"
+  },
+  {
+    "id": "generation-16",
+    "condition": "(time >= 20.776 && time <= 21.426)"
+  },
+  {
+    "id": "generation-core-16",
+    "condition": "(time >= 20.776 && time <= 21.426)"
+  },
+  {
+    "id": "generation-32",
+    "condition": "(time >= 21.426 && time <= 21.976)"
+  },
+  {
+    "id": "generation-core-32",
+    "condition": "(time >= 21.426 && time <= 21.976)"
+  },
+  {
+    "id": "generation-64",
+    "condition": "(time >= 21.976 && time <= 24.126)"
+  },
+  {
+    "id": "generation-core-64",
+    "condition": "(time >= 21.976 && time <= 24.126)"
+  },
+  {
+    "id": "cellsA",
+    "condition": "(time >= 23.826 && time <= 52)"
+  },
+  {
+    "id": "cellsB",
+    "condition": "(time >= 23.826 && time <= 52)"
+  },
+  {
+    "id": "coresA",
+    "condition": "(time >= 23.826 && time <= 52)"
+  },
+  {
+    "id": "coresB",
+    "condition": "(time >= 23.826 && time <= 52)"
+  },
+  {
+    "id": "septaA",
+    "condition": "(time >= 23.826 && time <= 52)"
+  },
+  {
+    "id": "septaB",
+    "condition": "(time >= 23.826 && time <= 52)"
+  },
+  {
+    "id": "mass-shell",
+    "condition": "(time >= 24.95 && time <= 38.212)"
+  },
+  {
+    "id": "mass-fill",
+    "condition": "(time >= 24.95 && time <= 38.212)"
+  },
+  {
+    "id": "mass-tick-1",
+    "condition": "((time >= 24.95 && time < 38.012 && 1 <= 0.9030899869919435*prop(\"cine-hours.x\") ? 1 : 0)) > 0"
+  },
+  {
+    "id": "mass-tick-2",
+    "condition": "((time >= 24.95 && time < 38.012 && 2 <= 0.9030899869919435*prop(\"cine-hours.x\") ? 1 : 0)) > 0"
+  },
+  {
+    "id": "mass-tick-3",
+    "condition": "((time >= 24.95 && time < 38.012 && 3 <= 0.9030899869919435*prop(\"cine-hours.x\") ? 1 : 0)) > 0"
+  },
+  {
+    "id": "mass-tick-4",
+    "condition": "((time >= 24.95 && time < 38.012 && 4 <= 0.9030899869919435*prop(\"cine-hours.x\") ? 1 : 0)) > 0"
+  },
+  {
+    "id": "mass-tick-5",
+    "condition": "((time >= 24.95 && time < 38.012 && 5 <= 0.9030899869919435*prop(\"cine-hours.x\") ? 1 : 0)) > 0"
+  },
+  {
+    "id": "mass-tick-6",
+    "condition": "((time >= 24.95 && time < 38.012 && 6 <= 0.9030899869919435*prop(\"cine-hours.x\") ? 1 : 0)) > 0"
+  },
+  {
+    "id": "mass-tick-7",
+    "condition": "((time >= 24.95 && time < 38.012 && 7 <= 0.9030899869919435*prop(\"cine-hours.x\") ? 1 : 0)) > 0"
+  },
+  {
+    "id": "mass-tick-8",
+    "condition": "((time >= 24.95 && time < 38.012 && 8 <= 0.9030899869919435*prop(\"cine-hours.x\") ? 1 : 0)) > 0"
+  },
+  {
+    "id": "mass-tick-9",
+    "condition": "((time >= 24.95 && time < 38.012 && 9 <= 0.9030899869919435*prop(\"cine-hours.x\") ? 1 : 0)) > 0"
+  },
+  {
+    "id": "named-ring-9",
+    "condition": "((time >= 24.95 && time < 38.012 && 9 <= 0.9030899869919435*prop(\"cine-hours.x\") ? 1 : 0)) > 0"
+  },
+  {
+    "id": "mass-tick-10",
+    "condition": "((time >= 24.95 && time < 38.012 && 10 <= 0.9030899869919435*prop(\"cine-hours.x\") ? 1 : 0)) > 0"
+  },
+  {
+    "id": "mass-tick-11",
+    "condition": "((time >= 24.95 && time < 38.012 && 11 <= 0.9030899869919435*prop(\"cine-hours.x\") ? 1 : 0)) > 0"
+  },
+  {
+    "id": "mass-tick-12",
+    "condition": "((time >= 24.95 && time < 38.012 && 12 <= 0.9030899869919435*prop(\"cine-hours.x\") ? 1 : 0)) > 0"
+  },
+  {
+    "id": "mass-tick-13",
+    "condition": "((time >= 24.95 && time < 38.012 && 13 <= 0.9030899869919435*prop(\"cine-hours.x\") ? 1 : 0)) > 0"
+  },
+  {
+    "id": "mass-tick-14",
+    "condition": "((time >= 24.95 && time < 38.012 && 14 <= 0.9030899869919435*prop(\"cine-hours.x\") ? 1 : 0)) > 0"
+  },
+  {
+    "id": "mass-tick-15",
+    "condition": "((time >= 24.95 && time < 38.012 && 15 <= 0.9030899869919435*prop(\"cine-hours.x\") ? 1 : 0)) > 0"
+  },
+  {
+    "id": "named-ring-15",
+    "condition": "((time >= 24.95 && time < 38.012 && 15 <= 0.9030899869919435*prop(\"cine-hours.x\") ? 1 : 0)) > 0"
+  },
+  {
+    "id": "mass-tick-16",
+    "condition": "((time >= 24.95 && time < 38.012 && 16 <= 0.9030899869919435*prop(\"cine-hours.x\") ? 1 : 0)) > 0"
+  },
+  {
+    "id": "mass-tick-17",
+    "condition": "((time >= 24.95 && time < 38.012 && 17 <= 0.9030899869919435*prop(\"cine-hours.x\") ? 1 : 0)) > 0"
+  },
+  {
+    "id": "mass-tick-18",
+    "condition": "((time >= 24.95 && time < 38.012 && 18 <= 0.9030899869919435*prop(\"cine-hours.x\") ? 1 : 0)) > 0"
+  },
+  {
+    "id": "named-ring-18",
+    "condition": "((time >= 24.95 && time < 38.012 && 18 <= 0.9030899869919435*prop(\"cine-hours.x\") ? 1 : 0)) > 0"
+  },
+  {
+    "id": "mass-tick-19",
+    "condition": "((time >= 24.95 && time < 38.012 && 19 <= 0.9030899869919435*prop(\"cine-hours.x\") ? 1 : 0)) > 0"
+  },
+  {
+    "id": "mass-tick-20",
+    "condition": "((time >= 24.95 && time < 38.012 && 20 <= 0.9030899869919435*prop(\"cine-hours.x\") ? 1 : 0)) > 0"
+  },
+  {
+    "id": "mass-tick-21",
+    "condition": "((time >= 24.95 && time < 38.012 && 21 <= 0.9030899869919435*prop(\"cine-hours.x\") ? 1 : 0)) > 0"
+  },
+  {
+    "id": "mass-tick-22",
+    "condition": "((time >= 24.95 && time < 38.012 && 22 <= 0.9030899869919435*prop(\"cine-hours.x\") ? 1 : 0)) > 0"
+  },
+  {
+    "id": "mass-tick-23",
+    "condition": "((time >= 24.95 && time < 38.012 && 23 <= 0.9030899869919435*prop(\"cine-hours.x\") ? 1 : 0)) > 0"
+  },
+  {
+    "id": "mass-tick-24",
+    "condition": "((time >= 24.95 && time < 38.012 && 24 <= 0.9030899869919435*prop(\"cine-hours.x\") ? 1 : 0)) > 0"
+  },
+  {
+    "id": "mass-tick-25",
+    "condition": "((time >= 24.95 && time < 38.012 && 25 <= 0.9030899869919435*prop(\"cine-hours.x\") ? 1 : 0)) > 0"
+  },
+  {
+    "id": "mass-tick-26",
+    "condition": "((time >= 24.95 && time < 38.012 && 26 <= 0.9030899869919435*prop(\"cine-hours.x\") ? 1 : 0)) > 0"
+  },
+  {
+    "id": "mass-tick-27",
+    "condition": "((time >= 24.95 && time < 38.012 && 27 <= 0.9030899869919435*prop(\"cine-hours.x\") ? 1 : 0)) > 0"
+  },
+  {
+    "id": "mass-tick-28",
+    "condition": "((time >= 24.95 && time < 38.012 && 28 <= 0.9030899869919435*prop(\"cine-hours.x\") ? 1 : 0)) > 0"
+  },
+  {
+    "id": "mass-tick-29",
+    "condition": "((time >= 24.95 && time < 38.012 && 29 <= 0.9030899869919435*prop(\"cine-hours.x\") ? 1 : 0)) > 0"
+  },
+  {
+    "id": "mass-tick-30",
+    "condition": "((time >= 24.95 && time < 38.012 && 30 <= 0.9030899869919435*prop(\"cine-hours.x\") ? 1 : 0)) > 0"
+  },
+  {
+    "id": "mass-tick-31",
+    "condition": "((time >= 24.95 && time < 38.012 && 31 <= 0.9030899869919435*prop(\"cine-hours.x\") ? 1 : 0)) > 0"
+  },
+  {
+    "id": "mass-tick-32",
+    "condition": "((time >= 24.95 && time < 38.012 && 32 <= 0.9030899869919435*prop(\"cine-hours.x\") ? 1 : 0)) > 0"
+  },
+  {
+    "id": "mass-tick-33",
+    "condition": "((time >= 24.95 && time < 38.012 && 33 <= 0.9030899869919435*prop(\"cine-hours.x\") ? 1 : 0)) > 0"
+  },
+  {
+    "id": "mass-tick-34",
+    "condition": "((time >= 24.95 && time < 38.012 && 34 <= 0.9030899869919435*prop(\"cine-hours.x\") ? 1 : 0)) > 0"
+  },
+  {
+    "id": "mass-tick-35",
+    "condition": "((time >= 24.95 && time < 38.012 && 35 <= 0.9030899869919435*prop(\"cine-hours.x\") ? 1 : 0)) > 0"
+  },
+  {
+    "id": "mass-tick-36",
+    "condition": "((time >= 24.95 && time < 38.012 && 36 <= 0.9030899869919435*prop(\"cine-hours.x\") ? 1 : 0)) > 0"
+  },
+  {
+    "id": "mass-tick-37",
+    "condition": "((time >= 24.95 && time < 38.012 && 37 <= 0.9030899869919435*prop(\"cine-hours.x\") ? 1 : 0)) > 0"
+  },
+  {
+    "id": "mass-tick-38",
+    "condition": "((time >= 24.95 && time < 38.012 && 38 <= 0.9030899869919435*prop(\"cine-hours.x\") ? 1 : 0)) > 0"
+  },
+  {
+    "id": "mass-tick-39",
+    "condition": "((time >= 24.95 && time < 38.012 && 39 <= 0.9030899869919435*prop(\"cine-hours.x\") ? 1 : 0)) > 0"
+  },
+  {
+    "id": "mass-tick-40",
+    "condition": "((time >= 24.95 && time < 38.012 && 40 <= 0.9030899869919435*prop(\"cine-hours.x\") ? 1 : 0)) > 0"
+  },
+  {
+    "id": "named-ring-40",
+    "condition": "((time >= 24.95 && time < 38.012 && 40 <= 0.9030899869919435*prop(\"cine-hours.x\") ? 1 : 0)) > 0"
+  },
+  {
+    "id": "earth-symbol-0",
+    "condition": "(time >= 0 && time <= 9.9)"
+  },
+  {
+    "id": "earth-halo-0",
+    "condition": "(time >= 0 && time <= 9.9)"
+  },
+  {
+    "id": "earth-symbol-38.012",
+    "condition": "(time >= 38.012 && time <= 40.122)"
+  },
+  {
+    "id": "earth-halo-38.012",
+    "condition": "(time >= 38.012 && time <= 40.122)"
+  },
+  {
+    "id": "earth-symbol-33.729",
+    "condition": "((time >= 33.729 && time < 38.012 && 960+(-5499.231208661901-prop(\"cam.y\")) >= 460 ? 1 : 0)) > 0"
+  },
+  {
+    "id": "earth-halo-33.729",
+    "condition": "(time >= 33.729 && time <= 38.012)"
+  },
+  {
+    "id": "balance-post",
+    "condition": "(time <= 10.4) || (time >= 37.962 && time <= 40.122)"
+  },
+  {
+    "id": "balance-foot",
+    "condition": "(time <= 10.4) || (time >= 37.962 && time <= 40.122)"
+  },
+  {
+    "id": "balance-beam",
+    "condition": "(time <= 10.4) || (time >= 37.962 && time <= 40.122)"
+  },
+  {
+    "id": "right-pan",
+    "condition": "(time <= 10.4) || (time >= 37.962 && time <= 40.122)"
+  },
+  {
+    "id": "right-wire",
+    "condition": "(time <= 10.4) || (time >= 37.962 && time <= 40.122)"
+  },
+  {
+    "id": "left-wire",
+    "condition": "(time <= 10.4) || (time >= 37.962 && time <= 40.122)"
+  }
+]

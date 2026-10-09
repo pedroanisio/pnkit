@@ -1,0 +1,52 @@
+<?xml version='1.0' encoding='utf-8'?>
+<scene version="1.2">
+  <project width="1080" height="1920" fps="24" duration="3.5" background="#0B1520" motionBlur="false" seed="20261002" />
+  <styles>
+    <textStyle id="pn-heading" fontAsset="pn-archivo" size="64" weight="700" variation="wght 700, wdth 75" />
+    <textStyle id="pn-subtitle" fontAsset="pn-archivo" size="36" weight="400" variation="wght 400, wdth 90" />
+  </styles>
+  <assets>
+    <font id="pn-archivo" src="../assets/archivo.ttf" family="Archivo" weight="400" license="OFL-1.1" />
+    <text id="titleAsset" text="O FOCO ESCOLHE A PEÇA" style="pn-heading" fontFile="../assets/archivo.ttf" size="64" weight="700" color="#F4EFE4" width="888" height="180" />
+    <text id="subAsset" text="Óptica de perto / foco 52 → 325 cm" style="pn-subtitle" fontFile="../assets/archivo.ttf" size="36" color="#A8BCCB" width="888" height="130" />
+    <text id="footAsset" text="PALS / ENGINE ATLAS" fontFile="../assets/archivo.ttf" size="23" color="#A8BCCB" width="888" height="50" />
+    <mesh id="rookAsset" src="../assets/rook.obj" format="obj" />
+    <mesh id="pawnAsset" src="../assets/pawn.obj" format="obj" />
+  </assets>
+  <materials>
+    <material id="floorMat" baseColor="#141C20" roughness="0.55" />
+    <material id="steel" baseColor="#BBCBD3" metallic="1" roughness="0.24" doubleSided="true" />
+    <material id="brass" baseColor="#C99848" metallic="1" roughness="0.22" />
+    <material id="glass" baseColor="#E6F7F5" transmission="1" roughness="0.025" ior="1.48" thickness="8" attenuationColor="#8ACEC2" attenuationDistance="450" />
+    <material id="water" baseColor="#C6E9EF" transmission="1" roughness="0.03" ior="1.33" thickness="100" attenuationColor="#428F9D" attenuationDistance="250" />
+    <material id="paper" baseColor="#EFE0BF" baseColorMap="../assets/paper.png" roughness="0.96" doubleSided="true" />
+    <material id="cloth" baseColor="#407E83" baseColorMap="../assets/weave.png" roughness="0.9" sheenColor="#AED6C9" sheenRoughness="0.5" doubleSided="true" />
+    <material id="black" baseColor="#070B10" roughness="0.12" />
+    <material id="ivory" baseColor="#ECE0BF" roughness="0.45" />
+    <material id="teal" baseColor="#32A89B" roughness="0.3" clearcoat="0.25" />
+  </materials>
+  <composition>
+    <camera id="cam" x="540" y="960" z="-300" pitch="-35" focalLength="50" depthOfField="true" fStop="2.2" focusDistance="52" far="100000">
+      <animate property="focusDistance">
+        <key time="0" value="52" interpolation="sine-in-out" />
+        <key time="3.5" value="325" />
+      </animate>
+    </camera>
+    <object3D id="table" primitive="box" width="200000" height="4" depth="200000" x="540" y="1172" z="0" material="floorMat" castShadow="false" />
+    <object3D id="nearStand" primitive="box" width="7.0" height="165.4927361626602" depth="7.0" x="532" y="1087.25363191867" z="-265" material="floorMat" />
+    <object3D id="near" primitive="mesh" mesh="rookAsset" x="532" y="1004.5072638373398" z="-265" scaleX="0.35" scaleY="0.35" scaleZ="0.35" material="teal" />
+    <object3D id="middleStand" primitive="box" width="14.0" height="123.48028387007753" depth="14.0" x="545" y="1108.2598580649612" z="-205" material="floorMat" />
+    <object3D id="middle" primitive="mesh" mesh="pawnAsset" x="545" y="1046.5197161299225" z="-205" scaleX="0.7" scaleY="0.7" scaleZ="0.7" material="ivory" />
+    <object3D id="farStand" primitive="box" width="32.0" height="7.946040065475472" depth="32.0" x="606" y="1166.0269799672624" z="-40" material="floorMat" />
+    <object3D id="far" primitive="mesh" mesh="pawnAsset" x="606" y="1162.0539599345245" z="-40" scaleX="1.6" scaleY="1.6" scaleZ="1.6" material="brass" />
+    <layer id="title" asset="titleAsset" x="96" y="205" />
+    <shape id="rule" shape="rect" x="96" y="400" width="94" height="5" fill="#E8BC79" />
+    <layer id="sub" asset="subAsset" x="96" y="440" />
+    <layer id="footer" asset="footAsset" x="96" y="1720" />
+  </composition>
+  <lights>
+    <light id="ambient" type="ambient" intensity="0.15" />
+    <light id="key" type="point" x="515" y="900" z="-330" intensity="0.8" colorTemperature="4500" castShadow="true" shadowMapSize="1024" />
+    <light id="dome" type="dome" environment="../assets/studio.hdr" intensity="0.4" />
+  </lights>
+</scene>

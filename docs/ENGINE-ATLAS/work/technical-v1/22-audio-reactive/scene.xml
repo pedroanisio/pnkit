@@ -1,0 +1,15 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<scene version="1.2">
+<project width="1080" height="1920" fps="24" duration="3.5" background="#0B1520" motionBlur="false" seed="20261002"/>
+<assets><text id="titleAsset" text="O som move a imagem" fontFile="../assets/atlas.ttf" size="64" color="#F4EFE4" width="888" height="180"/>
+<text id="subAsset" text="audioAmplitude / link / análise do mix" fontFile="../assets/atlas.ttf" size="28" color="#A8BCCB" width="888" height="100"/>
+<text id="footAsset" text="PALS / ENGINE ATLAS" fontFile="../assets/atlas.ttf" size="23" color="#A8BCCB" width="888" height="50"/><audio id="pulseAsset" src="../assets/pulse.wav" duration="3.5" sampleRate="48000" channels="1"/></assets>
+
+<composition><shape id="pulse" shape="ellipse" x="540" y="1060" width="580" height="580" anchorX="290" anchorY="290" fill="#3DC1AD" stroke="#D6E4D2" strokeWidth="4"><link property="scaleX" source="audio:drum:low" scale="0.5" offset="0.75"/><link property="scaleY" source="audio:drum:low" scale="0.5" offset="0.75"/></shape>
+<layer id="title" asset="titleAsset" x="96" y="205"/>
+<shape id="accentRule" shape="rect" x="96" y="400" width="94" height="5" fill="#E8BC79"/>
+<layer id="sub" asset="subAsset" x="96" y="440"/>
+<layer id="footer" asset="footAsset" x="96" y="1720"/>
+</composition>
+<audioMix sampleRate="48000"><audioTrack id="drum" asset="pulseAsset" volume="0.8"/></audioMix>
+</scene>

@@ -1,0 +1,36 @@
+{
+  "style": {
+    "exit": 0,
+    "mean_rgb": [
+      31.3335,
+      0.0,
+      0.0
+    ]
+  },
+  "explicit": {
+    "exit": 0,
+    "mean_rgb": [
+      0.0,
+      31.3335,
+      0.0
+    ]
+  },
+  "map-a": {
+    "exit": 0,
+    "zoom": 11,
+    "exaggeration": 3,
+    "tilt": -65
+  },
+  "map-b": {
+    "exit": 0,
+    "zoom": 12,
+    "exaggeration": 4,
+    "tilt": -65
+  },
+  "map-c": {
+    "exit": 0,
+    "zoom": 11,
+    "exaggeration": 5,
+    "tilt": -55
+  }
+}

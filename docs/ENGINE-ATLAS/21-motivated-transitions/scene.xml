@@ -1,0 +1,37 @@
+<?xml version='1.0' encoding='utf-8'?>
+<scene version="1.2">
+  <project width="1080" height="1920" fps="24" duration="3.5" background="#0B1520" motionBlur="false" seed="20261002" />
+  <styles>
+    <textStyle id="pn-heading" fontAsset="pn-archivo" size="64" weight="700" variation="wght 700, wdth 75" />
+    <textStyle id="pn-subtitle" fontAsset="pn-archivo" size="36" weight="400" variation="wght 400, wdth 90" />
+  </styles>
+  <assets>
+    <font id="pn-archivo" src="../assets/archivo.ttf" family="Archivo" weight="400" license="OFL-1.1" />
+    <text id="titleAsset" text="MUDAR TEM UMA RAZÃO" fontFile="../assets/archivo.ttf" size="64" color="#F4EFE4" width="888" height="180" style="pn-heading" weight="700" />
+    <text id="subAsset" text="Light leak / whip pan / luma" fontFile="../assets/archivo.ttf" size="36" color="#A8BCCB" width="888" height="130" style="pn-subtitle" />
+    <text id="footAsset" text="PALS / ENGINE ATLAS" fontFile="../assets/archivo.ttf" size="23" color="#A8BCCB" width="888" height="50" />
+    <generator id="lumaAsset" kind="gradient" width="820" height="230" paint="#000000" paint2="#FFFFFF" />
+  </assets>
+  <composition>
+    <group id="row0" x="130" y="630" width="820" height="230">
+      <shape id="a0" shape="rect" width="820" height="230" fill="#24505B" end="1.75" />
+      <shape id="b0" shape="rect" width="820" height="230" fill="#D8BB81" start="1.75" />
+      <transition type="light-leak" from="a0" to="b0" duration="0.85" direction="right" />
+    </group>
+    <group id="row1" x="130" y="930" width="820" height="230">
+      <shape id="a1" shape="rect" width="820" height="230" fill="#24505B" end="1.75" />
+      <shape id="b1" shape="rect" width="820" height="230" fill="#D8BB81" start="1.75" />
+      <transition type="whip-pan" from="a1" to="b1" duration="0.85" direction="right" />
+    </group>
+    <group id="row2" x="130" y="1230" width="820" height="230">
+      <shape id="a2" shape="rect" width="820" height="230" fill="#24505B" end="1.75" />
+      <shape id="b2" shape="rect" width="820" height="230" fill="#D8BB81" start="1.75" />
+      <layer id="matte2" asset="lumaAsset" />
+      <transition type="luma" from="a2" to="b2" duration="0.85" direction="right" matte="matte2" />
+    </group>
+    <layer id="title" asset="titleAsset" x="96" y="205" />
+    <shape id="accentRule" shape="rect" x="96" y="400" width="94" height="5" fill="#E8BC79" />
+    <layer id="sub" asset="subAsset" x="96" y="440" />
+    <layer id="footer" asset="footAsset" x="96" y="1720" />
+  </composition>
+</scene>

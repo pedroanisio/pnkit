@@ -1,0 +1,23 @@
+Projeto: motor
+Tarefa: engine-atlas-001
+Sessao: cx-engine
+Entrega: atlas26, segunda leva18 e correção primeira8 (r2), fontes e mídia atuais. Hashes tomados 2026-10-02 14:46:32 UTC.
+/home/pals/videos/ENGINE-ATLAS/SHA256SUMS
+SHA256 59749d27bd125959c7584a50af29ad7ab71ad98e9023089585b3d7feea4d79e7
+/home/pals/videos/ENGINE-ATLAS/CONTACT-SHEET.jpg
+SHA256 84666cb7539615441fdbf92142f6857ed8b95398f090047e61d5be5a40bd3b38
+/home/pals/videos/ENGINE-ATLAS/work/video-checks.json
+SHA256 0e0ad6922bd8932548910e24a8d67d08b3ada0bdc6fd6398ab35b7ed0eb8cbb7
+/home/pals/videos/ENGINE-ATLAS/work/final-validation.json
+SHA256 20151b2074bb751b03612c6cad96e6fd4b4ede813973f5f9cf606d193857e57a
+/home/pals/videos/ENGINE-ATLAS/work/gpu-batch-results.json
+SHA256 a064efe4f189d9e47e915c55ca20e4e9f2d41550d0a519351cad6c6d00321056
+/home/pals/videos/ENGINE-ATLAS/ISSUES.md
+SHA256 5664aa4367eb2c2e73342b0148ba432e1d3bbabc8793c3d02e5c133fa273d40f
+Índice: /home/pals/videos/ENGINE-ATLAS/README.md. Cada pasta XML+still+miniatura+README com parâmetros/custo/limites/2–3 aplicações.25 clipes3.5s,05 still apenas.
+Segunda leva09–26: deformers, skeleton/skin,puppet,rigid/soft physics,fluid,flock,slime,erosion,splats,motionPath,text animators,light-leak/whip/luma,audio-reactive,mapa nativo/DEM,charts,GLSL,contagem rica2D. Simulações nativas executadas, DEM sintético declarado, assets originais/OFL embarcados.
+Verificação servidor2:26 XMLs validate PASS,26 strict stills,25 clipes todos84 quadros decodificados/24fps/1080×1920/3.5s/strict sem warnings. Olhei as3 folhas de stills wave2 e5 folhas com3 tempos por clipe; primeira leva stills+frames+A-B também inspecionados. Não assisti playback nem ouvi áudio.22 áudio decodificado RMS.02618 e área varia1.6042×.26 nove frames confirmam12→96/23 selecionadas/365 peças, PASS da arte UID32 preservado.
+CorreçõesV1–V4: engrenagem01,bule cromado02,peças de xadrez em três profundidades03,montanhas de papel/neblina/lua04,ampulheta pathtrace12805,colher/copo oco/papel dobrado/pano06,bokeh suave e poeira07,óptica+LUT08; Archivo caps700/wdth75/subtítulo36; apoio real/piso sem borda. A-B lado a lado em01/02/08 com before.scene.xml; mesmos enquadramento/instante. Retângulo06 provado autoral (behindGlass), repro controlada em work/glass-rectangle-repro.
+Limites restantes explícitos:05 ainda tem fireflies/pontos isolados e custou166.199s, não capa final;06 água interna está presente mas nível pouco perceptível, não simulação;SSR mostra limites/padrões em superfície curva;25 volumeGLSL é ilustração. São demos, não corte publicável.
+GPU: refresh21 encodes sequenciais em um único ticket sr-gpu curto,41.027s total, taxas32.14–63.08fps conferidas durante o primeiro minuto, nenhum job concorrente.01–03/26 tinham tickets próprios anteriores. Build fixado inalterado, sem mudança de código-fonte no atlas.
+Pedido à arte: REVIEW desta versão da primeira leva e segunda leva;26 já PASS. Enquanto espero, passo à engine-linebreaks-001 conforme prioridade após wave2 e autorização direta do usuário; sem commit/push/pin/build fixado novo.

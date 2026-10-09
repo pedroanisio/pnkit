@@ -1,0 +1,37 @@
+<?xml version='1.0' encoding='utf-8'?>
+<scene version="1.2">
+  <project width="1080" height="1920" fps="30" duration="1" seed="12" background="#2A2622" workingColorSpace="linear-srgb" quality="final" />
+  <styles>
+    <textStyle id="cap" fontAsset="pn-archivo" size="58" weight="800" variation="wght 800, wdth 88" color="#F2EBDD" lineHeight="1.14" />
+    <textStyle id="big" fontAsset="pn-archivo" size="150" weight="900" variation="wght 900, wdth 62" color="#FFF6E8" textTransform="uppercase" lineHeight="0.95" />
+    <textStyle id="lab" fontAsset="pn-archivo" size="40" weight="700" variation="wght 700, wdth 100" color="#FFF6E8" textTransform="uppercase" tracking="40" />
+  </styles>
+  <colorManagement workingSpace="linear-srgb" toneMapping="aces2" />
+  <assets>
+    <font id="pn-archivo" src="assets/Archivo-wdth-wght.ttf" family="Archivo" weight="400" />
+    <image id="sky" src="assets/sky.png" width="512" height="1024" />
+    <image id="hf" src="assets/hill_far.png" width="2048" height="600" />
+    <image id="hm" src="assets/hill_mid.png" width="2048" height="600" />
+    <text id="t-cap" text="That bump you feel at the end&#10;of many bridges is a gap." style="cap" size="58" width="800" height="150" align="center" />
+    <text id="t-big" text="+40 °C" style="big" size="150" width="700" height="160" />
+    <text id="t-lab" text="480 MM LONGER" style="lab" size="40" width="700" height="56" />
+  </assets>
+  <materials>
+    <material id="m-asph" baseColor="#808080" roughness="0.88" />
+    <material id="m-steel" baseColorMap="assets/steel_base.png" metallic="0.85" roughness="0.34" clearcoat="0.2" clearcoatRoughness="0.3" />
+    <material id="m-dark" baseColor="#0B0A09" roughness="1" />
+    <material id="m-rail" baseColor="#8E8B86" metallic="0.6" roughness="0.45" />
+    <material id="m-paint" baseColor="#E9E3D2" roughness="0.7" />
+    <material id="m-tyre" baseColor="#1C1B1A" roughness="0.62" clearcoat="0.15" clearcoatRoughness="0.5" />
+    <material id="m-hub" baseColor="#8D9196" metallic="0.95" roughness="0.22" clearcoat="0.4" />
+  </materials>
+  <composition>
+    <camera id="c" x="-900" y="-1050" z="-2100" yaw="25.145" pitch="-21.204" fov="50" far="400000" depthOfField="false" fStop="4" focusDistance="2450" />
+    <object3D id="road" primitive="plane" width="9000" height="60000" x="1600" y="0" z="27000.0" rotationX="-90" material="m-asph" receiveShadow="true" />
+    </composition>
+  <lights>
+    <light id="amb" type="ambient" intensity="0.28" color="#9FB0D0" />
+    <light id="fill" type="directional" intensity="0.9" yaw="20" pitch="-35" colorTemperature="7500" castShadow="false" />
+    <light id="sun" type="directional" intensity="4.6" yaw="-125" pitch="-20" colorTemperature="3300" castShadow="true" shadowMapSize="4096" contactShadows="false" />
+  </lights>
+  </scene>

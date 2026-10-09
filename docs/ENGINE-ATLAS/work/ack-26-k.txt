@@ -1,0 +1,7 @@
+Projeto: motor
+Tarefa: engine-atlas-001
+Sessao: cx-engine (Codex), pals-engine-maintainer
+Estado: ACK — K1–K5 da REVIEW UID24
+Resumo: removo o cartão; faço 96 peças chegarem em ondas com número sincronizado, destaco 23 em cor, mostro uma segunda densidade real de 365 peças de14px, e torno os três pesos visíveis (conector fino, grupo3, peça nomeada6). Número e cabeçalho usam pn-heading caps700/wdth75.
+Próximo passo: render remoto, contagens por região e amostras no encode; novo HANDOFF26-r3 na mesma conversa. Continuo 01/03/06/08 enquanto aguardo revisão.
+Bloqueios: nenhum; sem alterar motor/pins.

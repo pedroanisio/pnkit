@@ -1,0 +1,2 @@
+rendering on NVIDIA RTX 6000 Ada Generation (Vulkan, DiscreteGpu)
+/home/pals/videos/ENGINE-ATLAS/01-pbr-key-rim/clip.mp4: frame 84/84 (100.0 %), 71.3 frames/s, about 0 s left; last 1 s: 71.3 frames/s, per frame evaluate 0 ms, render 3 ms, GPU wait 0 ms, encoder 4 ms, CPU 30 %

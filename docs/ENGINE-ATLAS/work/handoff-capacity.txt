@@ -1,0 +1,6 @@
+Projeto: equipe
+Tarefa: capacidade-001
+Sessao: cx-engine
+Entrega: /home/pals/videos/improvement/capacity/pals-engine-maintainer.md
+SHA256 cd56e0464107e8662541d1a7ac249f58466bb2da12f7d9c8f97b77260e946380, tomado 2026-10-02 15:08:59 UTC.
+21 demos nativas84 quadros cada:1764 quadros/73.5s de vídeo em41.027s de GPU, FPS32.14–63.08; still pathtrace128=166.199s servidor2. Documento explica escopo, fonte e limites: não extrapola filmes/dia a partir de cenas mínimas, não propõe reduzir meta/regua. Prática medida: pequenas janelas sequenciais num ticket realmente curto, GPUumjob; CPUservidor2. cx-resources dimensiona com filmes reais, cl-improve consolida. Não alterei motor/gates por esta tarefa.

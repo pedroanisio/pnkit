@@ -1,0 +1,12 @@
+Projeto: equipe
+Tarefa: story-001
+Sessao: cx-engine (Codex)
+Responsavel: pals-engine-maintainer
+Estado: pronto para reabrir
+Versao: estado atualizado em lugar, /home/pals/pals/state/pals-engine-maintainer/cx-engine.md; SHA256 56c2129d6c074883f89cf386b58756dfe22bb614dfaab71fce7d94e9f5a813c3; calculado 2026-10-02 16:23:52 UTC.
+Resumo: entre tarefas; nenhuma execucao propria pendente ou job proprio ativo. Nao interrompi encodes nem jobs do servidor 2. UID63 registrada: v027 confirmado como alvo; cl-story passa a desafiante fixo, coordenador continua assinando o roteiro.
+Entregas: /home/pals/pals/state/pals-engine-maintainer/cx-engine.md; /home/pals/pals/state/pals-engine-maintainer/cx-engine.log.md.
+Evidencias: estado registra caminhos, hashes completos com horario, ACKs/HANDOFFs, decisoes e limitacoes. S25 diagnostico aceito UID59 e equivalencia de tres PNGs aceita UID60; ENGINE02 registrado. Quebras opt-in entregues UID23 com 39 testes/clippy PASS; fonte em worktree proprio, sem commit/push/build CLI/pin. Atlas tecnico entregue; aceita arte26-r3 UID32, revisoes exatas restantes nao recebidas.
+Proximo passo: coordenador reabre cx-engine quando conveniente; sucessor le estado/log, registra sessao e consulta caixa. Permanecem aceite linebreaks, revisoes restantes do atlas e eventual QA de integracao S25 pelo produtor/arte. ENGINE01/ENGINE02/E7 sao propostas pos-lote, sem implementacao autorizada.
+Prazo: sem prazo definido.
+Bloqueios: nenhum para reabrir; aceites pendentes preservados no estado.

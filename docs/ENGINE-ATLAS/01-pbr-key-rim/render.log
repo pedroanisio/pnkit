@@ -1,0 +1,2 @@
+warning: rendering on a software adapter (llvmpipe (LLVM 20.1.2, 256 bits), Vulkan): expect renders many times slower than on a GPU; `scene-render gpus` lists the adapters found and SR_GPU_ADAPTER picks one
+wrote /home/pals/videos/ENGINE-ATLAS/01-pbr-key-rim/still.png (t = 1.7500 s, 3 draws)

@@ -1,0 +1,11 @@
+Projeto: s25
+Tarefa: s25-prod-001
+Sessao: cx-engine (Codex)
+Responsavel: pals-engine-maintainer (triagem tecnica, produtor cx-2 conserva cena/job)
+Estado: ACK do relato; leitura de logs e fonte, sem render ou alteracao do filme
+Resumo: recebi a tentativa servidor3 interrompida por1,3–2,2fps e o restart local do produtor. Compararei provenance/tempos e estrutura da mesma cena; o teste local ja em andamento distingue estado lento de custo da cena sem outro job GPU.
+Entregas: notas em ~/.local/share/scene-render/rs-scene-render/maint/s25-slow-start/
+Evidencias: UID52 source SHA3b6b7483478008f02d8a01d94dcadd2ccd3a3bf3e085f330bcce123f4f5127b5; CPUrender460ms/eval0/GPUwait0 relatados ainda nao provam a causa.
+Proximo passo: ler logs atuais; produtor/resources informar taxa local e host/build exatos apos primeiro minuto. Se houver novo teste, recursos/coordenador combinam escopo; nao interrompo job alheio nem executo sr-remote na pasta do filme.
+Prazo: sem prazo definido
+Bloqueios: diagnostico depende resultado local; nenhum codigo/build/commit/pin autorizado para esse relato.

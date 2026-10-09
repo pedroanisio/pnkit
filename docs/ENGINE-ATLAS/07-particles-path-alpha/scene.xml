@@ -1,0 +1,26 @@
+<?xml version='1.0' encoding='utf-8'?>
+<scene version="1.2">
+  <project width="1080" height="1920" fps="24" duration="3.5" background="#0B1520" motionBlur="false" seed="20261002" />
+  <styles>
+    <textStyle id="pn-heading" fontAsset="pn-archivo" size="64" weight="700" variation="wght 700, wdth 75" />
+    <textStyle id="pn-subtitle" fontAsset="pn-archivo" size="36" weight="400" variation="wght 400, wdth 90" />
+  </styles>
+  <assets>
+    <font id="pn-archivo" src="../assets/archivo.ttf" family="Archivo" weight="400" license="OFL-1.1" />
+    <text id="titleAsset" text="A LUZ ENCONTRA A POEIRA" style="pn-heading" fontFile="../assets/archivo.ttf" size="64" weight="700" color="#F4EFE4" width="888" height="180" />
+    <text id="subAsset" text="Feixe / poeira no caminho / bokeh no alpha" style="pn-subtitle" fontFile="../assets/archivo.ttf" size="36" color="#A8BCCB" width="888" height="130" />
+    <text id="footAsset" text="PALS / ENGINE ATLAS" fontFile="../assets/archivo.ttf" size="23" color="#A8BCCB" width="888" height="50" />
+    <image id="ringAlpha" src="../assets/ring-alpha.png" width="320" height="320" />
+    <image id="bokehSprite" src="../assets/bokeh-disk.png" width="128" height="128" />
+    <image id="beamAsset" src="../assets/soft-light-beam.png" width="1080" height="1000" />
+  </assets>
+  <composition>
+    <layer id="beam" asset="beamAsset" y="650" />
+    <particleEmitter id="dust" preset="dust" x="0" y="0" emitterShape="path" emitterPath="M 390 1460 C 460 1120 780 880 920 720" rate="140" lifetime="6" speed="12" size="3" color="#FFEFD0" opacity="0.45" blend="add" preroll="3" seed="11" />
+    <particleEmitter id="bokeh" preset="bokeh" shape="sprite" sprite="bokehSprite" x="240" y="850" emitterShape="asset-alpha" emitterAsset="ringAlpha" rate="9" lifetime="6" speed="30" spread="360" size="38" sizeEnd="45" sizeVariance=".35" color="#FFE6B7" opacity="1" opacityEnd="0.2" blend="add" preroll="4" seed="12" />
+    <layer id="title" asset="titleAsset" x="96" y="205" />
+    <shape id="rule" shape="rect" x="96" y="400" width="94" height="5" fill="#E8BC79" />
+    <layer id="sub" asset="subAsset" x="96" y="440" />
+    <layer id="footer" asset="footAsset" x="96" y="1720" />
+  </composition>
+</scene>

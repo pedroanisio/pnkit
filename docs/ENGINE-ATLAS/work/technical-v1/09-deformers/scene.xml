@@ -1,0 +1,16 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<scene version="1.2">
+<project width="1080" height="1920" fps="24" duration="3.5" background="#0B1520" motionBlur="false" seed="20261002"/>
+<assets><text id="titleAsset" text="A forma respira" fontFile="../assets/atlas.ttf" size="64" color="#F4EFE4" width="888" height="180"/>
+<text id="subAsset" text="Wave / bend / geometria 2D" fontFile="../assets/atlas.ttf" size="28" color="#A8BCCB" width="888" height="100"/>
+<text id="footAsset" text="PALS / ENGINE ATLAS" fontFile="../assets/atlas.ttf" size="23" color="#A8BCCB" width="888" height="50"/></assets>
+
+<composition><shape id="ribbon" shape="path" x="140" y="840" width="800" height="390" path="M 0 140 C 200 -50 600 330 800 140 L 800 270 C 600 460 200 80 0 270 Z" fill="#37B9AA" stroke="#A5ECE0" strokeWidth="3">
+<deform><modifier type="wave" amount="55" frequency="2" axis="x"><animate property="phase"><key time="0" value="0" interpolation="sine-in-out"/><key time="3.5" value="360"/></animate></modifier><modifier type="bend" amount="18" axis="x"/></deform></shape>
+<layer id="title" asset="titleAsset" x="96" y="205"/>
+<shape id="accentRule" shape="rect" x="96" y="400" width="94" height="5" fill="#E8BC79"/>
+<layer id="sub" asset="subAsset" x="96" y="440"/>
+<layer id="footer" asset="footAsset" x="96" y="1720"/>
+</composition>
+
+</scene>

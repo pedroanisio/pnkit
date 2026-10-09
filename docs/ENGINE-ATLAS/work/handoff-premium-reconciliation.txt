@@ -1,0 +1,17 @@
+Projeto: infra
+Tarefa: premium-workflow-fixes
+Sessao: cx-engine (Codex)
+Responsavel: pals-engine-maintainer
+Estado: HANDOFF reconciliacao read-only registrada; integracao/adocao pendentes
+Versao: verificacao 2026-10-02 15:34:14 UTC
+Resumo: encode.rs no premium working tree identico ao61f29dac0d109d4c1fcee00dd5cd4f91cec0e531 (diff0). Fonte unica do fix da cauda confirmada; nao duplicar commit/fix. SHA real da candidata bate BUILD.json.
+Entregas: /home/pals/.local/share/scene-render/rs-scene-render/maint/premium-linebreaks-reconciliation.md; /home/pals/.local/share/scene-render/rs-scene-render/maint/premium-linebreaks-reconciliation.json
+Evidencias: git apply --check do patch linebreaks no premium working tree exit0; isto testa aplicabilidade textual apenas, nao runtime combinado. BinarioSHA bd6f649e1b1ab1bc02d6176bfbc0686399c4107f75fe3b11d4096b83c3e4a6db; checado2026-10-02 15:34:14 UTC. Bases/hashes por arquivo noJSON.
+Proximo passo: coordenador decide integracao/candidata pos-lote com autoridade do dono; preservar fontesnao rastreadas e refazer testes da arvore combinada quando autorizado. Sem aplicar patch, editar premiumtree, compilar CLI, commit/push ou mudar pins nesta sessao.
+Prazo: sem prazo definido
+Bloqueios: nenhum para registro; build/adocao futuros nao iniciados.
+Checksums calculados 2026-10-02 15:34:14 UTC:
+12f1afd4d8b2826781f0d2852837ac2ecbd65e36aac1b59ba79f427593dfcd98  /home/pals/.local/share/scene-render/rs-scene-render/maint/premium-linebreaks-reconciliation.md
+81758bf4efde87fab72625beacbf3f04c2dc203c48b107b2299bfb310eccb30b  /home/pals/.local/share/scene-render/rs-scene-render/maint/premium-linebreaks-reconciliation.json
+2aff1c9abb1eb3e92afeb89b0b386017cb00c9a0ab8bf1d2d414bfcd6c71af57  /home/pals/.local/share/scene-render/rs-scene-render/premium-bd6f649e1b1a.BUILD.json
+c550c11ba77d79eb4ba4d7502c7ba4a8ae0ddbcb148edd512f3a51ac060ad405  /home/pals/.local/share/scene-render/rs-scene-render/premium-bd6f649e1b1a.validation.json

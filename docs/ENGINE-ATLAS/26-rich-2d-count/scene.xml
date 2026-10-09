@@ -1,0 +1,84 @@
+<?xml version='1.0' encoding='utf-8'?>
+<scene version="1.2">
+  <project width="1080" height="1920" fps="24" duration="3.5" background="#0B1520" motionBlur="false" seed="20261002" />
+  <styles>
+    <textStyle id="pn-heading" fontAsset="pn-archivo" size="64" weight="700" variation="wght 700, wdth 75" />
+    <textStyle id="pn-subtitle" fontAsset="pn-archivo" size="36" weight="400" variation="wght 400, wdth 90" />
+  </styles>
+  <assets>
+    <font id="pn-archivo" src="../assets/archivo.ttf" family="Archivo" weight="400" license="OFL-1.1" />
+    <text id="titleAsset" text="A QUANTIDADE MUDA" fontFile="../assets/archivo.ttf" size="64" color="#F4EFE4" width="888" height="180" style="pn-heading" weight="700" />
+    <text id="subAsset" text="96 em ondas / 23 selecionadas / densidade 365" fontFile="../assets/archivo.ttf" size="36" color="#A8BCCB" width="888" height="130" style="pn-subtitle" />
+    <text id="footAsset" text="PALS / ENGINE ATLAS" fontFile="../assets/archivo.ttf" size="23" color="#A8BCCB" width="888" height="50" />
+    <generator id="richField" kind="solid" width="1080" height="1920" paint="url(#richGlow)" />
+    <text id="countAsset" text="12 PEÇAS" fontFile="../assets/archivo.ttf" size="64" color="#F2E5C6" width="740" height="120" style="pn-heading" weight="700" />
+    <text id="count0" text="12 PEÇAS" fontFile="../assets/archivo.ttf" size="64" color="#F2E5C6" width="740" height="120" style="pn-heading" weight="700" />
+    <text id="count1" text="24 PEÇAS" fontFile="../assets/archivo.ttf" size="64" color="#F2E5C6" width="740" height="120" style="pn-heading" weight="700" />
+    <text id="count2" text="36 PEÇAS" fontFile="../assets/archivo.ttf" size="64" color="#F2E5C6" width="740" height="120" style="pn-heading" weight="700" />
+    <text id="count3" text="48 PEÇAS" fontFile="../assets/archivo.ttf" size="64" color="#F2E5C6" width="740" height="120" style="pn-heading" weight="700" />
+    <text id="count4" text="60 PEÇAS" fontFile="../assets/archivo.ttf" size="64" color="#F2E5C6" width="740" height="120" style="pn-heading" weight="700" />
+    <text id="count5" text="72 PEÇAS" fontFile="../assets/archivo.ttf" size="64" color="#F2E5C6" width="740" height="120" style="pn-heading" weight="700" />
+    <text id="count6" text="84 PEÇAS" fontFile="../assets/archivo.ttf" size="64" color="#F2E5C6" width="740" height="120" style="pn-heading" weight="700" />
+    <text id="count7" text="96 PEÇAS" fontFile="../assets/archivo.ttf" size="64" color="#F2E5C6" width="740" height="120" style="pn-heading" weight="700" />
+    <text id="countFinal" text="23 DE 96" fontFile="../assets/archivo.ttf" size="64" color="#F2E5C6" width="740" height="120" style="pn-heading" weight="700" />
+    <text id="denseLabel" text="365 PEÇAS · 14 PX" style="pn-heading" fontFile="../assets/archivo.ttf" size="48" weight="700" color="#E8BC79" width="888" height="80" />
+  </assets>
+  <paints>
+    <radialGradient id="richGlow" cx="0.5" cy="0.56" r="0.68" aspect="0.68">
+      <stop offset="0" color="#243C49" />
+      <stop offset="1" color="#0B1520" />
+    </radialGradient>
+  </paints>
+  <composition>
+    <camera id="cam" x="540" y="960" z="-1500" fov="42">
+      <animate property="z">
+        <key time="0" value="-1500" interpolation="sine-in-out" />
+        <key time="3.5" value="-1407" />
+      </animate>
+    </camera>
+    <layer id="field" asset="richField" />
+    <group id="counts" x="100" y="680" width="888" height="1000" effects="contactFX">
+      <repeat id="rows" count="8" offsetY="50" timeStep="0.2">
+        <shape id="cell" shape="rect" width="58" height="34" radius="4" fill="#D8C496" stroke="#96825F" strokeWidth="1.5" threeD="true" zDepth="0">
+          <shapeModifier type="repeater" copies="12" offsetX="72" />
+        </shape>
+      </repeat>
+      <group id="selected" start="1.8">
+        <shape id="connector" shape="path" width="888" height="120" path="M 29 17 H 821 L 749 67 H 29" fill="#00000000" stroke="#77989B" strokeWidth="1.5" threeD="true" zDepth="0" />
+        <shape id="highlightRowA" shape="rect" width="58" height="34" radius="4" fill="#3BBBA9" stroke="#218678" strokeWidth="1.5" threeD="true" zDepth="0">
+          <shapeModifier type="repeater" copies="12" offsetX="72" />
+        </shape>
+        <shape id="highlightRowB" shape="rect" y="50" width="58" height="34" radius="4" fill="#3BBBA9" stroke="#218678" strokeWidth="1.5" threeD="true" zDepth="0">
+          <shapeModifier type="repeater" copies="11" offsetX="72" />
+        </shape>
+        <shape id="groupOutline" shape="path" width="888" height="120" path="M -8 -8 H 858 V 42 H 786 V 92 H -8 Z" fill="#00000000" stroke="#87BAC2" strokeWidth="3" threeD="true" zDepth="0" />
+        <shape id="namedPiece" shape="rect" width="58" height="34" radius="4" fill="#3BBBA9" stroke="#F5E1AA" strokeWidth="6" threeD="true" zDepth="0" />
+      </group>
+      <layer id="densityNumber" asset="denseLabel" y="480" threeD="true" zDepth="0" />
+      <repeat id="denseRows" count="14" offsetY="24" y="550">
+        <shape id="denseCell" shape="rect" width="14" height="14" radius="2" fill="#D8C496" threeD="true" zDepth="0">
+          <shapeModifier type="repeater" copies="25" offsetX="32" />
+        </shape>
+      </repeat>
+      <shape id="denseTail" shape="rect" y="886" width="14" height="14" radius="2" fill="#D8C496" threeD="true" zDepth="0">
+        <shapeModifier type="repeater" copies="15" offsetX="32" />
+      </shape>
+      <layer id="number0" asset="count0" y="-90" threeD="true" zDepth="0" start="0.0" end="0.2" />
+      <layer id="number1" asset="count1" y="-90" threeD="true" zDepth="0" start="0.2" end="0.4" />
+      <layer id="number2" asset="count2" y="-90" threeD="true" zDepth="0" start="0.4" end="0.6000000000000001" />
+      <layer id="number3" asset="count3" y="-90" threeD="true" zDepth="0" start="0.6000000000000001" end="0.8" />
+      <layer id="number4" asset="count4" y="-90" threeD="true" zDepth="0" start="0.8" end="1.0" />
+      <layer id="number5" asset="count5" y="-90" threeD="true" zDepth="0" start="1.0" end="1.2000000000000002" />
+      <layer id="number6" asset="count6" y="-90" threeD="true" zDepth="0" start="1.2000000000000002" end="1.4000000000000001" />
+      <layer id="number7" asset="count7" y="-90" threeD="true" zDepth="0" start="1.4000000000000001" end="1.8" />
+      <layer id="numberFinal" asset="countFinal" y="-90" threeD="true" zDepth="0" start="1.8" />
+    </group>
+    <layer id="title" asset="titleAsset" x="96" y="205" />
+    <shape id="accentRule" shape="rect" x="96" y="400" width="94" height="5" fill="#E8BC79" />
+    <layer id="sub" asset="subAsset" x="96" y="440" />
+    <layer id="footer" asset="footAsset" x="96" y="1720" />
+  </composition>
+  <effects>
+    <effect id="contactFX" type="drop-shadow" radius="12" offsetY="12" color="#00000070" />
+  </effects>
+</scene>

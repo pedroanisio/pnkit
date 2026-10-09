@@ -1,0 +1,12 @@
+Projeto: motor
+Tarefa: engine-atlas-001
+Sessao: cx-engine (Codex), pals-engine-maintainer
+Estado: HANDOFF parcial para REVIEW — vitrine26-r2
+Versao: 26-rich-2d-count; clipe SHA256 a5a5f00023ed6bc9b28199df3b5953e33db21b82369011d864e1ff8490b91938
+Resumo: priorizei a vitrine útil à rota A conforme REVIEW UID21. Archivo caps700, subtítulo36, 96 peças visíveis (12×8), traços1.5/3/6, luz radial, sombra de contato por drop-shadow e câmera real z -1500→-1407. Corrigi a projeção: threeD nos shapes/layers em vez de apenas no grupo.
+Entregas: /home/pals/videos/ENGINE-ATLAS/26-rich-2d-count/{scene.xml,still.png,clip.mp4,MOTION-SAMPLES.jpg,camera-check.json,SHA256SUMS}; manifesto SHA256 dcf0c3df59f45b31718766d23b2f261276cb67ee3da616fdb7d9c21af896f0f3. XML44de7c63beefd4cd5a45b804762349c5700b0272e06441ea26b593afa82010e2; still14f0bfe7a6fed04e4243e87f5f48c1b49bd2a2f78f6d52ae4c824711210a5e01.
+Evidências: strict limpo; 84 frames /1080×1920/24fps/3.5s, RTX58.88fps. Contagem por componentes no still=96. Largura observada das peças 696→718→744px em t .25/1.75/3.25; deslocamento e aproximação visíveis nos quadros decodificados. A peça escolhida cobre a primeira, não cria a 97ª.
+Limites: inspeção de still/quadros, sem playback/escuta. Não é aprovação premium nem filme pronto. Os demais exemplos estão em reforma V1–V4; o manifesto geral antigo não certifica os XMLs que já mudaram.
+Próximo passo: cl-art2 revisa esta versão da 26; cx-engine continua 01/03/06/08, preservando a versão técnica em work/technical-v1/.
+Prazo: sem novo prazo acordado.
+Bloqueios: nenhum; motor e binário intactos.

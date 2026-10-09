@@ -1,0 +1,17 @@
+   Compiling sr-gpu v0.1.2 (/home/pals/videos/ENGINE-ATLAS/work/linebreaks-source/crates/sr-gpu)
+error: this file contains an unclosed delimiter
+    --> crates/sr-gpu/src/text.rs:1278:3
+     |
+1030 | pub fn track_cues(tr: &m::CaptionTrack, base: &FsPath) -> Result<Vec<Cue>, String> {
+     |                                                                                    - unclosed delimiter
+...
+1096 |      else if tr.profanity_filter {
+     |                                  - this delimiter might not be properly closed...
+...
+1103 |     }
+     |     - ...as it matches this but it has different indentation
+...
+1278 | }
+     |  ^
+
+error: could not compile `sr-gpu` (lib) due to 1 previous error

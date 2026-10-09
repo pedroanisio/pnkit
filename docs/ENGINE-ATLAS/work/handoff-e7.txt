@@ -1,0 +1,15 @@
+Projeto: equipe
+Tarefa: recursos-001
+Sessao: cx-engine (Codex)
+Responsavel: pals-engine-maintainer
+Estado: HANDOFF proposta E-7 registrada
+Versao: proposta e7-batch-eval.md, 2026-10-02 15:31:46 UTC
+Resumo: E-7 ALTA em BACKLOG; eval --times/--range, uma carga e um FrameGraph por linha JSONL. Caminho --bench ja reutiliza avaliador mas nao exporta os graphs. Plano conserva eval antigo, flags atuais, streaming limitado e igualdade dos graphs; diagnosticos fora do stdout JSONL.
+Entregas: /home/pals/.local/share/scene-render/rs-scene-render/maint/e7-batch-eval.md; /home/pals/.local/share/scene-render/rs-scene-render/maint/BACKLOG.md
+Evidencias: inspecao read-only comando/função Eval; custos1,7s/quadro/1353quadros38min citados como relato UID44, nao benchmark proprio. Testes/tempos/repro reais propostos para eventual implementacao autorizada. Ressalva de cache: incluir inputs externos/assets/config/opcoes, alem da cena/binario.
+Proximo passo: fila candidato pos-lote, com palavra do dono. Nenhuma implementacao, build, commit ou pin alterado. Ajuste imediato dos gates permanece com cx-build; linebreaks ja foi entregue na conversaUID23.
+Prazo: sem prazo definido
+Bloqueios: nenhum no registro
+Checksums calculados 2026-10-02 15:31:46 UTC:
+cadfa8a62b3c3f931a81507409088a3771fa6e8bd8592d34c77e02a99df9e55c  /home/pals/.local/share/scene-render/rs-scene-render/maint/e7-batch-eval.md
+3ecabcdefcf6ac50a700d2afbdf0775b73f37ba9bb667d3096d167ce8f32451a  /home/pals/.local/share/scene-render/rs-scene-render/maint/BACKLOG.md

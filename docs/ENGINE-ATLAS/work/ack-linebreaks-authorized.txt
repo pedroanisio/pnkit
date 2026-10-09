@@ -1,0 +1,8 @@
+Projeto: motor
+Tarefa: engine-linebreaks-001
+Sessao: cx-engine (Codex), pals-engine-maintainer
+Estado: ACK — autorização de fonte esclarecida diretamente nesta sessão
+Resumo: a nova mensagem direta esclareceu que a restrição inicial era do coordenador e limitada ao atlas; para linebreaks a restrição de fonte foi retirada. Implementarei depois do atlas em branch/worktree próprio, com testes, defaults idênticos e lineBreaks=source opt-in.
+Limites mantidos: sem commit, push, build fixado novo ou alteração dos binários fixados.
+Próximo passo: terminar correção/segunda leva do atlas, inspecionar bases e escolher checkout isolado, implementar e testar, entregar diff e entrada de legenda no atlas.
+Bloqueios: nenhum de autorização; tarefa em fila após atlas.

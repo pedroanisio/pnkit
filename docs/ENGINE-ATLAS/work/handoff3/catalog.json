@@ -1,0 +1,262 @@
+[
+  {
+    "slug": "01-pbr-key-rim",
+    "title": "A luz revela os dentes",
+    "motion": true,
+    "still": 1.75,
+    "notes": "Key lateral cria volume, rim frio separa o contorno; o apoio recebe sombra real. Vitrine revisada: Archivo, subtítulo36 e assunto próprio. Vitrine revisada: Archivo, subtítulo36 e assunto próprio.",
+    "params": "Engrenagem OBJ original; key200 lateral, rim650 por trás, dome .32; piso200000; shadow2048, contato desligado. A/B isola rim.",
+    "limits": "Luzes usam metros (100 unidades = 1 m). Área usa aproximação de ponto representativo. Não elevar ambient até apagar o volume.",
+    "ideas": "Revelar um sensor antes de explicar sua função; distinguir duas peças por luz; mostrar o contato que causa uma força."
+  },
+  {
+    "slug": "02-hdri-ao-ssr",
+    "title": "O laboratório se reflete",
+    "motion": true,
+    "still": 1.75,
+    "notes": "HDRI RGBE procedural com dois softboxes. AO fecha contatos; SSR acrescenta reflexos dos objetos visíveis. Vitrine revisada: Archivo, subtítulo36 e assunto próprio. Vitrine revisada: Archivo, subtítulo36 e assunto próprio.",
+    "params": "Bule OBJ cromado, roughness .06; HDRI original de janelas RGBE dome.7; AO radius65/intensity1.25; SSR piso roughness.08. A/B desliga AO/SSR com mesmas luzes.",
+    "limits": "SSR perde informação fora da tela e atrás da câmera. Dome não substitui sombra de luz. O HDRI é sintético, não fotografia.",
+    "ideas": "Uma peça cromada refletindo o laboratório; objeto sobre chão úmido; dar unidade a modelos de fornecedores diferentes."
+  },
+  {
+    "slug": "03-dof-focus-pull",
+    "title": "O foco escolhe a peça",
+    "motion": true,
+    "still": 1.75,
+    "notes": "A mudança de foco transfere a atenção entre objetos em profundidades diferentes. Vitrine revisada: Archivo, subtítulo36 e assunto próprio. Vitrine revisada: Archivo, subtítulo36 e assunto próprio.",
+    "params": "50mm, f/2.2, focus52→325 unidades (0.52→3.25m); três peças em profundidades físicas distintas, pedestais sobre a mesa. 100 unidades=1m.",
+    "limits": "DOF apenas object3D. A cena usa escala próxima da lente para círculo de confusão claramente visível; peças traseiras recebem escala maior para comparação de foco.",
+    "ideas": "Do componente à máquina; do sintoma à causa no fundo; revelar qual amostra foi selecionada."
+  },
+  {
+    "slug": "04-25d-parallax",
+    "title": "A paisagem tem profundidade",
+    "motion": true,
+    "still": 1.75,
+    "notes": "Três recortes de montanha separados em z respondem a um único deslocamento de câmera. Vitrine revisada: Archivo, subtítulo36 e assunto próprio. Vitrine revisada: Archivo, subtítulo36 e assunto próprio.",
+    "params": "Montanhas de papel texturizado, moon z800, mist entre planos; z700/0/-450; câmera x450→630.",
+    "limits": "Ordenação só entre irmãos threeD consecutivos. Placas não recebem DOF. Use imagem com alpha para recortes orgânicos. Névoa é placa alpha Gaussian, não volume3D. A frente termina antes do rodapé.",
+    "ideas": "Arquivo histórico em três recortes; camadas de um relevo; aproximação através de um instrumento."
+  },
+  {
+    "slug": "05-pathtrace-hero",
+    "title": "O tempo atravessa o vidro",
+    "motion": false,
+    "still": 1.75,
+    "notes": "Quadro de capa com reflexões e iluminação indireta determinísticas. Vitrine revisada: Archivo, subtítulo36 e assunto próprio. Vitrine revisada: Archivo, subtítulo36 e assunto próprio.",
+    "params": "Ampulheta OBJ original, vidro e latão; pathSamples128,maxBounces6,denoise; still apenas.",
+    "limits": "Areia é sólido ilustrativo, não simulação granular. Vidro não gera cáusticas; 128 amostras ainda exigem medir ruído e custo. Nesta versão,128 amostras ainda exibem fireflies/pontos escuros isolados: demonstração técnica, não capa final aprovada.",
+    "ideas": "Capa de uma peça ou material; comparação de acabamento; revelar uma amostra como objeto de museu."
+  },
+  {
+    "slug": "06-materials",
+    "title": "Quatro maneiras de tocar",
+    "motion": true,
+    "still": 1.75,
+    "notes": "Quatro respostas à mesma luz: ouro, transmissão, papel rugoso e sheen têxtil. Texturas originais procedurais. Vitrine revisada: Archivo, subtítulo36 e assunto próprio. Vitrine revisada: Archivo, subtítulo36 e assunto próprio.",
+    "params": "Colher OBJ, copo oco com parede8, água IOR1.33, folha dobrada e pano drapejado; todos na mesa y1425. Vidro IOR1.48, roughness .025.",
+    "limits": "Água e pano são geometrias estáticas ilustrativas; não são fluidos/soft-body neste exemplo. Refração screen-space não tem cáusticas. Textura das fibras não simula microestrutura.",
+    "ideas": "Comparar isolamento e reflexão; escolher material de uma cápsula; apresentar amostras antes de uma experiência."
+  },
+  {
+    "slug": "07-particles-path-alpha",
+    "title": "A luz encontra a poeira",
+    "motion": true,
+    "still": 1.75,
+    "notes": "Um caminho emite poeira; a silhueta opaca de um asset emite bokeh. Ambos usam seeds fixos. Vitrine revisada: Archivo, subtítulo36 e assunto próprio. Vitrine revisada: Archivo, subtítulo36 e assunto próprio.",
+    "params": "Poeira140/s,size3; bokeh9/s com sprite original 28–40% alpha,size38→45,sizeVariance.35 proporcional; blend add; seeds11/12,preroll3/4.",
+    "limits": "sizeVariance é fração: .35 varia ±35%; 14 produz discos enormes. Assets alpha governam nascimento, sprite governa desenho. Feixe é uma imagem procedural ilustrativa, sem simulação volumétrica.",
+    "ideas": "Resíduos saindo de uma peça; poeira de uma ruína recortada; mostrar trajetória por material suspenso."
+  },
+  {
+    "slug": "08-grade-lut-look",
+    "title": "O look muda a leitura",
+    "motion": true,
+    "still": 1.75,
+    "notes": "LUT suave dá tons âmbar e ciano; AgX controla highlights. A LUT foi criada para esta demonstração. Vitrine revisada: Archivo, subtítulo36 e assunto próprio. Vitrine revisada: Archivo, subtítulo36 e assunto próprio.",
+    "params": "LUT .cube17³ mix1, working linear-srgb, AgX exposure.3; comparação com a mesma cena sem LUT.",
+    "limits": "Espaço errado da LUT muda contraste/cor. AgX altera a imagem global, incluindo títulos; não tentar recuperar luz achatada com grade.",
+    "ideas": "Unificar foto e modelo; estabelecer a paleta do mundo do Short; diferenciar dois estados de uma experiência."
+  },
+  {
+    "slug": "09-deformers",
+    "title": "A forma respira",
+    "motion": true,
+    "still": 1.75,
+    "notes": "Uma silhueta vetorial é deformada em tempo real; nenhuma sequência de imagens necessária. Vitrine revisada: Archivo, subtítulo36 e assunto próprio. Vitrine revisada: Archivo, subtítulo36 e assunto próprio.",
+    "params": "Wave amount 55 px, frequency 2, phase 0 → 360; bend 18°. Use amplitude 10–25 para respirar, 55 para vitrine.",
+    "limits": "Deformer junto de threeD em camada de imagem/vídeo é ignorado. Valores altos podem dobrar a malha sobre si mesma.",
+    "ideas": "Bandeira ou membrana; objeto que reage ao calor; transformar a forma para explicar flexibilidade."
+  },
+  {
+    "slug": "10-skeleton-skin",
+    "title": "O gesto vem dos ossos",
+    "motion": true,
+    "still": 1.75,
+    "notes": "Uma faixa inteira acompanha uma cadeia de três ossos e mistura pesos entre articulações. Vitrine revisada: Archivo, subtítulo36 e assunto próprio. Vitrine revisada: Archivo, subtítulo36 e assunto próprio.",
+    "params": "Três bones de 225 unidades; rotações moderadas -20 → 25 / 20 → -35; pesos automáticos por distância.",
+    "limits": "Pesos automáticos podem dobrar partes vizinhas indesejadas. Use arquivo weights em JSON para controlar influência; IK precisa alvo e ordem válidos.",
+    "ideas": "Braço mecânico; caule que cresce e aponta; personagem desenhado que acompanha uma indicação."
+  },
+  {
+    "slug": "11-puppet-pins",
+    "title": "Um recorte ganha vida",
+    "motion": true,
+    "still": 1.75,
+    "notes": "Base fixa e ponta móvel: o recorte se dobra mantendo sua continuidade por ARAP. Vitrine revisada: Archivo, subtítulo36 e assunto próprio. Vitrine revisada: Archivo, subtítulo36 e assunto próprio.",
+    "params": "Pino fixo na base; deslocamento da ponta -80 → 100 px, y 15 → -35; starch amount 3 perto da base.",
+    "limits": "x/y de pin são deslocamentos do restX/restY, não coordenadas absolutas. Muitos pinos aumentam o custo e podem puxar contra si.",
+    "ideas": "Folha que inclina; face com respiração discreta; seta orgânica que se curva para mostrar uma força."
+  },
+  {
+    "slug": "12-rigid-physics",
+    "title": "Cada ficha pesa",
+    "motion": true,
+    "still": 1.75,
+    "notes": "Quatorze fichas caem e se apoiam num chão estático em uma execução real do motor. Vitrine revisada: Archivo, subtítulo36 e assunto próprio. Vitrine revisada: Archivo, subtítulo36 e assunto próprio.",
+    "params": "14 corpos circle de 82 px; gravity padrão, PPM 100, restitution .26, friction .6; --parallel 1.",
+    "limits": "Não prometer uma disposição final específica sem verificar a simulação. Physics cache pode fixar o resultado; renderizações seguem serial nesta produção.",
+    "ideas": "Contagem que se acumula; distribuição de probabilidades como fichas; comparar massa ou atrito."
+  },
+  {
+    "slug": "13-soft-physics",
+    "title": "A matéria cede",
+    "motion": true,
+    "still": 1.75,
+    "notes": "Pano preso pela borda esquerda e gel que cai: ambos deformam a própria superfície por simulação. Vitrine revisada: Archivo, subtítulo36 e assunto próprio. Vitrine revisada: Archivo, subtítulo36 e assunto próprio.",
+    "params": "Cloth 8×16, stiffness 180, mass 3, pin left; jelly 6×6, stiffness 220, pressure 45.",
+    "limits": "Molas explícitas exigem substeps; malha muito densa e stiffness alto podem ser recusados (P01). Soft colide com rigid, mas não o empurra.",
+    "ideas": "Rede que cede com peso; tecido num fluxo; gel absorvendo um impacto."
+  },
+  {
+    "slug": "14-fluid",
+    "title": "O fluxo se encontra",
+    "motion": true,
+    "still": 3.25,
+    "notes": "Duas fontes de dye e velocidade formam correntes que se encontram numa simulação 2D real. Vitrine revisada: Archivo, subtítulo36 e assunto próprio. Vitrine revisada: Archivo, subtítulo36 e assunto próprio.",
+    "params": "Resolution 112, vorticity 4, buoyancy 80, iterations 32; duas fontes com cores distintas e velocityY -230.",
+    "limits": "Fluido 2D estilizado, sem solver CFD validado para um experimento científico. Resolução, passos e pressão dominam CPU; cores literais.",
+    "ideas": "Convecção ilustrativa; mistura entre duas correntes; explicar compressão visualmente sem fingir cálculo científico."
+  },
+  {
+    "slug": "15-flock",
+    "title": "A ordem é local",
+    "motion": true,
+    "still": 1.75,
+    "notes": "Seiscentos agentes seguem regras locais; a organização nasce da simulação, não de trajetórias pré-desenhadas. Vitrine revisada: Archivo, subtítulo36 e assunto próprio. Vitrine revisada: Archivo, subtítulo36 e assunto próprio.",
+    "params": "600 agentes, perception 65, separation 1.5, alignment 1.2, cohesion .8; seed 7.",
+    "limits": "Flock representa regras abstratas; não chamar de comportamento medido de animais. Count grande pode pesar na busca de vizinhos.",
+    "ideas": "Coordenação sem líder; migração ilustrada; formar uma população que se organiza."
+  },
+  {
+    "slug": "16-slime",
+    "title": "O caminho se reforça",
+    "motion": true,
+    "still": 3.25,
+    "notes": "Agentes percebem trilhas, depositam sinal e fazem uma rede emergir. É uma execução do modelo abstrato. Vitrine revisada: Archivo, subtítulo36 e assunto próprio. Vitrine revisada: Archivo, subtítulo36 e assunto próprio.",
+    "params": "40000 agents, resolution 320, spawn disc, speed 85, saturation 8, seed 3.",
+    "limits": "Não é reprodução de um resultado biológico específico sem parâmetros/dados. Crescimento longo precisa escala temporal e evidência; CPU e checkpoints crescem.",
+    "ideas": "Trilhas que se reforçam; redes sem centralização; mostrar a diferença entre explorar e consolidar."
+  },
+  {
+    "slug": "17-erosion",
+    "title": "O relevo guarda o fluxo",
+    "motion": true,
+    "still": 1.75,
+    "notes": "Gotas transportam e depositam sedimento sobre um terreno procedural; a imagem é o hillshade do estado simulado. Vitrine revisada: Archivo, subtítulo36 e assunto próprio. Vitrine revisada: Archivo, subtítulo36 e assunto próprio.",
+    "params": "Resolution 192, droplets 16000/s, relief 1.8, seed 5; aumentar resolução só após medir.",
+    "limits": "Terreno sintético sem geografia real nem escala de tempo física. Poucos segundos mudam detalhes; amplie um trecho para mostrar antes/depois.",
+    "ideas": "Explicar erosão e depósito; revelar caminhos na paisagem; usar terreno como metáfora de memória."
+  },
+  {
+    "slug": "18-gaussian-splats",
+    "title": "Um objeto de pontos",
+    "motion": true,
+    "still": 1.75,
+    "notes": "Seis mil gaussianas formam um anel volumétrico que gira. O asset é sintético e não simula um scan real. Vitrine revisada: Archivo, subtítulo36 e assunto próprio. Vitrine revisada: Archivo, subtítulo36 e assunto próprio.",
+    "params": "6000 splats; scale 1.7; rotationY 0 → 70. Para captura: mesh format ply com f_dc/scale, câmera e escala conferidas.",
+    "limits": "Splats não recebem nova luz nem projetam sombras. .splat não tem spherical harmonics; captura PLY pode trazer brilho dependente da vista.",
+    "ideas": "Trazer um artefato capturado para um Short; mostrar uma nuvem volumétrica; comparar captura e reconstrução."
+  },
+  {
+    "slug": "19-motion-path",
+    "title": "O movimento tem caminho",
+    "motion": true,
+    "still": 1.75,
+    "notes": "A seta percorre a curva com orientação da tangente e distância uniforme por segundo. Vitrine revisada: Archivo, subtítulo36 e assunto próprio. Vitrine revisada: Archivo, subtítulo36 e assunto próprio.",
+    "params": "SVG cubic path, constantSpeed true, autoOrient true; 3.5 s.",
+    "limits": "Path é coordenada do pai. Orientação pode virar em cúspides; escolha trajeto suave ou remova autoOrient. Rota ilustrativa, sem dado geográfico.",
+    "ideas": "Percurso de um sinal; material entrando numa máquina; uma rota com posição sincronizada à fala."
+  },
+  {
+    "slug": "20-text-animators",
+    "title": "A palavra também age",
+    "motion": true,
+    "still": 2.75,
+    "notes": "Três presets com funções distintas: revelar, resolver letras, contar um número com layout tipográfico. Vitrine revisada: Archivo, subtítulo36 e assunto próprio. Vitrine revisada: Archivo, subtítulo36 e assunto próprio.",
+    "params": "PresetStart .1, presetDuration 1.8; segurar palavra completa por pelo menos 1.5 s.",
+    "limits": "Counter interpola números: não usar como contagem real de simulação. Scramble só para revelação, não para informação que precisa ler antes de estabilizar.",
+    "ideas": "Um termo que emerge de uma forma; descobrir uma sequência; um número que chega ao resultado verdadeiro da narração."
+  },
+  {
+    "slug": "21-motivated-transitions",
+    "title": "Mudar tem uma razão",
+    "motion": true,
+    "still": 1.6,
+    "notes": "Três janelas com a mesma mudança de estado: memória/luz, deslocamento e revelação por luminância. Vitrine revisada: Archivo, subtítulo36 e assunto próprio. Vitrine revisada: Archivo, subtítulo36 e assunto próprio.",
+    "params": "Duração .85 s centrada em 1.75; whip-pan direction right; luma exige matte node.",
+    "limits": "Whip-pan é warp 2D, não câmera 3D. Matte nomeia nó, não asset. Em filmes, escolha uma transição pelo sentido da mudança e reveja os frames intermediários.",
+    "ideas": "Luz que abre um flashback; deslocamento rápido entre duas regiões do mesmo aparelho; revelar segundo estado por sua luminância."
+  },
+  {
+    "slug": "22-audio-reactive",
+    "title": "O som move a imagem",
+    "motion": true,
+    "still": 1.75,
+    "notes": "O círculo lê o envelope low da trilha realmente misturada na entrega. Pulso original gerado para a demonstração. Vitrine revisada: Archivo, subtítulo36 e assunto próprio. Vitrine revisada: Archivo, subtítulo36 e assunto próprio.",
+    "params": "link audio:drum:low, scale .5, offset .75; som com cinco ataques a .25 / 1 / 1.75 / 2.5 / 3.1 s.",
+    "limits": "render isolado não prepara análise de áudio. O still deste recurso deve vir do encode. Não há avaliação de escuta nesta sessão; som da vitrine precisa playback.",
+    "ideas": "Pulso no componente que faz o som; espectro ligado à onda falada; reagir a batidas sem marcar cada key à mão."
+  },
+  {
+    "slug": "23-native-map-relief",
+    "title": "O mapa tem relevo",
+    "motion": true,
+    "still": 1.75,
+    "notes": "Um map asset é drapeado num mesh, elevado por tiles Terrarium e iluminado no renderer 3D. O exagero vertical de 4× torna a encosta legível nesta demonstração. Vitrine revisada: Archivo, subtítulo36 e assunto próprio. Vitrine revisada: Archivo, subtítulo36 e assunto próprio.",
+    "params": "Web Mercator zoom12, terrain DEM, resolution96, texture768, exaggeration4; tilt -65°; câmera z -1100.",
+    "limits": "Este exemplo é uma ilha e elevação sintéticas, sem localização factual. Terrain precisa Web Mercator. Dados reais exigem licença/crédito e exagero declarado; globe ainda não tem terrain. Contact shadows desligadas no plano; shadow maps preservados.",
+    "ideas": "Mostrar um trajeto sobre a encosta; comparar relevo e caminho; aproximar da região que altera uma decisão."
+  },
+  {
+    "slug": "24-animated-charts",
+    "title": "O dado ocupa a tela",
+    "motion": true,
+    "still": 3,
+    "notes": "As barras e a curva são dados nativos, revelados por progress. Valores sintéticos para ensino de layout. Vitrine revisada: Archivo, subtítulo36 e assunto próprio. Vitrine revisada: Archivo, subtítulo36 e assunto próprio.",
+    "params": "progress 0 → 1 em 2.7 s; showAxes true, showValues true para barras; largura820.",
+    "limits": "Animação draw-on não é crescimento observado. Identificar unidade/escala e fonte no filme; labels do gráfico não têm collision pass avançado.",
+    "ideas": "Diferença entre cenários; uma curva como objeto central do Short; comparação antes/depois sincronizada à frase."
+  },
+  {
+    "slug": "25-glsl-volume",
+    "title": "Um volume desenhado",
+    "motion": true,
+    "still": 1.75,
+    "notes": "Shader integra 24 camadas de densidade para uma aparência de volume animado, num único quad. Vitrine revisada: Archivo, subtítulo36 e assunto próprio. Vitrine revisada: Archivo, subtítulo36 e assunto próprio.",
+    "params": "24 passos; iTime no sin/cos; gradação ciano sutil; superfície820×920.",
+    "limits": "Volume estilizado, sem física de transporte de luz e sem interação com luzes PBR. GLSL inválido pode passar input: sempre exigir --strict.",
+    "ideas": "Campo invisível mostrado como ilustração; turbulência como fundo localizado; mostrar a zona ativa de um fenômeno."
+  },
+  {
+    "slug": "26-rich-2d-count",
+    "title": "A quantidade muda",
+    "motion": true,
+    "still": 3,
+    "notes": "96 peças chegam em oito ondas de12, e o número sobe por camadas com janelas start/end no mesmo instante. Ao final,23 peças mudam de cor. Outra grade mostra365 peças reais de14px. Sem cartão: as peças e números ocupam o campo. Vitrine revisada: Archivo, subtítulo36 e assunto próprio. Vitrine revisada: Archivo, subtítulo36 e assunto próprio.",
+    "params": "12×8=96; timeStep .2, contador discreto12→96;23 destacados. Densidade25×14+15=365,14px. Conector1.5, grupo3, peça6. Archivo caps700/wdth75; câmera z-1500→-1407.",
+    "limits": "Contagens de demonstração, sem dado factual. Sobreposições recolorem peças existentes. A segunda grade é intencionalmente uma textura na escala de telefone; o número e a cor carregam leitura. threeD nos shapes/layers, não apenas no grupo.",
+    "ideas": "Mostrar N casos de verdade; selecionar um item sem perder a população; aproximar do detalhe e voltar à totalidade mantendo o mesmo objeto."
+  }
+]
