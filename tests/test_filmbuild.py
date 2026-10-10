@@ -176,6 +176,20 @@ class Remote(Base):
         rows, _ = self.build(*self.ALL)
         self.assertEqual(rows["render"][1], "FAIL"); self.assertIn("engine on", rows["render"][3])
 
+    def test_an_interrupted_render_attaches_to_the_live_worker(self):
+        rows, b = self.build("snapshot", "plan", "generate", "assemble")
+        h = os.path.join(self.env["FAKE_VM_ROOT"], "h1", "film-build", "mini")
+        self.assertFalse(b._attach("h1", [1]))                                # nothing launched yet
+        for d in ("xml", "shots", "logs"):
+            os.makedirs(os.path.join(h, d), exist_ok=True)
+        shutil.copyfile(b.p("xml", "s01.scene.xml"), os.path.join(h, "xml", "s01.scene.xml"))
+        shutil.copyfile(b.p("picture", "shots-01.json"), os.path.join(h, "shots", "s01.json"))
+        open(os.path.join(h, "logs", "worker.pid"), "w").write(str(os.getpid()))      # a live process
+        self.assertTrue(b._attach("h1", [1]))
+        open(os.path.join(h, "xml", "s01.scene.xml"), "a").write("<!-- other -->")
+        with self.assertRaisesRegex(stages.StageFailed, "other documents"):
+            b._attach("h1", [1])
+
     def test_cli_prints_one_table(self):
         buf = io.StringIO()
         with redirect_stdout(buf):

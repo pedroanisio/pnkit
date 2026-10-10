@@ -379,7 +379,7 @@ class Build:
     def _worker(self, nums):
         r = self.f["render"]
         bg = self.f["picture"]["background"]
-        lines = ["#!/usr/bin/env bash", "set -u", f'cd "$HOME/{self.rdir}" || exit 1', "mkdir -p xml/seg logs res", self.env(),
+        lines = ["#!/usr/bin/env bash", "set -u", f'cd "$HOME/{self.rdir}" || exit 1', "mkdir -p xml/seg logs res", "echo $$ > logs/worker.pid", self.env(),
                  f'export E="$HOME/{r["engine"]}"',
                  'echo "CPU=$(grep -m1 "model name" /proc/cpuinfo | sed "s/^[^:]*: *//")" > res/host.txt',
                  'echo "CORES=$(nproc)" >> res/host.txt', 'echo "ENGINE_SHA256=$(sha256sum "$E" | cut -d" " -f1)" >> res/host.txt',
@@ -394,6 +394,22 @@ class Build:
                                         + (f" --bg {q(bg)}" if bg else "")) + f" > logs/{s}.check 2>&1")
             lines.append(f'flock "$HOME/{r["lock"]}" bash -c {q(job)}; echo done > logs/{s}.done')
         return "\n".join(lines) + "\n"
+
+    def _attach(self, h, ns):
+        """True when a worker launched by an earlier run is still alive on h and was given exactly these documents (the
+        stage was interrupted locally, the host kept working): poll it instead of launching a second one. A live worker
+        with other documents is an error, not something to queue behind."""
+        names = " ".join(f"xml/s{n:02d}.scene.xml shots/s{n:02d}.json" for n in ns)
+        out = self.remote.run(h, f'cd "$HOME/{self.rdir}" 2>/dev/null || exit 0; pid=$(cat logs/worker.pid 2>/dev/null); '
+                                 f'[ -n "$pid" ] && kill -0 "$pid" 2>/dev/null && echo "ALIVE $pid" && sha256sum {names} 2>/dev/null; true')
+        if not out.startswith("ALIVE"):
+            return False
+        have = {ln.split()[1]: ln.split()[0] for ln in out.splitlines()[1:] if len(ln.split()) == 2}
+        for n in ns:
+            if (have.get(f"xml/s{n:02d}.scene.xml") != sha256_file(self.p("xml", f"s{n:02d}.scene.xml"))
+                    or have.get(f"shots/s{n:02d}.json") != sha256_file(self.p("picture", f"shots-{n:02d}.json"))):
+                raise StageFailed(f"render: a worker ({out.split()[1]}) for other documents is still running on {h}; wait for it or stop it")
+        return True
 
     def render(self):
         f, t0 = self.f, time.time()
@@ -410,6 +426,9 @@ class Build:
         os.makedirs(self.p("seg"), exist_ok=True); os.makedirs(self.p("checks"), exist_ok=True)
         plan = self._assign(todo)
         for h, ns in plan.items():
+            if self._attach(h, ns):
+                self.log(f"render: {h} already rendering {', '.join(f's{n:02d}' for n in ns)}; attached")
+                continue
             self.put_lib(h)
             self.remote.run(h, f'mkdir -p "$HOME/{self.rdir}/xml/seg" "$HOME/{self.rdir}/shots" "$HOME/{self.rdir}/logs" "$HOME/{self.rdir}/res"'
                                f' && cd "$HOME/{self.rdir}" && rm -f ' + " ".join(f"logs/s{n:02d}.done" for n in ns))
