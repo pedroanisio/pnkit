@@ -60,11 +60,18 @@ class Build:
     def rdir(self):
         return self.f["render"]["remote_dir"]
 
+    @property
+    def code(self):
+        """sha256 of the pnkit sources: a stage record made by other code is not fresh"""
+        if getattr(self, "_code", None) is None:
+            self._code = sha256_json(Ledger(LIB, self.out).hashes([os.path.join(LIB, "pnkit")]))
+        return self._code
+
     def fresh(self, stage, inputs, cfg):
-        return not self.force and self.L.fresh(stage, self.L.hashes(inputs), cfg)
+        return not self.force and self.L.fresh(stage, self.L.hashes(inputs), {"cfg": cfg, "code": self.code})
 
     def done(self, stage, inputs, cfg, outputs, note, summary=None, t0=None):
-        self.L.save(stage, {"stage": stage, "status": "ok", "inputs": self.L.hashes(inputs), "config": sha256_json(cfg),
+        self.L.save(stage, {"stage": stage, "status": "ok", "inputs": self.L.hashes(inputs), "config": sha256_json({"cfg": cfg, "code": self.code}),
                             "outputs": {k: v for k, v in self.L.hashes(outputs).items() if v}, "note": note, "summary": summary or {},
                             "finished": now(), "seconds": round(time.time() - t0, 1) if t0 else None, "pnkit": PNKIT_VERSION})
         return note
@@ -256,8 +263,7 @@ class Build:
         src = self.p("src")
         inputs = [os.path.join(src, "scenes"), os.path.join(src, "timings.json"), os.path.join(src, "film.json")]
         inputs += [self.p("src", os.path.basename(pic[k])) for k in ("plan", "waivers") if pic.get(k)]
-        lib_hash = Ledger(LIB, self.out).hashes([os.path.join(LIB, "pnkit", "pixelart")])
-        cfg = {"seeds": pic["determinism_seeds"], "pixelart": sha256_json(lib_hash)}
+        cfg = {"seeds": pic["determinism_seeds"]}
         if self.fresh("generate", inputs, cfg):
             return "cached", self.last("generate")
         out = self.p("picture")
@@ -683,6 +689,9 @@ def run(build, stages, log=print):
             status, note = getattr(build, s)()
         except (StageFailed, FilmError, RemoteError) as e:
             rows.append((s, "FAIL", round(time.time() - t0, 1), str(e)))
+            break
+        except Exception as e:                                          # a defect in the tool or a broken input: still one row
+            rows.append((s, "FAIL", round(time.time() - t0, 1), f"{type(e).__name__}: {e}"))
             break
         rows.append((s, status, round(time.time() - t0, 1), note))
     return rows

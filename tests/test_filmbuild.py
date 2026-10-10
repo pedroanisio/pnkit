@@ -100,6 +100,18 @@ class LocalStages(Base):
         rows2, _ = self.build("snapshot", "voice", "plan", "generate", "assemble")
         self.assertEqual([r[1] for r in rows2.values()], ["cached", "skipped", "cached", "cached", "cached"])
 
+    def test_other_pnkit_code_makes_a_stage_stale(self):
+        self.build("snapshot")
+        b = stages.Build(Film(os.path.join(self.dir, "film.json")))
+        self.assertEqual(stages.run(b, ["snapshot"])[0][1], "cached")
+        b._code = "0" * 64
+        self.assertEqual(stages.run(b, ["snapshot"])[0][1], "ran")
+
+    def test_a_tool_defect_is_a_fail_row(self):
+        b = stages.Build(Film(os.path.join(self.dir, "film.json")))
+        rows = stages.run(b, ["audio"])
+        self.assertEqual(rows[0][1], "FAIL"); self.assertIn("FileNotFoundError", rows[0][3])
+
     def test_second_timings_file_is_refused(self):
         open(os.path.join(self.dir, "timings-old.json"), "w").write("{}")
         rows, _ = self.build("snapshot")
