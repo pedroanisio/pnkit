@@ -349,16 +349,21 @@ class Build:
             p_ = os.path.join(xd, f"s{n:02d}.scene.xml"); write_bytes(p_, x); outs.append(p_)
         proj = {"width": 320 * unit, "height": 180 * unit, "fps": fps}
         music, sfx = ("score" if aud.get("score") else None), ("sfx" if aud.get("sfx") else None)
-        for stem in (None, "full", "voice", "music", "sfx"):
+        stems = ["full"] + [k for k, has in (("voice", voices), ("music", music), ("sfx", sfx)) if has]   # an empty mix is invalid (C35)
+        for n in os.listdir(xd):
+            if n.startswith("stem-") and n.endswith(".scene.xml"):
+                os.remove(os.path.join(xd, n))
+        for stem in [None] + stems:
             x = asm.audio_xml(proj, dur, assets, voices, music, sfx, aud, stem=stem)
             p_ = os.path.join(xd, "full-audio.scene.xml" if stem is None else f"stem-{stem}.scene.xml"); write_bytes(p_, x); outs.append(p_)
+        write_json(os.path.join(xd, "stems.json"), stems); outs.append(os.path.join(xd, "stems.json"))
         if cue_out:
             write_json(os.path.join(xd, "cues.json"), {"cues": cue_out}, indent=1, ensure_ascii=False)
             outs.append(os.path.join(xd, "cues.json"))
         outs += [os.path.join(ad, n) for n in sorted(os.listdir(ad))]
         ml = asm.music_layer(read_bytes(os.path.join(xd, "full-audio.scene.xml")))
         notes.append(f"music layer: {', '.join(ml) or 'NONE'}")
-        return "ran", self.done("assemble", inputs, cfg, outs, f"{len(T['scenes'])} segment documents, audio + 4 stems; " + "; ".join(notes), t0=t0)
+        return "ran", self.done("assemble", inputs, cfg, outs, f"{len(T['scenes'])} segment documents, audio + stems ({', '.join(stems)}); " + "; ".join(notes), t0=t0)
 
     # ---------------------------------------------------------------- render
     def _seg_key(self, n):
@@ -504,7 +509,8 @@ class Build:
         f, t0 = self.f, time.time()
         r, hub = f["render"], f["render"]["hub"]
         xd = self.p("xml")
-        docs = ["full-audio", "stem-full", "stem-voice", "stem-music", "stem-sfx"]
+        stems = read_json(os.path.join(xd, "stems.json"))
+        docs = ["full-audio"] + [f"stem-{k}" for k in stems]
         inputs = [os.path.join(xd, f"{d}.scene.xml") for d in docs] + [os.path.join(xd, "audio")]
         cfg = {k: r[k] for k in ("hub", "engine", "engine_sha256", "env")}
         if self.fresh("audio", inputs, cfg):
@@ -515,20 +521,21 @@ class Build:
         self.remote.put(hub, [os.path.join(xd, "audio", n) for n in sorted(os.listdir(os.path.join(xd, "audio")))], f"{ra}/audio/")
         job = (f'cd "$HOME/{ra}" && {self.env()} E="$HOME/{r["engine"]}"; '
                + "; ".join(f'"$E" encode stem-{s}.scene.xml --output stem --strict --no-upload --hw software > stem-{s}.log 2>&1 || exit 3'
-                           for s in ("full", "voice", "music", "sfx"))
+                           for s in stems)
                + '; "$E" encode full-audio.scene.xml --output master --strict --no-upload --hw software > final.log 2>&1 || exit 4; '
-               'sha256sum final.m4a full.wav voice.wav music.wav sfx.wav')
+               'sha256sum final.m4a ' + " ".join(f"{k}.wav" for k in stems))
         try:
             out = self.remote.run(hub, self.locked(job), timeout=r["timeout_s"])
         except RemoteError as e:
-            raise StageFailed(f"audio render on {hub}: {e}")
+            logs = self.remote.run(hub, f'cd "$HOME/{ra}" && grep -h -m3 -E "error|invalid" *.log 2>/dev/null || true')
+            raise StageFailed(f"audio render on {hub}: {e}; {logs.strip()[-300:]}")
         sums = {ln.split()[1]: ln.split()[0] for ln in out.splitlines() if len(ln.split()) == 2}
         self.remote.get(hub, f"{ra}/final.m4a", self.p("final.m4a"))
         if sha256_file(self.p("final.m4a")) != sums.get("final.m4a"):
             raise StageFailed("audio: fetched final.m4a differs from the host's")
         write_json(self.p("audio.json"), {"host": hub, "sha256": sums}, indent=1)
         return "ran", self.done("audio", inputs, cfg, [self.p("final.m4a"), self.p("audio.json")],
-                                f"final.m4a and 4 stems on {hub} (stems stay on the host)", t0=t0)
+                                f"final.m4a and stems {', '.join(stems)} on {hub} (stems stay on the host)", t0=t0)
 
     # ---------------------------------------------------------------- join
     def film_versions(self):

@@ -5,6 +5,10 @@ import hashlib, os, sys
 import xml.etree.ElementTree as ET
 
 cmd, doc = sys.argv[1], sys.argv[2]
+root0 = ET.parse(doc).getroot()
+mix0 = root0.find("audioMix")
+if mix0 is not None and not mix0.findall("audioTrack"):                # as the engine: error[C35]
+    print("error[C35]: audioMix needs at least one audioTrack.", file=sys.stderr); sys.exit(1)
 if cmd == "validate":
     sys.exit(0)
 if cmd == "encode":

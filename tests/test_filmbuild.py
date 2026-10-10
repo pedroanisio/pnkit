@@ -95,6 +95,8 @@ class LocalStages(Base):
         a = open(b.p("xml", "full-audio.scene.xml")).read()
         self.assertIn('role="music"', a); self.assertIn('loudness="-14.0"', a)
         self.assertIn('normalize="none"', open(b.p("xml", "stem-music.scene.xml")).read())
+        self.assertEqual(json.load(open(b.p("xml", "stems.json"))), ["full", "music"])          # no voice, no sfx: no empty stems
+        self.assertFalse(os.path.exists(b.p("xml", "stem-voice.scene.xml")))
         rows2, _ = self.build("snapshot", "voice", "plan", "generate", "assemble")
         self.assertEqual([r[1] for r in rows2.values()], ["cached", "skipped", "cached", "cached", "cached"])
 
