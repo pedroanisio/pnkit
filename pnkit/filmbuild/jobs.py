@@ -33,7 +33,7 @@ def probe(path):
 
 def frame_rgb(path, index, w=1920, h=1080):
     import numpy as np
-    raw = subprocess.run(["ffmpeg", "-v", "error", "-i", path, "-vf", f"select=eq(n\\,{index})", "-vsync", "0", "-frames:v", "1",
+    raw = subprocess.run(["ffmpeg", "-v", "error", "-i", path, "-vf", f"select=eq(n\\,{index})", "-fps_mode", "passthrough", "-frames:v", "1",
                           "-f", "rawvideo", "-pix_fmt", "rgb24", "-"], capture_output=True, check=True).stdout
     if len(raw) != w * h * 3:
         raise ValueError(f"{path} frame {index}: no frame decoded")
