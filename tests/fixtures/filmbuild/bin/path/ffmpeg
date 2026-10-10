@@ -1,0 +1,15 @@
+#!/usr/bin/env python3
+"""fake ffmpeg for the film_build tests: the concat + mux of the join stage, as plain byte concatenation"""
+import sys
+a = sys.argv[1:]
+lst = a[a.index("concat") + 4] if "concat" in a else None
+ins = [a[i + 1] for i, x in enumerate(a) if x == "-i"]
+data = b""
+if lst:
+    for ln in open(lst):
+        if ln.startswith("file "):
+            data += open(ln[5:].strip().strip("'"), "rb").read()
+    ins = ins[1:]
+for p in ins:
+    data += open(p, "rb").read()
+open(a[-1], "wb").write(data)

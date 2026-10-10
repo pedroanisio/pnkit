@@ -380,7 +380,7 @@ class Build:
         r = self.f["render"]
         bg = self.f["picture"]["background"]
         lines = ["#!/usr/bin/env bash", "set -u", f'cd "$HOME/{self.rdir}" || exit 1', "mkdir -p xml/seg logs res", self.env(),
-                 f'E="$HOME/{r["engine"]}"',
+                 f'export E="$HOME/{r["engine"]}"',
                  'echo "CPU=$(grep -m1 "model name" /proc/cpuinfo | sed "s/^[^:]*: *//")" > res/host.txt',
                  'echo "CORES=$(nproc)" >> res/host.txt', 'echo "ENGINE_SHA256=$(sha256sum "$E" | cut -d" " -f1)" >> res/host.txt',
                  'echo "HOST=$(hostname)" >> res/host.txt']
