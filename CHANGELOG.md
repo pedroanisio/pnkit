@@ -5,6 +5,41 @@ release adds components or parameters and keeps every existing default's output 
 prove it); a change to an existing default's output is a major release until 1.0, and a minor one is never allowed
 to hide it. Each release names the golden projects it was checked against.
 
+## 0.8.0 — 2026-10-10 — the film kit: the pixel-art picture framework and film_build
+
+Additive: every existing default's output is unchanged (no existing function's code path changed; tools/flat_field.py and
+tools/timings_diff.py now import their unchanged cores from the library). Owner's go of 2026-10-09 on the reviews in
+`PALS-Notes/docs/reviews/2026-10-07/` (PICTURE-REVIEW section 4, PIPELINE-REVIEW sections 3 and 4).
+
+Added
+- `pnkit.pixelart`: the Lula 3.0.0 picture framework as a library (geometry, art and figure modules, `ctx.Ctx`, the shared
+  `sets`), imports made package-relative and the timings set by the caller (`ctx.set_timings`) instead of a fixed path.
+  **Golden:** all 32 Lula scene modules build byte-identical against it (`tests/golden/pixelart/lula-3.0.0.json`,
+  `tools/pixelart/lula_alias.py`; 3 scenes in the default suite, all 32 with `PNKIT_LULA_ALL=1`).
+- `pnkit.pixelart.checks.CheckedCtx`: the build-time picture checks (view outside the set, figure cut mid-body, plate line
+  breaks, judged by `pnkit.pixel`) and `apply_waivers` (a waiver needs a reason; unused waivers are reported).
+  **Found while porting:** Lula's `checks_picture.run()` never called `finish()`, so its mid-body-crop check never ran on the
+  film; the review's "0 crop findings" was not a measurement. Run through the library on the 32 Lula scenes the check reports
+  crop findings in 18 shots; at least some are the "figure behind furniture drawn in the set" pattern the check cannot see
+  (its known limit: only later draws in the same parent count as cover), so the count is an upper bound, not 18 defects.
+- `pnkit.pixelart.plan`: the plan check as functions (parse_plan, check_plan_only, check_plan_slots, check_built); same 53
+  errors and 63 warnings as Lula's check_plan.py on the same built shots.
+- `pnkit.pixelart.frames` (flat or empty field, plate visible in a frame) and `pnkit.pixelart.segment` (the per-segment render
+  check of Lula check_scene_v3.py, plus flat field on each shot's first frame and plate visibility).
+- `pnkit.timings`: load and diff word-timings files (the core of tools/timings_diff.py).
+- `pnkit.filmbuild` and `tools/film_build.py`: one film.json, stages snapshot, voice (pronunciation list first, TTS command,
+  timings), plan, generate (two hash seeds must agree), assemble (segment, audio and stem documents; the score must regenerate
+  bit-identical from its script; caption text gate when the film has captions), render (segments over film.json's hosts
+  under the lock; per-segment sha256, host CPU and core count; only changed segments re-render), audio, join (write-once
+  `name-vN.mp4`), gates (GATES.md generated from the gate JSON), sheets, pack (vpkg, verify, rebuild check of N segments and
+  the audio). No host, path or engine is built in; remote paths are relative to the host's $HOME and may not contain `~`.
+  Each stage records its inputs' hashes and is skipped when nothing changed. One summary table on stdout.
+- `tools/sync.py` vendors subpackages (`pixelart/`, `filmbuild/`).
+
+Tests: 255 -> 311 (5 skipped), including an end-to-end run of every film_build stage against a fake runner (hosts are
+folders; the engine, host python and ffmpeg are stand-ins), so no render runs on the development machine.
+Golden film: `PALS-Notes/projects/golden-pixel/` (10 s, two scenes), built end to end on the prod VM by film_build.
+
 ## 0.7.0 — 2026-10-07 — lessons of the Lula 3.0.0 film: written-form captions, picture checks, pre-batch checks
 
 Additive: every existing default's output is unchanged. Three branches, merged by the coordinator: captions and the

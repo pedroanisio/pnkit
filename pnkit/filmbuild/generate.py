@@ -9,10 +9,12 @@ build(ctx) and imports the framework as `from pnkit.pixelart.ctx import ...`.
 """
 import hashlib, importlib, json, os, sys
 
+from .state import read_json, write_json, write_bytes
+
 
 def main(argv=None):
     src, out = (sys.argv[1:] if argv is None else argv)[:2]
-    film = json.load(open(os.path.join(src, "film.json"), encoding="utf-8"))
+    film = read_json(os.path.join(src, "film.json"))
     pic = film.get("picture", {})
     sys.path.insert(0, os.path.join(src, pic.get("scenes_dir", "scenes")))
     from ..pixelart import ctx as C
@@ -26,11 +28,11 @@ def main(argv=None):
         importlib.import_module(sc["module"]).build(c)
         c.finish()
         x = c.tostring()
-        open(os.path.join(out, f"scene_{n:02d}.xml"), "wb").write(x)
-        json.dump(c.shots_json(), open(os.path.join(out, f"shots-{n:02d}.json"), "w", encoding="utf-8"), indent=1, ensure_ascii=False)
+        write_bytes(os.path.join(out, f"scene_{n:02d}.xml"), x)
+        write_json(os.path.join(out, f"shots-{n:02d}.json"), c.shots_json(), indent=1, ensure_ascii=False)
         hashes[f"scene_{n:02d}.xml"] = hashlib.sha256(x).hexdigest()
         findings += c.findings
-    json.dump(findings, open(os.path.join(out, "findings.json"), "w", encoding="utf-8"), indent=1, ensure_ascii=False)
+    write_json(os.path.join(out, "findings.json"), findings, indent=1, ensure_ascii=False)
     print(json.dumps(hashes))
 
 

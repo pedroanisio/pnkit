@@ -25,7 +25,7 @@ from .. import __version__ as PNKIT_VERSION, files
 from . import assemble as asm, gates as G, voice as V
 from .config import FilmError
 from .remote import Remote, RemoteError, find_runner, q
-from .state import Ledger, sha256_file, sha256_json, now
+from .state import Ledger, sha256_file, sha256_json, now, read_json, write_json, read_text, write_text, read_bytes, write_bytes
 
 ORDER = ["snapshot", "voice", "plan", "generate", "assemble", "render", "audio", "join", "gates", "sheets", "pack"]
 LIB = os.path.dirname(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))      # the folder that holds pnkit/
@@ -77,7 +77,7 @@ class Build:
         return self.f["scenes"]
 
     def timings(self):
-        return json.load(open(self.p("src", "timings.json"), encoding="utf-8"))
+        return read_json(self.p("src", "timings.json"))
 
     def duration(self):
         return self.timings()["scenes"][-1]["slot_end"]
@@ -111,8 +111,8 @@ class Build:
                     with open(full, "rb") as fh:
                         t.addfile(info, fh)
         data = buf.getvalue()
-        if not os.path.exists(tar) or open(tar, "rb").read() != data:
-            open(tar, "wb").write(data)
+        if not os.path.exists(tar) or read_bytes(tar) != data:
+            write_bytes(tar, data)
         sha = sha256_file(tar)
         have = self.remote.run(host, f'cat "$HOME/{self.rdir}/lib/.sha" 2>/dev/null || true').strip()
         if have != sha:
@@ -164,7 +164,7 @@ class Build:
             except FilmError as e:
                 raise StageFailed(str(e))
         rows = {rel: sha256_file(os.path.join(src, rel)) for rel in sorted(sources) if sources[rel]}
-        json.dump(rows, open(os.path.join(src, "SNAPSHOT.json"), "w"), indent=1)
+        write_json(os.path.join(src, "SNAPSHOT.json"), rows, indent=1)
         outs = [os.path.join(src, r) for r in rows] + [os.path.join(src, "SNAPSHOT.json")]
         return "ran", self.done("snapshot", inputs, sources, outs, f"{len(rows)} files, {len(f['scenes'])} scene modules", t0=t0)
 
@@ -178,7 +178,7 @@ class Build:
         inputs, cfg = [nar], dict(vc)
         if self.fresh("voice", inputs, cfg):
             return "cached", self.last("voice")
-        N = json.load(open(nar, encoding="utf-8"))
+        N = read_json(nar)
         lang, engine = N.get("lang", "pt-br"), vc.get("engine", "kokoro")
         vd = self.p("voice"); os.makedirs(vd, exist_ok=True)
         text = " ".join(ln["text"] for sc in N["scenes"] for ln in sc["lines"])
@@ -191,20 +191,20 @@ class Build:
                 if not os.path.exists(wav):
                     self._cmd(vc["pronounce"], {"term": t["spoken"], "wav": wav})
                 t["clip"] = os.path.relpath(wav, vd); clips += 1
-        json.dump(pr, open(os.path.join(vd, "pronounce.json"), "w", encoding="utf-8"), indent=1, ensure_ascii=False)
+        write_json(os.path.join(vd, "pronounce.json"), pr, indent=1, ensure_ascii=False)
         takes, outs = {}, [os.path.join(vd, "pronounce.json")]
         from .. import vo
         for sc in N["scenes"]:
             spoken = " ".join(vo.speak(ln["text"], lang, engine, numbers=lang.lower().startswith("pt")) for ln in sc["lines"])
             tf, wav, words = (os.path.join(vd, f"{sc['id']}{ext}") for ext in (".txt", ".wav", ".words.json"))
-            open(tf, "w", encoding="utf-8").write(spoken)
+            write_text(tf, spoken)
             self._cmd(vc["tts"], {"scene": sc["id"], "text": tf, "wav": wav, "words": words})
-            W = json.load(open(words, encoding="utf-8"))
+            W = read_json(words)
             takes[sc["n"]] = (W["duration"], [tuple(w) for w in W["words"]])
             outs += [tf, wav, words]
         T = V.build_timings(N, takes, lang, engine, vc["lead"], vc["tail"])
         tim = f.path(f["timings"])
-        json.dump(T, open(tim, "w", encoding="utf-8"), indent=1, ensure_ascii=False)
+        write_json(tim, T, indent=1, ensure_ascii=False)
         shutil.copyfile(tim, self.p("src", "timings.json"))
         return "ran", self.done("voice", inputs, cfg, outs + [tim], f"{len(pr['terms'])} terms to hear ({clips} clips), "
                                 f"{len(takes)} takes, {sum(len(s['lines']) for s in T['scenes'])} sentences", t0=t0)
@@ -229,7 +229,7 @@ class Build:
         T = self.timings()
         errs, note = [], []
         if pf:
-            plan = P.parse_plan(open(pf, encoding="utf-8").read())
+            plan = P.parse_plan(read_text(pf))
             errs += P.check_plan_only(plan) + P.check_plan_slots(plan, T)
             note.append(f"{len(plan)} planned shots")
         else:
@@ -237,11 +237,11 @@ class Build:
         last = os.path.join(self.L.dir, "timings.last.json")
         moved = None
         if os.path.exists(last):
-            d = TD.diff(TD.load_sentences(json.load(open(last, encoding="utf-8"))), TD.load_sentences(T))
+            d = TD.diff(TD.load_sentences(read_json(last)), TD.load_sentences(T))
             moved = {"sentences": len(d["sentences"]), "words": len(d["words"]), "only_a": d["only_a"], "only_b": d["only_b"]}
-            json.dump(d, open(self.p("timings-diff.json"), "w"), indent=1, ensure_ascii=False)
+            write_json(self.p("timings-diff.json"), d, indent=1, ensure_ascii=False)
             note.append(f"timings moved since last build: {moved['sentences']} sentences, {moved['words']} words")
-        json.dump({"errors": errs, "timings_moved": moved}, open(self.p("plan-check.json"), "w"), indent=1, ensure_ascii=False)
+        write_json(self.p("plan-check.json"), {"errors": errs, "timings_moved": moved}, indent=1, ensure_ascii=False)
         if errs:
             raise StageFailed(f"{len(errs)} plan errors (build/plan-check.json): {errs[0]}")
         shutil.copyfile(tim, last)
@@ -274,16 +274,16 @@ class Build:
         if any(x != runs[0] for x in runs[1:]):
             bad = sorted(k for k in runs[0] if any(x.get(k) != runs[0][k] for x in runs[1:]))
             raise StageFailed(f"not deterministic across hash seeds {pic['determinism_seeds']}: {bad}")
-        wv = json.load(open(self.p("src", os.path.basename(pic["waivers"])), encoding="utf-8")) if pic.get("waivers") else []
-        found, unused = apply_waivers(json.load(open(os.path.join(out, "findings.json"), encoding="utf-8")), wv, report_unused=True)
-        built = [s for sc in self.scenes() for s in json.load(open(os.path.join(out, f"shots-{sc['n']:02d}.json"), encoding="utf-8"))]
+        wv = read_json(self.p("src", os.path.basename(pic["waivers"]))) if pic.get("waivers") else []
+        found, unused = apply_waivers(read_json(os.path.join(out, "findings.json")), wv, report_unused=True)
+        built = [s for sc in self.scenes() for s in read_json(os.path.join(out, f"shots-{sc['n']:02d}.json"))]
         errs, warns = [], []
         if pic.get("plan"):
-            errs, warns = P.check_built(built, P.parse_plan(open(self.p("src", os.path.basename(pic["plan"])), encoding="utf-8").read()), self.timings())
-        json.dump(built, open(os.path.join(out, "all-shots.json"), "w", encoding="utf-8"), ensure_ascii=False)
+            errs, warns = P.check_built(built, P.parse_plan(read_text(self.p("src", os.path.basename(pic["plan"])))), self.timings())
+        write_json(os.path.join(out, "all-shots.json"), built, ensure_ascii=False)
         rep = {"scene_sha256": runs[0], "seeds": pic["determinism_seeds"], "picture_findings": found, "unused_waivers": unused,
                "plan_errors": errs, "plan_warnings": warns}
-        json.dump(rep, open(self.p("generate.json"), "w"), indent=1, ensure_ascii=False)
+        write_json(self.p("generate.json"), rep, indent=1, ensure_ascii=False)
         open_ = [x for x in found if not x["waived"]]
         if errs or open_:
             raise StageFailed(f"{len(errs)} plan errors, {len(open_)} open picture findings (build/generate.json)"
@@ -335,7 +335,7 @@ class Build:
             words = [tuple(w) for sc in T["scenes"] for ln in sc.get("lines", []) for w in ln["words"]]
             cues = CP.timed(CP.split_cues(words, cap["width"]))
             cap_findings = [str(x) for x in CP.check_text(cues, approved, cap["lang"])]
-            json.dump({"findings": cap_findings}, open(self.p("caption-gate.json"), "w"), indent=1, ensure_ascii=False)
+            write_json(self.p("caption-gate.json"), {"findings": cap_findings}, indent=1, ensure_ascii=False)
             if cap_findings:
                 raise StageFailed(f"caption text gate: {len(cap_findings)} findings: {cap_findings[0]}")
             pages = asm.caption_pages(cues, cap["width"], unit)
@@ -344,19 +344,19 @@ class Build:
         for sc in T["scenes"]:
             n = sc["n"]
             pg = [(c["text"].split("\n"), c["start"], c["end"]) for c in cue_out if sc["slot_start"] <= c["start"] < sc["slot_end"]]
-            x = asm.segment_xml(open(self.p("picture", f"scene_{n:02d}.xml"), "rb").read(), sc, dur, f"seg/s{n:02d}.mp4",
+            x = asm.segment_xml(read_bytes(self.p("picture", f"scene_{n:02d}.xml")), sc, dur, f"seg/s{n:02d}.mp4",
                                 f["film"]["title"], pg, unit)
-            p_ = os.path.join(xd, f"s{n:02d}.scene.xml"); open(p_, "wb").write(x); outs.append(p_)
+            p_ = os.path.join(xd, f"s{n:02d}.scene.xml"); write_bytes(p_, x); outs.append(p_)
         proj = {"width": 320 * unit, "height": 180 * unit, "fps": fps}
         music, sfx = ("score" if aud.get("score") else None), ("sfx" if aud.get("sfx") else None)
         for stem in (None, "full", "voice", "music", "sfx"):
             x = asm.audio_xml(proj, dur, assets, voices, music, sfx, aud, stem=stem)
-            p_ = os.path.join(xd, "full-audio.scene.xml" if stem is None else f"stem-{stem}.scene.xml"); open(p_, "wb").write(x); outs.append(p_)
+            p_ = os.path.join(xd, "full-audio.scene.xml" if stem is None else f"stem-{stem}.scene.xml"); write_bytes(p_, x); outs.append(p_)
         if cue_out:
-            json.dump({"cues": cue_out}, open(os.path.join(xd, "cues.json"), "w", encoding="utf-8"), indent=1, ensure_ascii=False)
+            write_json(os.path.join(xd, "cues.json"), {"cues": cue_out}, indent=1, ensure_ascii=False)
             outs.append(os.path.join(xd, "cues.json"))
         outs += [os.path.join(ad, n) for n in sorted(os.listdir(ad))]
-        ml = asm.music_layer(open(os.path.join(xd, "full-audio.scene.xml"), "rb").read())
+        ml = asm.music_layer(read_bytes(os.path.join(xd, "full-audio.scene.xml")))
         notes.append(f"music layer: {', '.join(ml) or 'NONE'}")
         return "ran", self.done("assemble", inputs, cfg, outs, f"{len(T['scenes'])} segment documents, audio + 4 stems; " + "; ".join(notes), t0=t0)
 
@@ -404,7 +404,7 @@ class Build:
         if self.fresh("render", inputs, cfg):
             return "cached", self.last("render")
         rec_path = self.p("render.json")
-        segs = json.load(open(rec_path, encoding="utf-8")) if os.path.exists(rec_path) else {}
+        segs = read_json(rec_path) if os.path.exists(rec_path) else {}
         todo = [n for n in nums if self.force or segs.get(str(n), {}).get("key") != self._seg_key(n)
                 or not os.path.exists(self.p("seg", f"s{n:02d}.mp4")) or sha256_file(self.p("seg", f"s{n:02d}.mp4")) != segs[str(n)]["sha256"]]
         os.makedirs(self.p("seg"), exist_ok=True); os.makedirs(self.p("checks"), exist_ok=True)
@@ -418,7 +418,7 @@ class Build:
             for n in ns:
                 shutil.copyfile(self.p("picture", f"shots-{n:02d}.json"), os.path.join(stage_dir, f"s{n:02d}.json"))
             self.remote.put(h, [os.path.join(stage_dir, f"s{n:02d}.json") for n in ns], f"{self.rdir}/shots/")
-            wk = self.p(f"worker-{h}.sh"); open(wk, "w").write(self._worker(ns))
+            wk = self.p(f"worker-{h}.sh"); write_text(wk, self._worker(ns))
             self.remote.put(h, [wk], f"{self.rdir}/worker.sh")
             self.remote.run(h, f'cd "$HOME/{self.rdir}" && chmod +x worker.sh && (setsid nohup ./worker.sh > logs/worker.log 2>&1 < /dev/null &) ; echo started')
             self.log(f"render: {h} <- {', '.join(f's{n:02d}' for n in ns)}")
@@ -443,7 +443,7 @@ class Build:
                 shutil.rmtree(tmp)
             os.makedirs(tmp)
             self.remote.get(h, f"{self.rdir}/res", tmp)
-            host = dict(ln.split("=", 1) for ln in open(os.path.join(tmp, "res", "host.txt")).read().splitlines() if "=" in ln)
+            host = dict(ln.split("=", 1) for ln in read_text(os.path.join(tmp, "res", "host.txt")).splitlines() if "=" in ln)
             cpus[h] = host
             if r["engine_sha256"] and host.get("ENGINE_SHA256") != r["engine_sha256"]:
                 raise StageFailed(f"render: the engine on {h} has sha256 {host.get('ENGINE_SHA256', '?')[:16]}, film.json says {r['engine_sha256'][:16]}")
@@ -454,7 +454,7 @@ class Build:
                     err = self.remote.run(h, f'tail -c 400 "$HOME/{self.rdir}/logs/{s}.err" "$HOME/{self.rdir}/logs/{s}.validate" 2>/dev/null || true')
                     raise StageFailed(f"render {s} on {h}: exit {rc}: {err.strip()[-300:]}")
                 self.remote.get(h, f"{self.rdir}/xml/seg/{s}.mp4", self.p("seg", f"{s}.mp4"))
-                want = open(os.path.join(tmp, "res", f"{s}.sha256")).read().split()[0]
+                want = read_text(os.path.join(tmp, "res", f"{s}.sha256")).split()[0]
                 got = sha256_file(self.p("seg", f"{s}.mp4"))
                 if got != want:
                     raise StageFailed(f"render {s}: fetched sha256 {got[:12]} differs from the host's {want[:12]}")
@@ -463,13 +463,13 @@ class Build:
                     shutil.rmtree(cd)
                 if os.path.isdir(os.path.join(tmp, "res", s)):
                     shutil.copytree(os.path.join(tmp, "res", s), cd)
-                chk = json.load(open(os.path.join(cd, "check.json"))) if os.path.exists(os.path.join(cd, "check.json")) else None
+                chk = read_json(os.path.join(cd, "check.json")) if os.path.exists(os.path.join(cd, "check.json")) else None
                 segs[str(n)] = {"scene": n, "host": h, "hostname": host.get("HOST"), "cpu": host.get("CPU"), "cores": host.get("CORES"),
                                 "engine_sha256": host.get("ENGINE_SHA256"), "key": self._seg_key(n), "sha256": got,
                                 "frames": chk["frames"] if chk else None, "findings": chk["findings"] if chk else ["no check"], "rendered": now()}
             shutil.rmtree(tmp)
-        json.dump(segs, open(rec_path, "w"), indent=1, sort_keys=True)
-        open(self.p("SHA256SUMS"), "w").write("".join(f"{segs[str(n)]['sha256']}  seg/s{n:02d}.mp4\n" for n in nums))
+        write_json(rec_path, segs, indent=1, sort_keys=True)
+        write_text(self.p("SHA256SUMS"), "".join(f"{segs[str(n)]['sha256']}  seg/s{n:02d}.mp4\n" for n in nums))
         used = {(v["cpu"], v["cores"]) for v in segs.values()}
         warn = f"; WARNING hosts differ in CPU/cores {sorted(used)}: a rebuild on one host may not match byte for byte" if len(used) > 1 else ""
         flagged = {f"s{int(k):02d}": v["findings"] for k, v in segs.items() if v["findings"]}
@@ -507,7 +507,7 @@ class Build:
         self.remote.get(hub, f"{ra}/final.m4a", self.p("final.m4a"))
         if sha256_file(self.p("final.m4a")) != sums.get("final.m4a"):
             raise StageFailed("audio: fetched final.m4a differs from the host's")
-        json.dump({"host": hub, "sha256": sums}, open(self.p("audio.json"), "w"), indent=1)
+        write_json(self.p("audio.json"), {"host": hub, "sha256": sums}, indent=1)
         return "ran", self.done("audio", inputs, cfg, [self.p("final.m4a"), self.p("audio.json")],
                                 f"final.m4a and 4 stems on {hub} (stems stay on the host)", t0=t0)
 
@@ -533,11 +533,11 @@ class Build:
         cfg = {"hub": hub}
         if self.fresh("join", inputs, cfg):
             return "cached", self.last("join")
-        segs = json.load(open(self.p("render.json")))
+        segs = read_json(self.p("render.json"))
         rj = f"{self.rdir}/join"
         self.remote.run(hub, f'rm -rf "$HOME/{rj}" && mkdir -p "$HOME/{rj}/seg"')
         self.remote.put(hub, [self.p("seg", f"s{n:02d}.mp4") for n in nums], f"{rj}/seg/")
-        open(self.p("concat.txt"), "w").write("".join(f"file seg/s{n:02d}.mp4\n" for n in nums))
+        write_text(self.p("concat.txt"), "".join(f"file seg/s{n:02d}.mp4\n" for n in nums))
         self.remote.put(hub, [self.p("concat.txt")], f"{rj}/concat.txt")
         job = (f'cd "$HOME/{rj}" && sha256sum seg/*.mp4 && ffmpeg -v error -y -f concat -safe 0 -i concat.txt -i "$HOME/{self.rdir}/audio/final.m4a" '
                '-c copy -map 0:v -map 1:a -movflags +faststart film.mp4 && sha256sum film.mp4')
@@ -564,24 +564,23 @@ class Build:
                 raise files.WriteOnceError(dest)
             made = "new"
         os.remove(tmp)
-        json.dump({"film": os.path.relpath(dest, self.out), "sha256": sha, "hub": hub}, open(self.p("join.json"), "w"), indent=1)
+        write_json(self.p("join.json"), {"film": os.path.relpath(dest, self.out), "sha256": sha, "hub": hub}, indent=1)
         return "ran", self.done("join", inputs, cfg, [dest, self.p("join.json")], f"{made} {os.path.relpath(dest, f.root)} (sha256 {sha[:16]})", t0=t0)
 
     # ---------------------------------------------------------------- gates
     def gates(self):
         f, t0 = self.f, time.time()
         r, hub, pic = f["render"], f["render"]["hub"], f["picture"]
-        J = json.load(open(self.p("join.json")))
+        J = read_json(self.p("join.json"))
         film_path = os.path.join(self.out, J["film"])
         inputs = [film_path, self.p("render.json"), self.p("generate.json"), self.p("xml", "full-audio.scene.xml")]
         cfg = {"gates": f["gates"], "hub": hub}
         if self.fresh("gates", inputs, cfg):
             return "cached", self.last("gates")
-        segs = json.load(open(self.p("render.json")))
+        segs = read_json(self.p("render.json"))
         nums = [s["n"] for s in self.scenes()]
         gd = self.p("gates"); os.makedirs(gd, exist_ok=True)
-        json.dump([{"scene": n, "path": f"../join/seg/s{n:02d}.mp4", "frames": segs[str(n)]["frames"]} for n in nums],
-                  open(os.path.join(gd, "segments.json"), "w"))
+        write_json(os.path.join(gd, "segments.json"), [{"scene": n, "path": f"../join/seg/s{n:02d}.mp4", "frames": segs[str(n)]["frames"]} for n in nums])
         rg = f"{self.rdir}/gates"
         self.put_lib(hub)
         self.remote.run(hub, f'rm -rf "$HOME/{rg}" && mkdir -p "$HOME/{rg}"')
@@ -596,18 +595,18 @@ class Build:
         except RemoteError as e:
             raise StageFailed(f"gates job on {hub}: {e}")
         self.remote.get(hub, f"{rg}/film.json", os.path.join(gd, "film.json"))
-        m = json.load(open(os.path.join(gd, "film.json")))
-        gen = json.load(open(self.p("generate.json")))
-        ml = asm.music_layer(open(self.p("xml", "full-audio.scene.xml"), "rb").read())
-        capf = json.load(open(self.p("caption-gate.json")))["findings"] if f["captions"]["enabled"] else None
+        m = read_json(os.path.join(gd, "film.json"))
+        gen = read_json(self.p("generate.json"))
+        ml = asm.music_layer(read_bytes(self.p("xml", "full-audio.scene.xml")))
+        capf = read_json(self.p("caption-gate.json"))["findings"] if f["captions"]["enabled"] else None
         rows = G.judge(m, f["gates"], segments={f"s{int(k):02d}": v["findings"] for k, v in segs.items()},
                        picture=gen["picture_findings"], music=ml, captions=capf, voice=voice)
-        json.dump(rows, open(os.path.join(gd, "gates.json"), "w"), indent=1, ensure_ascii=False)
+        write_json(os.path.join(gd, "gates.json"), rows, indent=1, ensure_ascii=False)
         md = G.gates_md(f["film"], rows, os.path.relpath(film_path, f.root), J["sha256"],
                         [("film measures", "build/gates/film.json"), ("judged rows", "build/gates/gates.json"),
                          ("segment checks", "build/checks/sNN/check.json"), ("render records (host, CPU, cores, sha256)", "build/render.json"),
                          ("build-time picture findings and plan check", "build/generate.json")], now()[:10])
-        open(os.path.join(self.out, "GATES.md"), "w", encoding="utf-8").write(md)
+        write_text(os.path.join(self.out, "GATES.md"), md)
         bad = [x["gate"] for x in rows if not x["ok"]]
         note = f"{len(rows) - len(bad)}/{len(rows)} pass; I {m['loudness']['I']} LUFS, TP {m['loudness']['true_peak']} dBTP, black {len(m['black'])}, " \
                f"first-frame {len(m['first_frames'])}, joins {len(m['joins'])}" + (f"; FAIL: {', '.join(bad)}" if bad else "")
@@ -620,7 +619,7 @@ class Build:
     def sheets(self):
         f, t0 = self.f, time.time()
         hub = f["render"]["hub"]
-        J = json.load(open(self.p("join.json")))
+        J = read_json(self.p("join.json"))
         film_path = os.path.join(self.out, J["film"])
         inputs, cfg = [film_path], {"hub": hub}
         if self.fresh("sheets", inputs, cfg):
@@ -637,7 +636,7 @@ class Build:
             t.extractall(sd, filter="data")
         os.remove(os.path.join(sd, "sheets.tar"))
         pngs = sorted(x for x in os.listdir(sd) if x.endswith(".png"))
-        segs = json.load(open(self.p("render.json")))
+        segs = read_json(self.p("render.json"))
         T = {s["n"]: s for s in self.timings()["scenes"]}
         flagged = [f"s{int(k):02d} {T[int(k)]['slot_start']}-{T[int(k)]['slot_end']} s" for k, v in segs.items() if v["findings"]]
         return "ran", self.done("sheets", inputs, cfg, [os.path.join(sd, x) for x in pngs],

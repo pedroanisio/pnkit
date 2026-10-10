@@ -47,6 +47,13 @@ pnkit/            the package; vendored into projects as film/vendor/pnkit/
   data/sfx_library.json  the channel's palette (AudioForge cues and tools/foley.py's files) and the retired cues
   files.py        approved files are write-once: write_once (raises WriteOnceError if the path exists), next_free
                   (excerpt.wav -> excerpt-v2.wav), write_next (write_once to the first free path)
+pixelart/         the picture framework of an integer-grid pixel-art film (from Lula 3.0.0): geometry, art and figure
+                  modules, ctx (Ctx: shots, zoom, plates, signs, actors, crowds), sets (shared sets), checks (CheckedCtx:
+                  build-time picture checks, waivers), plan (the plan check), frames (flat field, plate visible), segment
+                  (the per-segment render check, run on the render host)
+filmbuild/        film_build: config (film.json), state (hash ledger), remote (runner), stages, assemble, gates, jobs (run on
+                  the render host), voice (pronunciation list, timings from takes), pack (vpkg, verify, rebuild check)
+timings.py        load and diff word-timings files
 kit.json          the catalog: every component, its parameters and the guide rules it satisfies
 tools/sync.py     vendor pnkit into a project and write its lock
 tools/check_lock.py   verify a project's vendored copy against its lock
@@ -61,6 +68,8 @@ tools/vm_preflight.py  before a batch: reachability, free disk, who holds ~/heav
 tools/caption_gate.py CUES --approved TEXT   the caption text gate: cues (.vtt, scene .xml or .json) must equal the approved
                   written text and, in pt-br, must not spell numbers out; exit 1 on findings
 tools/timings_diff.py A.json B.json   sentences and words whose start or end moved by more than --threshold (0.15 s)
+tools/film_build.py FILM.json [STAGE ...]   build a film in restartable, hash-recorded stages (docs/film-kit/README.md)
+tools/pixelart/lula_alias.py   build Lula 3.0.0 scene modules against pnkit.pixelart and print their sha256
 tests/            unit tests (python3 -m unittest discover -s tests) and the golden test (tests/golden/)
 ```
 

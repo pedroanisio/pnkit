@@ -16,7 +16,7 @@ import hashlib, json, math, os, shutil, time, zipfile
 
 from .. import __version__ as PNKIT_VERSION
 from .remote import RemoteError
-from .state import sha256_file, now
+from .state import sha256_file, now, read_json, write_json, read_text, write_text, read_bytes, write_bytes
 
 FIXED = (2026, 1, 1, 0, 0, 0)
 EXCLUDE_DIRS = {"__pycache__", "seg"}
@@ -64,8 +64,8 @@ def manifest(f, segs, nums, film_name, film_sha, audio_sha):
 
 def _tree(b):
     f = b.f
-    J = json.load(open(b.p("join.json")))
-    segs = json.load(open(b.p("render.json")))
+    J = read_json(b.p("join.json"))
+    segs = read_json(b.p("render.json"))
     nums = [s["n"] for s in f["scenes"]]
     film_name = J["film"]
     pk = os.path.join(b.out, "pack", f"{f.id}-{f.version}")
@@ -79,12 +79,10 @@ def _tree(b):
     shutil.copyfile(os.path.join(os.path.dirname(os.path.abspath(__file__)), "pack_join.py"), os.path.join(pj, "join.py"))
     audio_sha = sha256_file(b.p("final.m4a"))
     sums = [f"{segs[str(n)]['sha256']}  xml/seg/s{n:02d}.mp4" for n in nums] + [f"{audio_sha}  xml/final.m4a", f"{J['sha256']}  output/{film_name}"]
-    open(os.path.join(pj, "SHA256SUMS"), "w").write("\n".join(sums) + "\n")
-    json.dump({k: {x: v[x] for x in ("scene", "host", "hostname", "cpu", "cores", "engine_sha256", "sha256", "frames", "rendered")} for k, v in segs.items()},
-              open(os.path.join(pj, "render.json"), "w"), indent=1, sort_keys=True)
-    json.dump({"segments": [f"xml/seg/s{n:02d}.mp4" for n in nums], "audio": "xml/final.m4a", "film_name": film_name, "film_sha256": J["sha256"]},
-              open(os.path.join(pj, "film-meta.json"), "w"), indent=1)
-    json.dump(manifest(f, segs, nums, film_name, J["sha256"], audio_sha), open(os.path.join(pk, "vpkg.json"), "w"), indent=1, ensure_ascii=False)
+    write_text(os.path.join(pj, "SHA256SUMS"), "\n".join(sums) + "\n")
+    write_json(os.path.join(pj, "render.json"), {k: {x: v[x] for x in ("scene", "host", "hostname", "cpu", "cores", "engine_sha256", "sha256", "frames", "rendered")} for k, v in segs.items()}, indent=1, sort_keys=True)
+    write_json(os.path.join(pj, "film-meta.json"), {"segments": [f"xml/seg/s{n:02d}.mp4" for n in nums], "audio": "xml/final.m4a", "film_name": film_name, "film_sha256": J["sha256"]}, indent=1)
+    write_json(os.path.join(pk, "vpkg.json"), manifest(f, segs, nums, film_name, J["sha256"], audio_sha), indent=1, ensure_ascii=False)
     return pk, pj, segs, nums, J
 
 
@@ -99,12 +97,12 @@ def _zip(pk, dest):
     with zipfile.ZipFile(buf, "w", zipfile.ZIP_DEFLATED) as z:
         for n in sorted(names):
             zi = zipfile.ZipInfo(n, FIXED); zi.compress_type = zipfile.ZIP_DEFLATED; zi.external_attr = 0o644 << 16
-            z.writestr(zi, open(os.path.join(pk, n), "rb").read())
+            z.writestr(zi, read_bytes(os.path.join(pk, n)))
         zi = zipfile.ZipInfo("MANIFEST.sha256", FIXED); zi.compress_type = zipfile.ZIP_DEFLATED; zi.external_attr = 0o644 << 16
         z.writestr(zi, "".join(f"{v}  {k}\n" for k, v in man.items()))
     data = buf.getvalue()
     if os.path.exists(dest):
-        if open(dest, "rb").read() != data:
+        if read_bytes(dest) != data:
             raise FileExistsError(dest)
         return False, len(man)
     with open(dest, "xb") as o:
@@ -169,7 +167,7 @@ def rebuild_check(b, pj, segs, nums, n_seg):
 def pack(b):
     from .stages import StageFailed
     f, t0 = b.f, time.time()
-    J = json.load(open(b.p("join.json")))
+    J = read_json(b.p("join.json"))
     inputs = [os.path.join(b.out, J["film"]), b.p("render.json"), b.p("xml"), b.p("src"), os.path.join(b.out, "GATES.md"), b.p("final.m4a")]
     cfg = {"pack": f["pack"], "film": f["film"], "pnkit": PNKIT_VERSION}
     if b.fresh("pack", inputs, cfg):
@@ -184,10 +182,10 @@ def pack(b):
         lows = [p["psnr_db"] for w in worst for p in w if p["psnr_db"] != "inf"]
         claim = (f"NOT byte-identical: {len(worst)} of {len(reb['segments'])} segments differ (lowest PSNR {min(lows) if lows else 'inf'} dB)"
                  + ("" if reb["audio_identical"] else "; the audio differs"))
-    json.dump(dict(reb, claim=claim), open(os.path.join(pj, "rebuild.json"), "w"), indent=1)
+    write_json(os.path.join(pj, "rebuild.json"), dict(reb, claim=claim), indent=1)
     date = now()[:10]
     cpus = sorted({(v["cpu"], v["cores"]) for v in segs.values()})
-    open(os.path.join(pj, "REBUILD.md"), "w", encoding="utf-8").write(_md(
+    write_text(os.path.join(pj, "REBUILD.md"), _md(
         f"Rebuilding {f['film']['title']} {f.version}",
         "Written for: whoever rebuilds this film from the package.\n\n"
         f"**Claim, measured {date}:** {claim} (`rebuild.json`).\n\n"
@@ -204,7 +202,7 @@ def pack(b):
         "## Regenerate the documents\n\n"
         "`src/` is the snapshot film_build built from: `film.json`, `timings.json`, the scene modules and the plan. "
         f"With pnkit {PNKIT_VERSION} on the path, `python3 tools/film_build.py project/film.json snapshot generate assemble` rebuilds `xml/`.", date))
-    open(os.path.join(pk, "README.md"), "w", encoding="utf-8").write(_md(
+    write_text(os.path.join(pk, "README.md"), _md(
         f"{f['film']['title']} {f.version}",
         f"{f['film'].get('description', '')}\n\nPackage made by pnkit {PNKIT_VERSION} film_build on {date}. "
         f"Film `{J['film']}`, sha256 `{J['sha256']}`. Gates: `project/GATES.md`. Rebuild: `project/REBUILD.md` ({claim}).", date))
@@ -214,7 +212,7 @@ def pack(b):
         raise StageFailed(f"{os.path.relpath(zpath, f.root)} exists with other content: a package version is not rewritten (bump film.version)")
     n = verify(zpath)
     zsha = sha256_file(zpath)
-    open(zpath + ".sha256", "w").write(f"{zsha}  {os.path.basename(zpath)}\n")
+    write_text(zpath + ".sha256", f"{zsha}  {os.path.basename(zpath)}\n")
     filed = ""
     if f["pack"].get("file_to"):
         dest_dir = f.path(f["pack"]["file_to"])
@@ -223,7 +221,7 @@ def pack(b):
             raise StageFailed(f"filing: {dest} exists with other content")
         if not os.path.exists(dest):
             shutil.copyfile(zpath, dest)
-            open(dest + ".sha256", "w").write(f"{zsha}  {os.path.basename(zpath)}\n")
+            write_text(dest + ".sha256", f"{zsha}  {os.path.basename(zpath)}\n")
         filed = f"; filed in {os.path.relpath(dest_dir, f.root)}"
     note = f"{os.path.relpath(zpath, f.root)} ({n} files verified, sha256 {zsha[:16]}); rebuild {claim}{filed}"
     return "ran", b.done("pack", inputs, cfg, [zpath, zpath + ".sha256"], note, summary={"rebuild": reb}, t0=t0)

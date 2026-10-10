@@ -24,6 +24,8 @@ expanded on the wrong side and wiped a home folder). No host, path or engine is 
 """
 import copy, json, os
 
+from .state import read_json
+
 DEFAULTS = {
     "picture": {"framework": "pnkit.pixelart", "scenes_dir": "scenes", "plan": None, "waivers": None, "fps": 24, "unit": 6,
                 "background": None, "determinism_seeds": [0, 1]},
@@ -62,7 +64,7 @@ class Film:
         self.file = os.path.abspath(path)
         self.root = os.path.dirname(self.file)
         try:
-            raw = json.load(open(self.file, encoding="utf-8"))
+            raw = read_json(self.file)
         except (OSError, ValueError) as e:
             raise FilmError(f"cannot read {path}: {e}")
         self.raw = raw
@@ -131,7 +133,7 @@ class Film:
         return os.path.join(self.out, "build")
 
     def timings(self):
-        t = json.load(open(self.path(self.d["timings"]), encoding="utf-8"))
+        t = read_json(self.path(self.d["timings"]))
         check_timings(t, self.d["scenes"])
         return t
 

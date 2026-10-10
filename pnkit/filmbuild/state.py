@@ -75,3 +75,34 @@ class Ledger:
             if not os.path.exists(p) or sha256_file(p) != sha:
                 return False
         return True
+
+
+def read_json(path):
+    with open(path, encoding="utf-8") as fh:
+        return json.load(fh)
+
+
+def write_json(path, obj, **kw):
+    kw.setdefault("ensure_ascii", False)
+    with open(path, "w", encoding="utf-8") as fh:
+        json.dump(obj, fh, **kw)
+
+
+def read_text(path):
+    with open(path, encoding="utf-8") as fh:
+        return fh.read()
+
+
+def write_text(path, text):
+    with open(path, "w", encoding="utf-8") as fh:
+        fh.write(text)
+
+
+def read_bytes(path):
+    with open(path, "rb") as fh:
+        return fh.read()
+
+
+def write_bytes(path, data):
+    with open(path, "wb") as fh:
+        fh.write(data)
