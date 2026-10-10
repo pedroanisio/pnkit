@@ -27,6 +27,7 @@ class Lock(unittest.TestCase):
         lock = json.load(open(os.path.join(self.tmp, "film", "vendor", "pnkit.lock")))
         self.assertEqual(lock["version"], pnkit.__version__)
         self.assertIn("camera.py", lock["files"]); self.assertIn("kit.json", lock["files"]); self.assertIn("data/vo_lexicon.json", lock["files"])
+        self.assertIn("pixelart/ctx.py", lock["files"]); self.assertIn("pixelart/__init__.py", lock["files"])
         self.assertTrue(os.path.exists(os.path.join(self.tmp, "film", "vendor", "__init__.py")))
         self.assertEqual(self.run_tool("check_lock.py", self.tmp).returncode, 0)
         # the vendored copy imports as vendor.pnkit

@@ -24,6 +24,10 @@ def sha256(path):
 def package_files():
     """[(relative path, source path)] of what is vendored, sorted"""
     out = [(n, os.path.join(PKG, n)) for n in sorted(os.listdir(PKG)) if n.endswith(".py")]
+    for sub in sorted(os.listdir(PKG)):                # subpackages (pixelart/): their .py files, vendored as sub/<name>
+        d = os.path.join(PKG, sub)
+        if os.path.isfile(os.path.join(d, "__init__.py")):
+            out += [(f"{sub}/{n}", os.path.join(d, n)) for n in sorted(os.listdir(d)) if n.endswith(".py")]
     data = os.path.join(PKG, "data")                   # the package's data files (vo_lexicon.json), vendored as data/<name>
     if os.path.isdir(data):
         out += [(f"data/{n}", os.path.join(data, n)) for n in sorted(os.listdir(data)) if n.endswith(".json")]
