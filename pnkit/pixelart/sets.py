@@ -560,6 +560,8 @@ HOUSE_DOOR_SLOTS = _door_slots()        # where figures may stand (sprite origin
 
 # ------------------------------------------------------------------------------------------------------------ SCHOOL street
 ESCOLA_STREET_SIGN = ('ESCOLA', (130, 24, 200, 34))
+ESCOLA_STREET_BOARD = (94, 23, 236, 36)  # the whole blue board the lettering sits on (measured from the 'wide' set, 2026-10-10): declare THIS as the sign
+                                         # rectangle when a plate could come near it; the lettering rect above lets a plate cover the board's ends
 SCHOOL_DOOR = (147, 56, 183, 118)       # 10f / 11f1 wide view: door frame (x0, y0, x1, y1)
 
 

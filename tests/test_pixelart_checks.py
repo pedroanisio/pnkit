@@ -147,3 +147,21 @@ class FlatField(unittest.TestCase):
 
 if __name__ == "__main__":
     unittest.main()
+
+
+class SignBoard(unittest.TestCase):
+    def test_plate_over_the_school_board_is_refused_when_the_board_is_the_sign(self):
+        from pnkit.pixelart import sets
+        def draw(c, s):
+            c.sign('ESCOLA', sets.ESCOLA_STREET_BOARD)
+            c.plate('Golden · 2026', 'TL', 0.5, 2.5)
+        with self.assertRaisesRegex(PlanError, 'overlaps sign'):
+            one_shot(checks.CheckedCtx(), draw)
+
+    def test_the_board_constant_matches_the_set(self):
+        from pnkit.pixelart import sets
+        g = sets.school_street('wide', 'morning', signs=True)
+        x0, y0, x1, y1 = sets.ESCOLA_STREET_BOARD
+        board = g.cells[(x0, y0)]
+        self.assertTrue(all(g.cells.get((x, y)) == board for x in (x0, x1 - 1) for y in (y0, y1 - 1)))
+        self.assertNotEqual(g.cells.get((x0 - 1, y0)), board); self.assertNotEqual(g.cells.get((x0, y1)), board)
