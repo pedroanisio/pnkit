@@ -18,6 +18,11 @@ the only Intel CPU (the others are Ryzen, same Mesa, same engine). Re-rendering 
 bytes, so the engine is deterministic per host, not across CPU models. A film split across hosts of different CPU
 models can therefore differ from a rebuild on another host. Run this before a batch and after any VM, driver or
 engine change.
+Cause found 2026-10-09 (Coder A, task A7): style3 is also the only 8-core host (the others have 6). The rendered
+frames were the same on style3 and lab (4 frames of Lula s02, same binary), but libx264 chooses 1.5 x the cores as
+its thread count when it is not given one, and its bytes depend on that count (`-threads` 6, 8, 9 and 12 each gave the
+same bytes on both hosts; auto gave 12 on style3 and 9 on lab). The probe therefore also reports the core count
+(CORES=) and warns when it differs. Engines with fix/encoder-threads pass a fixed thread count to libx264 and x265.
 
 The runner. Every command goes through a template, default
     tools/vm/vmrun.sh {host} run {cmd}          (env PNKIT_VM_RUNNER overrides; --runner overrides both)
@@ -46,11 +51,12 @@ DEFAULT_HOSTS = ["prod", "fix", "lab", "style1", "style2", "style3"]
 DEFAULT_RUNNER = "tools/vm/vmrun.sh {host} run {cmd}"
 LOCK = "$HOME/heavy.lock"
 
-# read-only; prints PNKIT_OK, FREE_KB=, CPU=, LOCKFILE=, and LOCK / PS lines
+# read-only; prints PNKIT_OK, FREE_KB=, CPU=, CORES=, LOCKFILE=, and LOCK / PS lines
 PROBE = (
     'echo PNKIT_OK; '
     'echo FREE_KB=$(df -Pk "$HOME" | awk \'NR==2{print $4}\'); '
     'echo CPU=$(grep -m1 "model name" /proc/cpuinfo | sed "s/^[^:]*: *//"); '
+    'echo CORES=$(nproc); '
     'ino=$(stat -c %i "$HOME/heavy.lock" 2>/dev/null); echo LOCKFILE=${ino:-none}; '
     'if [ -n "$ino" ]; then grep -E ":$ino " /proc/locks | sed "s/^/LOCK /"; '
     'for p in $(grep -E ":$ino " /proc/locks | awk \'{for(i=1;i<=NF;i++) if($i=="READ"||$i=="WRITE") print $(i+1)}\' | sort -u); '
@@ -98,10 +104,10 @@ def _short(s, n=200):
 
 
 def parse_probe(out):
-    """the probe's stdout -> {"reachable", "free_gb", "cpu", "lock": {"present", "holders", "waiters"}}"""
+    """the probe's stdout -> {"reachable", "free_gb", "cpu", "cores", "lock": {"present", "holders", "waiters"}}"""
     if "PNKIT_OK" not in out:
         return {"reachable": False}
-    free = cpu = None
+    free = cpu = cores = None
     present, locks, ps = False, [], {}
     for line in out.splitlines():
         if line.startswith("FREE_KB="):
@@ -109,6 +115,9 @@ def parse_probe(out):
             free = round(int(v) / 1048576, 2) if v.isdigit() else None
         elif line.startswith("CPU="):
             cpu = line[4:].strip() or "unknown"
+        elif line.startswith("CORES="):
+            v = line[6:].strip()
+            cores = int(v) if v.isdigit() else None
         elif line.startswith("LOCKFILE="):
             present = line[9:].strip() not in ("", "none")
         elif line.startswith("LOCK "):
@@ -123,7 +132,7 @@ def parse_probe(out):
                 ps[t[0]] = {"user": t[1], "elapsed": t[2], "cmd": _short(t[3] if len(t) > 3 else "", 120)}
     for l in locks:
         l.update(ps.get(l["pid"], {}))
-    return {"reachable": True, "free_gb": free, "cpu": cpu or "unknown",
+    return {"reachable": True, "free_gb": free, "cpu": cpu or "unknown", "cores": cores,
             "lock": {"present": present, "holders": [l for l in locks if not l["waiting"]],
                      "waiters": [l for l in locks if l["waiting"]]}}
 
@@ -196,6 +205,15 @@ def preflight(run, hosts, min_free_gb=20.0, scene=None, times=None, render_tmpl=
     if len(cpus) > 1:
         rep["warnings"].append("CPU models differ: " + "; ".join(f"{c} ({', '.join(sorted(h))})" for c, h in sorted(cpus.items()))
                                + ". Renders may differ byte for byte across them (Lula: 6 of 32 segments, all on the one Intel host).")
+    cores = collections.defaultdict(list)
+    for i in infos:
+        if i["reachable"] and i.get("cores"):
+            cores[str(i["cores"])].append(i["host"])
+    rep["core_counts"] = {c: sorted(h) for c, h in cores.items()}
+    if len(cores) > 1:
+        rep["warnings"].append("core counts differ: " + "; ".join(f"{c} cores ({', '.join(sorted(h))})" for c, h in sorted(cores.items()))
+                               + ". libx264 and libx265 size their threads from the cores when not told, and their bytes depend on it;"
+                               + " engines before fix/encoder-threads (2026-10-09) encode differently per core count. Probe an encode, not only frames.")
     if scene:
         live = [i["host"] for i in infos if i["reachable"]]
         with concurrent.futures.ThreadPoolExecutor(max_workers=max(1, len(live))) as ex:

@@ -8,9 +8,9 @@ RYZEN, INTEL = "AMD Ryzen 7 5700G", "Intel(R) Core(TM) i7-12700"
 SHA_A, SHA_B = "a" * 64, "b" * 64
 
 
-def probe_out(free_kb=200 * 1048576, cpu=RYZEN, lock=()):
+def probe_out(free_kb=200 * 1048576, cpu=RYZEN, lock=(), cores=6):
     """what the probe prints; lock = [(pid, waiting, user, etime, cmd)]"""
-    s = f"PNKIT_OK\nFREE_KB={free_kb}\nCPU={cpu}\nLOCKFILE={'4242' if lock else 'none'}\n"
+    s = f"PNKIT_OK\nFREE_KB={free_kb}\nCPU={cpu}\nCORES={cores}\nLOCKFILE={'4242' if lock else 'none'}\n"
     for pid, waiting, user, et, cmd in lock:
         s += f"LOCK 1: {'-> ' if waiting else ''}FLOCK  ADVISORY  WRITE {pid} 08:01:4242 0 EOF\n"
         s += f"PS {pid:>6} {user} {et} {cmd}\n"
@@ -84,6 +84,15 @@ class Hosts(unittest.TestCase):
         self.assertEqual(rep["cpu_models"][INTEL], ["style3"])
         self.assertTrue(any("CPU models differ" in w and "style3" in w for w in rep["warnings"]))
         self.assertEqual({h["host"]: h["cpu"] for h in rep["hosts"]}, {"fix": RYZEN, "style3": INTEL})
+
+    def test_differing_core_counts_warn_with_their_cause(self):
+        # libx264/libx265 size their threads from the cores and their bytes depend on it (A7, 2026-10-09)
+        rep = vp.preflight(Fake({"fix": probe_out(), "style3": probe_out(cpu=INTEL, cores=8)}), ["fix", "style3"])
+        self.assertTrue(rep["ok"])
+        self.assertEqual(rep["core_counts"], {"6": ["fix"], "8": ["style3"]})
+        self.assertTrue(any("core counts differ" in w and "libx264" in w for w in rep["warnings"]), rep["warnings"])
+        same = vp.preflight(Fake({"fix": probe_out(), "lab": probe_out()}), ["fix", "lab"])
+        self.assertFalse(any("core counts differ" in w for w in same["warnings"]))
 
     def test_probe_is_one_read_only_command_per_host(self):
         r = Fake({"prod": probe_out()})
