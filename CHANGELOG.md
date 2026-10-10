@@ -36,9 +36,19 @@ Added
   Each stage records its inputs' hashes and is skipped when nothing changed. One summary table on stdout.
 - `tools/sync.py` vendors subpackages (`pixelart/`, `filmbuild/`).
 
-Tests: 255 -> 311 (5 skipped), including an end-to-end run of every film_build stage against a fake runner (hosts are
+- `sets.ESCOLA_STREET_BOARD`: the school board's whole rectangle (no output change).
+
+Fixed while proving it on the golden film (each with a test): the render worker exports the engine path for the
+flock'd job; an interrupted render stage attaches to the worker still running on the host instead of launching a
+second one; only stems that have tracks are rendered (an empty audioMix is engine error C35); a stage record made by
+other pnkit code is stale; an unexpected error is a FAIL row, not a traceback.
+
+Tests: 255 -> 316 (5 skipped), including an end-to-end run of every film_build stage against a fake runner (hosts are
 folders; the engine, host python and ffmpeg are stand-ins), so no render runs on the development machine.
-Golden film: `PALS-Notes/projects/golden-pixel/` (10 s, two scenes), built end to end on the prod VM by film_build.
+Golden film: `PALS-Notes/projects/golden-pixel/` (10 s, two scenes), built end to end on the prod VM by film_build with
+engine v0.1.4 (v0.3.1 is not installed on lab or prod). 1.0.1: `out/golden-pixel-v2.mp4`, sha256 6b32e89c...1ed62c16,
+10/10 gates, package rebuild byte-identical (1 segment and the audio). 1.0.0 passed every gate with a plate over the
+ESCOLA board's end, which only the 1 s sheet showed; the sign is now declared as the whole board.
 
 ## 0.7.0 — 2026-10-07 — lessons of the Lula 3.0.0 film: written-form captions, picture checks, pre-batch checks
 
