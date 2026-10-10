@@ -25,23 +25,10 @@ Prints one line per frame: the findings (or "ok"), the frame path and the measur
 {path, flags, empty_frac, empty_strip_cols, dominant_frac, dominant_rgb}. Exit status 0 when no frame is flagged, 1
 when any is, 2 when Pillow is missing. Needs Pillow, imported inside the function; nothing is rendered here.
 """
-import argparse, json, sys
-from collections import Counter
+import argparse, json, os, sys
 
-EMPTY_FRAC = 0.15
-STRIP_COLS = 8
-FLAT_FRAC = 0.75
-
-
-def parse_rgb(text):
-    """'#rrggbb' or 'r,g,b' -> (r, g, b)"""
-    t = text.strip()
-    if t.startswith("#") and len(t) == 7:
-        return tuple(int(t[i:i + 2], 16) for i in (1, 3, 5))
-    parts = [int(p) for p in t.split(",")]
-    if len(parts) != 3 or not all(0 <= p <= 255 for p in parts):
-        raise ValueError(f"not a colour: {text!r} (use #rrggbb or r,g,b)")
-    return tuple(parts)
+sys.path.insert(0, os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
+from pnkit.pixelart.frames import EMPTY_FRAC, STRIP_COLS, FLAT_FRAC, parse_rgb, to_grid, analyse   # noqa: E402  (the library holds the check)
 
 
 def _pillow():
@@ -50,48 +37,6 @@ def _pillow():
     except ImportError:
         raise SystemExit("flat_field: Pillow is required to read frames (pip install pillow)")
     return Image
-
-
-def to_grid(img, grid=(320, 180), rows=None):
-    """the picture as rows of RGB tuples on the logical grid (centre pixel of each cell); raises ValueError when
-    the frame is not a whole multiple of the grid"""
-    gw, gh = grid
-    im = img.convert("RGB")
-    w, h = im.size
-    if w % gw or h % gh or w // gw != h // gh:
-        raise ValueError(f"expected a whole multiple of the {gw}x{gh} grid, got {w}x{h}")
-    k = w // gw
-    px = im.load()
-    n = gh if rows is None else min(rows, gh)
-    return [[px[x * k + k // 2, y * k + k // 2] for x in range(gw)] for y in range(n)]
-
-
-def analyse(img, bg, grid=(320, 180), rows=None, empty_frac=EMPTY_FRAC, strip_cols=STRIP_COLS, flat_frac=FLAT_FRAC):
-    """measures and flags of one frame (a Pillow image); bg is an (r, g, b) tuple"""
-    bg = tuple(bg)
-    g = to_grid(img, grid, rows)
-    gw, nrows = grid[0], len(g)
-    n = gw * nrows
-    counts = Counter(c for row in g for c in row)
-    out = {"empty_frac": counts.get(bg, 0) / n}
-    best = run = 0
-    for x in range(gw):
-        if all(g[y][x] == bg for y in range(nrows)):
-            run += 1
-            best = max(best, run)
-        else:
-            run = 0
-    out["empty_strip_cols"] = best
-    dom, cnt = counts.most_common(1)[0]
-    out["dominant_frac"] = cnt / n
-    out["dominant_rgb"] = tuple(int(v) for v in dom)
-    flags = []
-    if out["empty_frac"] >= empty_frac or best >= strip_cols:
-        flags.append("empty-background")
-    if out["dominant_frac"] >= flat_frac and out["dominant_rgb"] != bg:
-        flags.append("flat-field")
-    out["flags"] = flags
-    return out
 
 
 def main(argv=None):
