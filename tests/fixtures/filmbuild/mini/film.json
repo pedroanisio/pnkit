@@ -1,0 +1,13 @@
+{
+ "film": {"id": "mini", "version": "0.1.0", "title": "Mini test film", "lang": "pt-BR", "description": "Two scenes, the film_build test fixture."},
+ "timings": "timings.json",
+ "scenes": [{"n": 1, "id": "s01", "module": "scene_01"}, {"n": 2, "id": "s02", "module": "scene_02"}],
+ "picture": {"scenes_dir": "scenes", "plan": "SHOTS.md", "waivers": "waivers.json"},
+ "voice": {"mode": "none"},
+ "captions": {"enabled": false},
+ "audio": {"score": "sound/score.wav", "score_script": ["{python}", "sound/make_score.py", "{out}"]},
+ "render": {"hosts": ["h1", "h2"], "hub": "h1", "runner": "../bin/fake_vmrun.py", "remote_dir": "film-build/mini",
+            "engine": "engine/fake/scene-render", "python": "venv/bin/python", "env": {"SR_GPU_BACKEND": "vulkan"}, "poll_s": 0.2, "timeout_s": 60},
+ "out": {"dir": "out", "name": "mini"},
+ "pack": {"rebuild_segments": 1}
+}

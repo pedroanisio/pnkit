@@ -15,9 +15,9 @@ stings, soft struck foley only after the last word). Projects vendor it into fil
 import functools, types
 
 from .doc import Doc
-from . import xml, palette, text, draw, camera, brand, captions, shorts, physics, mesh, figure, vo, audio, files
+from . import xml, palette, text, draw, camera, brand, captions, shorts, physics, mesh, figure, vo, audio, files, timings
 
-__version__ = "0.7.0"
+__version__ = "0.8.0"
 __all__ = ["Doc", "bind", "__version__", "xml", "palette", "text", "draw", "camera", "brand", "captions", "shorts",
            "physics", "mesh", "figure", "vo", "audio"]
 
