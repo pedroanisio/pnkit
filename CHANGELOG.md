@@ -16,8 +16,8 @@ Why a major: output is no longer byte-identical to 0.8. The SDK writes an `xs:do
 `855.0`. Every golden below is therefore compared as C14N 2.0 with comments (`tests/c14n.py`); where the old text has a plain
 decimal such as `1.000` or `5.0`, the comparison also rewrites plain decimals to their shortest form (`c14n_numeric`), nothing
 else. Goldens checked against the 0.8.0 reference (ac380b2):
-- component corpus, 78 entries (`tests/golden/components-0.8.0.json`): 61 strictly C14N-equal, the 17 that carry a double the
-  old code wrote with trailing zeros equal under `c14n_numeric` (captions, Shorts outputs, filmbuild documents); 54 are
+- component corpus, 78 entries (`tests/golden/components-0.8.0.json`): 63 strictly C14N-equal (or equal id lists), the 15 that carry a double the
+  old code wrote with trailing zeros equal under `c14n_numeric` (captions, Shorts outputs, filmbuild documents); 53 are
   also byte-identical as strings.
 - all 32 Lula 3.0.0 scenes (`tests/golden/pixelart/lula-3.0.0.json`): equal under `c14n_numeric` (every scene differs
   under strict C14N: `time`/`end`/`clipIn` such as `855.0`), and level-1 clean (`PNKIT_LULA_ALL=1`).

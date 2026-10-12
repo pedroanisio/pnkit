@@ -11,7 +11,7 @@ and bump the version as a breaking change.
 - `components-0.8.0.json` + `components_corpus.py`: what 0.8.0 wrote for 78 fixed calls of every component that writes scene XML
   (xml, text, draw, camera, brand, captions, shorts, physics, figure, audio, filmbuild.assemble). Regenerate the reference
   from an old checkout with `python3 components_corpus.py KIT OLD_LIB > components-0.8.0.json`. Checked in
-  `tests/test_sdk.py` (`Golden`): 61+ entries are strictly C14N-equal; the entries in `Golden.NUMERIC` carry an
+  `tests/test_sdk.py` (`Golden`): 63 entries are strictly C14N-equal; the entries in `Golden.NUMERIC` carry an
   xs:double the old code wrote as `1.000` / `5.0` and are compared with `c14n_numeric`.
 - `pixelart/lula-3.0.0.json`: per scene `sha256` (0.8.0 bytes, record only), `c14n_sha256` and `c14n_numeric_sha256`.
   1.0 matches `c14n_numeric_sha256` for all 32 scenes (`PNKIT_LULA_ALL=1`, about 45 s; 3 scenes by default) and its
