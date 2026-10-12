@@ -41,6 +41,16 @@ __all__ = ["Xml", "BuildError", "num", "put", "new", "adopt", "parse_fragment", 
 MIN_SDK = "1.7.0"
 
 
+def _need(version):
+    got = tuple(int(x) for x in re.findall(r"\d+", getattr(S, "__version__", None) or __import__("sr_core").__version__)[:3])
+    if got < tuple(int(x) for x in version.split(".")):
+        raise ImportError(f"pnkit needs sr-core >= {version} (sr_core.scene), found {'.'.join(map(str, got))}: "
+                          f"install it from the sr-core repository")
+
+
+_need(MIN_SDK)
+
+
 class BuildError(ValueError):
     """a document that `check()` reports level-1 errors for; `.findings` holds every finding"""
 

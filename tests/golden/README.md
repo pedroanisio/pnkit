@@ -1,8 +1,23 @@
 # Golden tests
 
 A golden test rebuilds a delivered project with the vendored pnkit and compares the scene it writes with the
-delivered one, byte for byte. A release of pnkit must pass every golden test listed here. If a change is meant
-to alter output, it must say so in the CHANGELOG and bump the version as a breaking change.
+delivered one. From 1.0 the comparison is C14N 2.0 with comments (`tests/c14n.py`), because the scene SDK writes
+numbers in their shortest form; the goldens frozen from pnkit 0.8.0 (below) are the reference for 1.0. A release of
+pnkit must pass every golden test listed here. If a change is meant to alter output, it must say so in the CHANGELOG
+and bump the version as a breaking change.
+
+## The 0.8.0 goldens that 1.0 is held to
+
+- `components-0.8.0.json` + `components_corpus.py`: what 0.8.0 wrote for 78 fixed calls of every component that writes scene XML
+  (xml, text, draw, camera, brand, captions, shorts, physics, figure, audio, filmbuild.assemble). Regenerate the reference
+  from an old checkout with `python3 components_corpus.py KIT OLD_LIB > components-0.8.0.json`. Checked in
+  `tests/test_sdk.py` (`Golden`): 61+ entries are strictly C14N-equal; the entries in `Golden.NUMERIC` carry an
+  xs:double the old code wrote as `1.000` / `5.0` and are compared with `c14n_numeric`.
+- `pixelart/lula-3.0.0.json`: per scene `sha256` (0.8.0 bytes, record only), `c14n_sha256` and `c14n_numeric_sha256`.
+  1.0 matches `c14n_numeric_sha256` for all 32 scenes (`PNKIT_LULA_ALL=1`, about 45 s; 3 scenes by default) and its
+  scenes are level-1 clean (`tools/pixelart/lula_alias.py --numeric`).
+
+## The v013 project goldens (byte for byte, 0.1.0 to 0.8.0)
 
 ## v013 "How Jev works" (`~/videos/done/v013-jev-decisions`)
 

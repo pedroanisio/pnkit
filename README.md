@@ -1,26 +1,56 @@
 # pnkit — the PALS's Notes component kit
 
+## Disclaimer
+
+This work is subject to the methodological caveats and commitments described in [@DISCLAIMER.md](./DISCLAIMER.md).
+> No statement or premise not backed by a real logical definition or verifiable reference should be taken for granted.
+
 pnkit is the shared library for the Python generators that write PALS's Notes scenes (`film/build.py` →
 `film.scene.xml`). It holds what every episode re-implemented: number formatting and ids, fades and keyframes,
 text layers with the 36 px floor, self-drawing paths, pills, the 2D camera with its safe-rect clamp and check,
 the brand kit's prologue and components, captions, the Shorts overlay and spans, the physics block, baked
 tapered-tube meshes for 3D geometry no native primitive covers, and an articulated 3D figure built from them.
 
-It is a Python package with no dependencies outside the standard library. It writes inline XML. It does not use
+Since 1.0 pnkit builds its scenes with **`sr_core.scene`**, the Python scene SDK of sr-core (>= 1.7.0, installed from the
+sr-core repository; `kit.json` records it under `requires.dependencies`). Nothing writes angle brackets by hand: a
+component creates SDK elements, so an element in the wrong parent, an undeclared attribute, a bad enumeration value or a
+colour that is not `#RRGGBB` raises when the element is made, not in a render.
+
+- **What a component returns.** `pnkit.sdk.Xml`, a `str` holding the XML text that also keeps the SDK elements it was
+  built from (`.element`, `.elements`, `.nodes`). Callers that used the 0.8 string (`str()`, `"\n".join`, f-strings, `in`,
+  `ET.fromstring`) keep working without a change; callers that want the element read `.element`. This is the least
+  disruptive design: no `*_xml` twin of each function, no changed signature. What a component *accepts* (`extra=`,
+  `content=`, group items) may be an element, an `Xml` or a plain XML string; a string is parsed against its parent, so
+  a foreign child raises there. `Cam.open()` + `Cam.CLOSE` still works (the legacy text pair); `Cam.group()` is the element form.
+- **The document.** `Doc.build(project, composition, *parts)` returns an `sr_core.scene.Scene` made from the frame, the
+  sections handed in (for example `Brand.prologue`'s) and the registries (`assets`, `paints`, `materials`, `physics`).
+  `Doc.check()` returns `sr_core.scene.check(...)` findings; `build()` and `Doc.write()` raise `pnkit.sdk.BuildError` on
+  a level-1 error, and `write()` writes nothing then. `pnkit.pixelart.ctx.Ctx` and `pnkit.filmbuild.assemble` build
+  `Scene`s the same way (`Ctx.check_scene()`). `filmbuild`'s other modules, and `tools/gate.py`, `caption_gate.py`,
+  `instance_clock.py`, only orchestrate or read documents, and are unchanged.
+- **Numbers.** pnkit's 3-decimal form (`pnkit.xml.f`) is kept: the SDK is given the value that form reads back as. One
+  limit of the SDK: it writes an `xs:double` in its shortest form (`855`, never `855.0`; a text `"855.0"` is refused), so a
+  document that 0.8 wrote with `time="855.0"` or `start="1.000"` is now written `855` / `1`. It is the same value
+  (CHANGELOG 1.0.0 lists the goldens this touches and how they are compared).
+- **Output equality.** `tests/golden/` compares C14N 2.0 with comments (`tests/c14n.py`), not bytes.
+
+It is a Python package. It writes inline XML (through the SDK). It does not use
 `<include>` or symbol instances, because neither can carry per-use text: an included document resolves with its
 own parameter defaults, and `encode` drops `<override>` on instances after the first frame (guide §6, Avoid 1).
 The brand kit, `docs/palsnotes-brand.xml` in this repository (also reachable as `~/videos/docs/palsnotes-brand.xml`, a symlink kept for older projects), stays the source of truth for tokens and styles. `docs/` also holds the thumbnail and cover guide (`thumbnail.md`) and the kit's fonts with their licence. pnkit reads
 the copy each project pins, and `pnkit.palette.check()` compares pnkit's hex constants with the kit.
 
-Version 0.1.0 was extracted from v013 "How Jev works". Rebuilding v013 with it gives a byte-identical
-`film.scene.xml` (see `tests/golden/`).
+Version 0.1.0 was extracted from v013 "How Jev works" and rebuilt its `film.scene.xml` byte for byte; 1.0 is C14N-equal
+to 0.8 on the component corpus and on all 32 Lula scenes (see `tests/golden/` and the CHANGELOG).
 
 ## Layout
 
 ```
 pnkit/            the package; vendored into projects as film/vendor/pnkit/
-  xml.py          f, esc, Ids, opacity, keys, path_d, hash01, HASH_EXPR, fmt
-  doc.py          Doc: frame, text-role styles, ids, registries (assets, paints, materials, fields, bodies)
+  sdk.py          the one place pnkit meets sr_core.scene: Xml, new, adopt, put, add, BuildError (needs sr-core >= 1.7.0)
+  _num.py         f (3-decimal numbers) and esc, shared by xml.py and sdk.py
+  xml.py          f, esc, Ids, animate, opacity, keys, path_d, hash01, HASH_EXPR, fmt
+  doc.py          Doc: frame, text-role styles, ids, registries (assets, paints, materials, fields, bodies); build, check, to_bytes, write
   palette.py      the kit's colours as hex; tokens(kit), check(kit)
   text.py         text_asset, label (>= 36 px)
   draw.py         draw, rect, disc, group, pill, arrow_d, round_rect_d
@@ -190,7 +220,7 @@ Three habits from the Lula 3.0.0 film, each with a tool or helper here.
 >   library, not the vendored copy:
 >   - Add a unit test and a CHANGELOG entry.
 >   - Bump the version.
->   - Rebuild the golden projects. They must stay byte-identical.
+>   - Rebuild the golden projects. They must stay C14N-equal (byte-identical where the SDK writes the same bytes).
 >   - Sync.
 >
 >   A change to what an existing default writes is a breaking change and is released as one.
