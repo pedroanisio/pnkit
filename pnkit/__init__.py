@@ -1,6 +1,8 @@
 """pnkit — the shared component library for PALS's Notes videos.
 
-A Python package (standard library only) that writes inline scene XML: formatting and ids (xml), the document's
+A Python package that builds scenes with `sr_core.scene` (the Python scene SDK, sr-core >= 1.7.0): the SDK checks
+every element and attribute when it is made. Components return `Xml`, a `str` of the XML that also holds the SDK
+elements (see `sdk`). It writes inline scene XML: formatting and ids (xml), the document's
 registries (doc), text (text), shapes (draw), the 2D camera with its safe-rect clamp and check (camera), the brand
 kit's prologue and components (brand), captions (captions), Shorts overlays and spans (shorts), the physics
 block (physics), baked tapered-tube meshes for geometry no native primitive covers (mesh), an articulated 3D
@@ -15,10 +17,10 @@ stings, soft struck foley only after the last word). Projects vendor it into fil
 import functools, types
 
 from .doc import Doc
-from . import xml, palette, text, draw, camera, brand, captions, shorts, physics, mesh, figure, vo, audio, files, timings
+from . import sdk, xml, palette, text, draw, camera, brand, captions, shorts, physics, mesh, figure, vo, audio, files, timings
 
-__version__ = "0.8.0"
-__all__ = ["Doc", "bind", "__version__", "xml", "palette", "text", "draw", "camera", "brand", "captions", "shorts",
+__version__ = "1.0.0"
+__all__ = ["Doc", "bind", "__version__", "sdk", "xml", "palette", "text", "draw", "camera", "brand", "captions", "shorts",
            "physics", "mesh", "figure", "vo", "audio"]
 
 

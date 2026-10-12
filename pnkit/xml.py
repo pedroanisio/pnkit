@@ -1,26 +1,16 @@
-"""pnkit.xml — number formatting, escaping, ids and animation keys for scene XML written as strings.
+"""pnkit.xml — number formatting, ids and animation keys for the scene SDK.
 
-Everything here is pure except `Ids`, which is the one registry a document needs to keep its ids unique.
+`f` and `esc` are pnkit's number and text forms (pnkit._num); `Ids` is the one registry a document needs to keep its ids
+unique; `opacity` and `keys` build <animate> elements through `sr_core.scene` (pnkit.sdk) and return them as `Xml`,
+a `str` that is their XML text. The rest is pure.
 """
 import math
 
-__all__ = ["f", "esc", "Ids", "opacity", "keys", "path_d", "hash01", "HASH_EXPR", "fmt"]
+from ._num import f, esc
+from . import sdk
+from .sdk import S
 
-
-def f(x):
-    """a number as the scene format writes it: ints as they are, floats to 3 decimals without trailing zeros
-    (-0 is written 0); anything else through str()"""
-    if isinstance(x, (int,)) and not isinstance(x, bool):
-        return str(x)
-    if isinstance(x, float):
-        s = f"{x:.3f}".rstrip("0").rstrip(".")
-        return "0" if s in ("-0", "") else s
-    return str(x)
-
-
-def esc(s):
-    """escape text for an XML attribute value in double quotes"""
-    return s.replace("&", "&amp;").replace('"', "&quot;").replace("<", "&lt;").replace(">", "&gt;")
+__all__ = ["f", "esc", "Ids", "opacity", "keys", "animate", "path_d", "hash01", "HASH_EXPR", "fmt"]
 
 
 class Ids:
@@ -42,6 +32,14 @@ class Ids:
         return len(self.used)
 
 
+def animate(prop, rows):
+    """an <animate property=prop> of <key>s from (time, value, interpolation or None) rows, as `Xml`"""
+    an = sdk.new(S.Layer, "animate", property=prop)
+    for t, v, e in rows:
+        sdk.add(an, sdk.new(an, "key", time=t, value=v, interpolation=e))
+    return sdk.Xml.of(an)
+
+
 def opacity(a, b, fin=0.5, fout=0.5, peak=1.0, ease_in="cubic-out", ease_out="cubic-in"):
     """an opacity <animate>: visible from a (fading in over fin) to b (fading out over fout). A window shorter than
     0.1 s is widened to 0.1 s; fades that do not fit share the window equally."""
@@ -49,18 +47,17 @@ def opacity(a, b, fin=0.5, fout=0.5, peak=1.0, ease_in="cubic-out", ease_out="cu
     if b < a + 0.1: b = a + 0.1
     if fin + fout > b - a: fin = fout = (b - a) / 2
     pk = f(float(peak))
-    return (f'<animate property="opacity"><key time="{f(a)}" value="0" interpolation="{ease_in}"/><key time="{f(a + fin)}" value="{pk}"/>'
-            f'<key time="{f(max(a + fin, b - fout))}" value="{pk}" interpolation="{ease_out}"/><key time="{f(b)}" value="0"/></animate>')
+    return animate("opacity", [(a, "0", ease_in), (a + fin, pk, None), (max(a + fin, b - fout), pk, ease_out), (b, "0", None)])
 
 
 def keys(prop, pairs, ease="sine-in-out"):
     """<animate> from (time, value[, ease]) tuples; the ease of a key shapes the move that starts there. Times are
     rounded to the millisecond; numeric values go through f(), others are written as given."""
-    out = []
+    rows = []
     for p in pairs:
         t, v = p[0], p[1]; e = p[2] if len(p) > 2 else ease
-        out.append(f'<key time="{f(round(float(t), 3))}" value="{f(v) if isinstance(v, (int, float)) else v}" interpolation="{e}"/>')
-    return f'<animate property="{prop}">' + "".join(out) + "</animate>"
+        rows.append((round(float(t), 3), f(v) if isinstance(v, (int, float)) else v, e))
+    return animate(prop, rows)
 
 
 def path_d(pts, closed=False):

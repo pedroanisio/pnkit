@@ -5,7 +5,9 @@ visible [a, b] with the given fades (b None where allowed: no opacity animation)
 the element (more <animate>s), `attrs` is appended to its tag.
 """
 import math
-from .xml import f, opacity
+from . import sdk
+from .sdk import S
+from .xml import f, opacity, animate
 from .text import text_asset
 from .palette import CREAM, ORANGE, INK
 
@@ -15,29 +17,29 @@ __all__ = ["draw", "rect", "disc", "arrow_d", "round_rect_d", "group", "pill"]
 def draw(doc, d, a, b, stroke=CREAM, width=3.0, dur=1.0, dash=None, fill="#00000000", effects=None, peak=1.0, fin=0.15, fout=0.5,
          sid=None, extra="", cap="round", ease="cubic-in-out", attrs=""):
     """a frame-sized path that draws itself (trimEnd 0 -> 1) from a over dur, then stays until b (dur 0: drawn at once)"""
-    ds = f' dash="{dash}"' if dash else ""; fx = f' effects="{effects}"' if effects else ""
-    trim = (f'<animate property="trimEnd"><key time="{f(a)}" value="0" interpolation="{ease}"/><key time="{f(a + dur)}" value="1"/></animate>'
-            if dur > 0 else "")
-    return (f'<shape id="{doc.uid(sid or "p")}" shape="path" width="{doc.width}" height="{doc.height}" path="{d}" fill="{fill}" stroke="{stroke}" '
-            f'strokeWidth="{f(width)}" strokeCap="{cap}" strokeJoin="round" trimEnd="{0 if dur > 0 else 1}"{ds}{fx}{attrs}>'
-            f'{trim}{opacity(a, b, fin, fout, peak)}{extra}</shape>')
+    sh = sdk.new(S.Composition, "shape", id=doc.uid(sid or "p"), shape="path", width=doc.width, height=doc.height, path=d, fill=fill,
+                 stroke=stroke, strokeWidth=width, strokeCap=cap, strokeJoin="round", trimEnd=0 if dur > 0 else 1,
+                 dash=dash or None, effects=effects or None, **sdk.attrs_of(attrs))
+    trim = animate("trimEnd", [(a, "0", ease), (a + dur, "1", None)]) if dur > 0 else None
+    sdk.adopt(sh, trim, opacity(a, b, fin, fout, peak), extra)
+    return sdk.Xml.of(sh)
 
 
 def rect(doc, x, y, w, h, fill, a, b, radius=0, stroke=None, sw=2, peak=1.0, fin=0.4, fout=0.4, extra="", sid=None, attrs="", anchor="center"):
     """a rect at (x, y), anchored at its centre (anchor="center") or its top-left corner (anything else)"""
-    st = f' stroke="{stroke}" strokeWidth="{f(sw)}"' if stroke else ""
     ax, ay = (w / 2, h / 2) if anchor == "center" else (0, 0)
-    op = opacity(a, b, fin, fout, peak) if b is not None else ""
-    return (f'<shape id="{doc.uid(sid or "r")}" shape="rect" x="{f(x)}" y="{f(y)}" anchorX="{f(ax)}" anchorY="{f(ay)}" width="{f(w)}" '
-            f'height="{f(h)}" radius="{f(radius)}" fill="{fill}"{st}{attrs}>{op}{extra}</shape>')
+    sh = sdk.new(S.Composition, "shape", id=doc.uid(sid or "r"), shape="rect", x=x, y=y, anchorX=ax, anchorY=ay, width=w, height=h,
+                 radius=radius, fill=fill, stroke=stroke or None, strokeWidth=sw if stroke else None, **sdk.attrs_of(attrs))
+    sdk.adopt(sh, opacity(a, b, fin, fout, peak) if b is not None else None, extra)
+    return sdk.Xml.of(sh)
 
 
 def disc(doc, x, y, r, fill, a, b, stroke=None, sw=2, peak=1.0, fin=0.3, fout=0.4, extra="", sid=None, attrs=""):
     """a circle of radius r centred on (x, y)"""
-    st = f' stroke="{stroke}" strokeWidth="{f(sw)}"' if stroke else ""
-    op = opacity(a, b, fin, fout, peak) if b is not None else ""
-    return (f'<shape id="{doc.uid(sid or "d")}" shape="ellipse" x="{f(x)}" y="{f(y)}" anchorX="{f(r)}" anchorY="{f(r)}" width="{f(2 * r)}" '
-            f'height="{f(2 * r)}" fill="{fill}"{st}{attrs}>{op}{extra}</shape>')
+    sh = sdk.new(S.Composition, "shape", id=doc.uid(sid or "d"), shape="ellipse", x=x, y=y, anchorX=r, anchorY=r, width=2 * r, height=2 * r,
+                 fill=fill, stroke=stroke or None, strokeWidth=sw if stroke else None, **sdk.attrs_of(attrs))
+    sdk.adopt(sh, opacity(a, b, fin, fout, peak) if b is not None else None, extra)
+    return sdk.Xml.of(sh)
 
 
 def arrow_d(x1, y1, x2, y2, head=16):
@@ -55,9 +57,17 @@ def round_rect_d(x, y, w, h, r):
 
 
 def group(doc, content, gid=None, a=None, b=None, fin=0.5, fout=0.5, attrs="", extra=""):
-    """a group of the non-empty items of `content`, one per line; with a, b it fades as a whole"""
-    op = opacity(a, b, fin, fout) if a is not None else ""
-    return f'<group id="{doc.uid(gid or "g")}"{attrs}>{op}{extra}\n' + "\n".join(c for c in content if c) + "\n</group>"
+    """a group of the non-empty items of `content`, one per line; with a, b it fades as a whole. Items are SDK elements,
+    `Xml` or XML strings; the group takes only what the schema allows in a <group>."""
+    g = sdk.new(S.Composition, "group", id=doc.uid(gid or "g"), **sdk.attrs_of(attrs))
+    sdk.adopt(g, opacity(a, b, fin, fout) if a is not None else None, extra)
+    sdk.ws(g)
+    for i, c in enumerate([c for c in content if c]):
+        if i:
+            sdk.ws(g)
+        sdk.adopt(g, c)
+    sdk.ws(g)
+    return sdk.Xml.of(g)
 
 
 def pill(doc, x, y, text, a, b, w=None, h=64, fill=ORANGE, color=INK, size=38, pid=None, extra="", fin=0.3, fout=0.4, stroke=None, attrs=""):
@@ -65,8 +75,10 @@ def pill(doc, x, y, text, a, b, w=None, h=64, fill=ORANGE, color=INK, size=38, p
     Ids: <pid>, <pid>-b (the body), <pid>-t (the label)."""
     w = w or int(len(text) * size * 0.62 + 56)
     pid = doc.uid(pid or "pill")
-    st = f' stroke="{stroke}" strokeWidth="3"' if stroke else ""
     aid, tw_, th = text_asset(doc, text, size, color, "caps", width=w, align="center", tracking=20)
-    return (f'<group id="{pid}" x="{f(x)}" y="{f(y)}" anchorX="{f(w / 2)}" anchorY="{f(h / 2)}" width="{w}" height="{h}"{attrs}>{opacity(a, b, fin, fout)}{extra}'
-            f'<shape id="{pid}-b" shape="rect" width="{w}" height="{h}" radius="{f(h / 2)}" fill="{fill}"{st}/>'
-            f'<layer id="{pid}-t" asset="{aid}" x="0" y="{f((h - th) / 2 + 1)}"/></group>')
+    g = sdk.new(S.Composition, "group", id=pid, x=x, y=y, anchorX=w / 2, anchorY=h / 2, width=w, height=h, **sdk.attrs_of(attrs))
+    sdk.adopt(g, opacity(a, b, fin, fout), extra)
+    sdk.adopt(g, sdk.new(g, "shape", id=f"{pid}-b", shape="rect", width=w, height=h, radius=h / 2, fill=fill,
+                         stroke=stroke or None, strokeWidth=3 if stroke else None))
+    sdk.adopt(g, sdk.new(g, "layer", id=f"{pid}-t", asset=aid, x=0, y=(h - th) / 2 + 1))
+    return sdk.Xml.of(g)

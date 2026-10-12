@@ -13,7 +13,9 @@ Content placed between cam.open() and Cam.CLOSE lives in world coordinates. veri
 returns every breach; a build should fail (or at least report) when it is not empty.
 """
 import math
-from .xml import f, keys
+from . import sdk
+from .sdk import S
+from .xml import keys
 
 __all__ = ["Cam"]
 
@@ -111,11 +113,24 @@ class Cam:
         for t, cx, cy, z in self.keys:
             cx, cy, z = CX + (cx - CX) * factor, CY + (cy - CY) * factor, 1 + (z - 1) * factor
             xs.append((t, round(CX - (cx - CX) * z, 2))); ys.append((t, round(CY - (cy - CY) * z, 2))); ss.append((t, round(z, 4)))
-        return keys("x", xs) + keys("y", ys) + keys("scaleX", ss) + keys("scaleY", ss)
+        return sdk.Xml.of(keys("x", xs), keys("y", ys), keys("scaleX", ss), keys("scaleY", ss), sep="")
+
+    def _group(self, gid):
+        g = sdk.new(S.Composition, "group", id=self.doc.uid(gid or "cam2d-" + self.name), anchorX=self.CX, anchorY=self.CY, x=self.CX, y=self.CY)
+        sdk.adopt(g, self.anim())
+        return g
+
+    def group(self, *content, gid=None):
+        """the camera group as one element: its animation, then `content` (SDK elements, Xml or XML strings)"""
+        g = self._group(gid)
+        sdk.adopt(g, *content)
+        return sdk.Xml.of(g)
 
     def open(self, gid=None):
-        """the camera group's opening tag with its animation; close it with Cam.CLOSE"""
-        return f'<group id="{self.doc.uid(gid or "cam2d-" + self.name)}" anchorX="{f(self.CX)}" anchorY="{f(self.CY)}" x="{f(self.CX)}" y="{f(self.CY)}">{self.anim()}'
+        """the camera group's opening tag with its animation, as text (the streaming form: close it with Cam.CLOSE);
+        group() is the same group as an element"""
+        t = str(sdk.Xml.of(self._group(gid)))
+        return t[:-len(self.CLOSE)]
 
     def verify(self, fade=1.2, step=0.25, lo=None, hi=None, tolerance=6):
         """every `step` s from lo (default start + 3.6) to hi (default end): the safe rect in force, and the one in

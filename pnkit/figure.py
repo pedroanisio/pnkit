@@ -41,7 +41,9 @@ bones import correctly under that convention — see its docstring).
 """
 import math, os
 
+from . import sdk
 from .mesh import bake_bone
+from .sdk import S
 
 # ---------------------------------------------------------------------- defaults: dims, poses, materials
 DIMS = dict(pelvis_h=95, torso_h=52, thigh=46, shin=46, upper=30, fore=28, hip_w=11, sh_w=21, arm_roll=22,
@@ -73,10 +75,18 @@ GAIT_MODES = {"walk", "run"}   # poses sampled at `cadence` rather than held
 def f(x): return f"{x:.2f}".rstrip("0").rstrip(".")
 
 
+def _n(x):
+    """x in this module's 2-decimal form, as the int or float the SDK writes back the same"""
+    return sdk.parse_num(f(x), x)
+
+
 def _keys(prop, pairs, ease="sine-in-out"):
     if not pairs:
-        return ""
-    return f'<animate property="{prop}">' + "".join(f'<key time="{f(t)}" value="{f(v)}" interpolation="{ease}"/>' for t, v in pairs) + "</animate>"
+        return sdk.Xml("")
+    an = sdk.new(S.Group, "animate", property=prop)
+    for t, v in pairs:
+        sdk.add(an, sdk.new(an, "key", time=_n(t), value=f(v), interpolation=ease))
+    return sdk.Xml.of(an)
 
 
 def _bend(deg):
@@ -122,7 +132,7 @@ def bone_meshes(assets_dir, dims=DIMS, fid="fig"):
         name = f"bone-{bone}-{round(length)}-{round(r0 * 10)}-{round(r1 * 10)}"
         mesh_id = _bone_mesh(assets_dir, name, length, r0, r1, seed=hash(bone) & 0xFFFF, up=up)
         ids[bone] = f"m-{mesh_id}"
-        assets.append(f'<mesh id="m-{mesh_id}" src="assets/{mesh_id}.obj" format="obj"/>')
+        assets.append(sdk.Xml.of(sdk.new(S.Assets, "mesh", id=f"m-{mesh_id}", src=f"assets/{mesh_id}.obj", format="obj")))
     return ids, assets
 
 
@@ -132,11 +142,12 @@ def default_materials():
     Returns (ids, xml): `ids` is {key: material id}, the shape `figure()`'s `materials` parameter takes;
     `xml` is the <material> tags to register once in the document (e.g. `doc.materials.extend(xml)`). Build
     your own look the same way: your own `ids` dict (skin, body, gear, metal) and matching `<material>` tags."""
+    mat = lambda mid, **kw: sdk.Xml.of(sdk.new(S.Materials, "material", id=mid, **kw))
     xml = [
-        '<material id="fig-skin" baseColor="#C89A78" roughness="0.9"/>',
-        '<material id="fig-body" baseColor="#D8D2C4" roughness="0.9"/>',
-        '<material id="fig-gear" baseColor="#5E5A45" roughness="0.85"/>',
-        '<material id="fig-metal" baseColor="#1E1F1E" metallic="0.4" roughness="0.5"/>',
+        mat("fig-skin", baseColor="#C89A78", roughness=0.9),
+        mat("fig-body", baseColor="#D8D2C4", roughness=0.9),
+        mat("fig-gear", baseColor="#5E5A45", roughness=0.85),
+        mat("fig-metal", baseColor="#1E1F1E", metallic=0.4, roughness=0.5),
     ]
     ids = {"skin": "fig-skin", "body": "fig-body", "gear": "fig-gear", "metal": "fig-metal"}
     return ids, xml
@@ -227,27 +238,28 @@ def figure(fid, segments, x0, z0, mesh_ids, materials, heading0=0.0, dims=DIMS, 
                              else _keys(prop, _reduce(P[key], 0.3), "sine-in-out"))
 
     o = []
-    J = lambda jid, parent, x, y, z, extra="": o.append(
-        f'<object3D id="{fid}-{jid}" primitive="sphere" radius="1" x="{f(x)}" y="{f(y)}" z="{f(z)}" parent="{parent}" opacity="0">{extra}</object3D>')
-    Ball = lambda bid, parent, x, y, z, r, mat: o.append(
-        f'<object3D id="{fid}-{bid}" primitive="sphere" x="{f(x)}" y="{f(y)}" z="{f(z)}" radius="{f(r)}" parent="{parent}" material="{mat}" castShadow="true" receiveShadow="true"/>')
-    Bone = lambda bid, parent, mesh_id, mat: o.append(
-        f'<object3D id="{fid}-{bid}" primitive="mesh" mesh="{mesh_id}" x="0" y="0" z="0" parent="{parent}" material="{mat}" castShadow="true" receiveShadow="true"/>')
-    Foot = lambda bid, parent, y, r, mat: o.append(
-        f'<object3D id="{fid}-{bid}" primitive="box" x="0" y="{f(y + r * 0.3)}" z="{f(r * 0.9)}" width="{f(r * 1.3)}" height="{f(r * 1.1)}" depth="{f(r * 2.8)}" '
-        f'bevel="{f(r * 0.25)}" parent="{parent}" material="{mat}" castShadow="true" receiveShadow="true"/>')
+    obj = lambda oid, *ch, **kw: sdk.new(S.Group, "object3D", *ch, id=f"{fid}-{oid}", **kw)
+    J = lambda jid, parent, x, y, z, extra="": o.append(sdk.Xml.of(obj(
+        jid, extra, primitive="sphere", radius=1, x=_n(x), y=_n(y), z=_n(z), parent=parent, opacity=0)))
+    Ball = lambda bid, parent, x, y, z, r, mat: o.append(sdk.Xml.of(obj(
+        bid, primitive="sphere", x=_n(x), y=_n(y), z=_n(z), radius=_n(r), parent=parent, material=mat, castShadow=True, receiveShadow=True)))
+    Bone = lambda bid, parent, mesh_id, mat: o.append(sdk.Xml.of(obj(
+        bid, primitive="mesh", mesh=mesh_id, x=0, y=0, z=0, parent=parent, material=mat, castShadow=True, receiveShadow=True)))
+    Foot = lambda bid, parent, y, r, mat: o.append(sdk.Xml.of(obj(
+        bid, primitive="box", x=0, y=_n(y + r * 0.3), z=_n(r * 0.9), width=_n(r * 1.3), height=_n(r * 1.1), depth=_n(r * 2.8),
+        bevel=_n(r * 0.25), parent=parent, material=mat, castShadow=True, receiveShadow=True)))
 
     skin, body, gear = materials["skin"], materials["body"], materials["gear"]
-    o.append(f'<object3D id="{fid}" primitive="sphere" radius="1" x="{f(x0)}" y="{f(-d["pelvis_h"])}" z="{f(z0)}" opacity="0">'
-             f'{lin("x", "x")}{lin("z", "z")}{lin("y", "y")}{lin("rotationY", "yaw")}</object3D>')
+    o.append(sdk.Xml.of(sdk.new(S.Group, "object3D", lin("x", "x"), lin("z", "z"), lin("y", "y"), lin("rotationY", "yaw"),
+                                id=fid, primitive="sphere", radius=1, x=_n(x0), y=_n(-d["pelvis_h"]), z=_n(z0), opacity=0)))
     J("spine", fid, 0, 0, 0, lin("rotationX", "lean") + lin("rotationY", "spin"))          # lean + torso counter-twist
     Bone("torso", f"{fid}-spine", mesh_ids["torso"], body)
     Ball("neck", f"{fid}-spine", 0, -d["torso_h"], 0, d["r_torso"] * 0.42, skin)
     Ball("head", f"{fid}-spine", 0, -d["torso_h"] - d["r_torso"] * 0.9, 0, d["r_torso"] * 0.6, skin)
     if head_accessory:
-        o.append(head_accessory)
+        o.append(sdk.xml_of(head_accessory, S.Group))
     if chest_accessory:
-        o.append(chest_accessory)
+        o.append(sdk.xml_of(chest_accessory, S.Group))
     for side, sx in (("L", -1), ("R", 1)):
         J(f"hip{side}", fid, sx * d["hip_w"], 0, 0, lin("rotationX", f"hip{side}"))
         Ball(f"hipball{side}", f"{fid}-hip{side}", 0, 0, 0, d["r_hip"], body)
@@ -262,8 +274,8 @@ def figure(fid, segments, x0, z0, mesh_ids, materials, heading0=0.0, dims=DIMS, 
         # bending plane and a standing arm's ~90 degrees of cumulative bend points it at the camera
         # instead of hanging at the figure's side. Rolling the shoulder first tips that plane so the
         # same two angles compose into a natural hang.
-        o.append(f'<object3D id="{fid}-shr{side}" primitive="sphere" radius="1" x="{f(sx * d["sh_w"])}" y="{f(-d["torso_h"] + 6)}" z="0" '
-                 f'parent="{fid}-spine" rotation="{f(-sx * d["arm_roll"])}" opacity="0"></object3D>')
+        o.append(sdk.Xml.of(obj(f"shr{side}", primitive="sphere", radius=1, x=_n(sx * d["sh_w"]), y=_n(-d["torso_h"] + 6), z=0,
+                                parent=f"{fid}-spine", rotation=_n(-sx * d["arm_roll"]), opacity=0)))
         J(f"sh{side}", f"{fid}-shr{side}", 0, 0, 0, lin("rotationX", f"sh{side}"))
         Ball(f"shball{side}", f"{fid}-sh{side}", 0, 0, 0, d["r_shoulder"], body)
         Bone(f"upper{side}", f"{fid}-sh{side}", mesh_ids["upper"], body)
@@ -271,4 +283,4 @@ def figure(fid, segments, x0, z0, mesh_ids, materials, heading0=0.0, dims=DIMS, 
         Ball(f"elball{side}", f"{fid}-el{side}", 0, 0, 0, d["r_elbow"], body)
         Bone(f"fore{side}", f"{fid}-el{side}", mesh_ids["fore"], body)
         Ball(f"hand{side}", f"{fid}-el{side}", 0, d["fore"], 0, d["r_wrist"], skin)
-    return "\n".join(o)
+    return sdk.Xml.of(*o, sep="\n")

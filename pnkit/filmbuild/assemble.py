@@ -9,8 +9,8 @@
   stems_xml     the same mix without normalisation, as full / voice / music / sfx WAVs for the voice-margin gate.
   caption_pages pixel caption pages in the band (rows 147-179) from timed cues: at most two lines, <= 288 columns.
 """
-import copy
-import xml.etree.ElementTree as ET
+from .. import sdk
+from ..sdk import S
 
 BAND_TOP, LINE_ROWS_2, LINE_ROW_1, MAXW = 147, (152, 162), 157, 288
 
@@ -24,25 +24,39 @@ def _fmt(v):
 
 
 def E(p, tag, **kw):
-    return ET.SubElement(p, tag, {k: _fmt(v) for k, v in kw.items() if v is not None})
+    """a new <tag> under `p` (an SDK element) with the attributes given (None skipped); the SDK refuses a misplaced
+    element or a bad value here"""
+    el = sdk.new(p, tag)
+    for k, v in kw.items():
+        if v is not None:
+            sdk.set_exact(el, k, v, _fmt)
+    p.add(el)
+    return el
 
 
 def _tostring(root):
-    ET.indent(root, space=" ")
-    return ET.tostring(root, encoding="utf-8", xml_declaration=True)
+    sdk.indent(root, " ")
+    return S.to_bytes(root)
+
+
+def _read(doc):
+    return S.read(doc.encode("utf-8") if isinstance(doc, str) else doc)
 
 
 def _early_windows(comp):
-    for g in comp.findall("group"):
-        if not g.get("name") or g.get("start") is None:
-            continue
-        gs = float(g.get("start"))
-        for e in g.iter("group"):
-            if e is not g and e.get("start") is not None:
-                st = float(e.get("start"))
+    def walk(g):
+        for e in g.find_all("group"):
+            if e.start is not None:
+                st = float(e.start)
                 if gs < st <= gs + 0.0151:
                     st = gs
-                e.set("start", repr(round(st - 0.0001, 6)))
+                e.start = round(st - 0.0001, 6)
+            walk(e)
+    for g in comp.find_all("group"):
+        if not g.name or g.start is None:
+            continue
+        gs = float(g.start)
+        walk(g)
 
 
 def caption_pages(cues, width, unit=6):
@@ -88,20 +102,20 @@ def _caption_groups(comp, pages, unit, scene_id):
 
 def segment_xml(scene_xml, slot, duration, out_path, title="", pages=None, unit=6):
     """bytes of the video-only document of one scene. slot: the scene's timings record (n, id, slot_start, slot_end)."""
-    src = ET.fromstring(scene_xml)
-    proj = copy.deepcopy(src.find("project"))
-    proj.set("duration", _fmt(float(duration)))
-    root = ET.Element("scene", version=src.get("version", "1.1"))
-    root.append(proj)
+    src = _read(scene_xml)
+    root = S.Scene(version=src.version or "1.1")
+    proj = src.find("project").copy()
+    sdk.set_exact(proj, "duration", float(duration), _fmt)
+    root.add(proj)
     meta = E(root, "metadata")
     E(meta, "meta", name="title", value=f"{title} {slot.get('id', '')}".strip())
     E(root, "output", id="master", path=out_path, codec="h264", crf=15, preset="fast", audio=False, faststart=False,
       start=float(slot["slot_start"]), end=float(slot["slot_end"]))
     sy = src.find("symbols")
     if sy is not None:
-        root.append(copy.deepcopy(sy))
-    comp = copy.deepcopy(src.find("composition"))
-    root.append(comp)
+        root.add(sy.copy())
+    comp = src.find("composition").copy()
+    root.add(comp)
     _early_windows(comp)
     if pages:
         _caption_groups(comp, pages, unit, slot.get("id", f"s{slot['n']:02d}"))
@@ -112,7 +126,7 @@ def audio_xml(project, duration, assets, voices, music, sfx, mix, out_path="fina
     """bytes of the full-film audio document (or of one stem when stem is 'full', 'voice', 'music' or 'sfx').
     project: {width, height, fps}; assets: {id: (src, sha256)}; voices: [(asset id, start)]; music, sfx: asset ids or
     None; mix: film.json audio settings."""
-    root = ET.Element("scene", version="1.1")
+    root = S.Scene(version="1.1")
     E(root, "project", width=project["width"], height=project["height"], fps=project["fps"], duration=float(duration),
       seed=1, background="#000000", quality="final")
     if stem is None:
@@ -151,6 +165,5 @@ def audio_xml(project, duration, assets, voices, music, sfx, mix, out_path="fina
 
 def music_layer(audio_doc):
     """S2 §2.1 'check the role, not just the file': the ids of role=music tracks with an asset in an audio document"""
-    root = ET.fromstring(audio_doc)
-    mix = root.find("audioMix")
-    return [t.get("id") for t in (mix.findall("audioTrack") if mix is not None else []) if t.get("role") == "music" and t.get("asset")]
+    mix = _read(audio_doc).find("audioMix")
+    return [t.id for t in (mix.find_all("audioTrack") if mix is not None else []) if t.role == "music" and t.asset]

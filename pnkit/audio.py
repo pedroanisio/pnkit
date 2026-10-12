@@ -25,6 +25,8 @@ Standard library only; bake_beds() runs ffmpeg.
 """
 import json, os, re, subprocess
 
+from . import sdk
+from .sdk import S
 from .xml import f
 
 __all__ = ["AudioDesignError", "Cues", "library", "cue", "retired", "tail_ok", "resolve_digest", "scene_cues", "scene_tail_violations"]
@@ -137,18 +139,20 @@ class Cues:
         out = []
         for n in sorted({n for _, n, _ in self.events(duration)}):
             c = self.lib[n]
-            out.append(f'<audio id="sfx-{n}" src="{c["path"]}"/>' if c["kind"] == "file" else
-                       f'<generated id="sfx-{n}" kind="sound-effect" provider="audioforge" model="{c["model"]}" prompt="{c["prompt"]}" '
-                       f'cache="{cache_dir}/{n}.wav" cacheSha256="{digest(n)}"/>')
-        out += [f'<audio id="amb-{n}" src="{self.bed_path(n, tag)}"/>' for n, _, _ in self.beds]
+            out.append(sdk.Xml.of(sdk.new(S.Assets, "audio", id=f"sfx-{n}", src=c["path"]) if c["kind"] == "file" else
+                                  sdk.new(S.Assets, "generated", id=f"sfx-{n}", kind="sound-effect", provider="audioforge", model=c["model"],
+                                          prompt=c["prompt"], cache=f"{cache_dir}/{n}.wav", cacheSha256=digest(n))))
+        out += [sdk.Xml.of(sdk.new(S.Assets, "audio", id=f"amb-{n}", src=self.bed_path(n, tag))) for n, _, _ in self.beds]
         return out
 
     def tracks(self, duration, bus="fx-bus", duck="vo-bus"):
         """the <audioTrack>s: effects duck 8 dB under the voice, beds 5 dB"""
-        out = [f'<audioTrack id="sfx-{i:03d}" asset="sfx-{n}" role="effects" start="{f(max(0.0, t))}" volume="{f(g if g is not None else self.lib[n]["gain"])}" '
-               f'bus="{bus}" duckUnder="{duck}" duckAmount="-8" duckAttack="0.05" duckRelease="0.4"/>' for i, (t, n, g) in enumerate(self.events(duration))]
-        out += [f'<audioTrack id="amb-{i}" asset="amb-{n}" role="effects" start="0" volume="{f(g)}" '
-                f'bus="{bus}" duckUnder="{duck}" duckAmount="-5" duckAttack="0.2" duckRelease="0.8"/>' for i, (n, g, _) in enumerate(self.beds)]
+        track = lambda tid, asset, start, vol, amount, attack, release: sdk.Xml.of(sdk.new(
+            S.AudioMix, "audioTrack", id=tid, asset=asset, role="effects", start=start, volume=f(vol), bus=bus, duckUnder=duck,
+            duckAmount=amount, duckAttack=attack, duckRelease=release))
+        out = [track(f"sfx-{i:03d}", f"sfx-{n}", f(max(0.0, t)), g if g is not None else self.lib[n]["gain"], "-8", "0.05", "0.4")
+               for i, (t, n, g) in enumerate(self.events(duration))]
+        out += [track(f"amb-{i}", f"amb-{n}", "0", g, "-5", "0.2", "0.8") for i, (n, g, _) in enumerate(self.beds)]
         return out
 
     def bed_jobs(self, duration, tag="film", cache_dir="sfx"):

@@ -5,7 +5,9 @@ label() places one as a layer that fades in and out, and enforces the informatio
 information is at least 36 px at 1080p (guide §5, Typography). Brand components (pn-label 28 px, pn-cite 24 px)
 are not labels in this sense and are made by pnkit.brand at the kit's sizes.
 """
-from .xml import f, esc, opacity, keys
+from . import sdk
+from .sdk import S
+from .xml import f, opacity, keys
 from .palette import CREAM
 
 __all__ = ["MIN_INFO_PX", "WIDTH_PER_EM", "text_asset", "label", "text_box"]
@@ -33,13 +35,16 @@ def text_asset(doc, text, size=40, color=CREAM, style="text", width=None, height
     bw, bh = text_box(text, size, style, tracking)
     width = width or bw
     height = height or bh
-    extra = (f' tracking="{tracking}"' if tracking else "") + (f' wrap="{wrap}"' if wrap else "")
     st = doc.styles[style]
     if spans:
-        inner = "".join(f'<span{" role=" + chr(34) + r + chr(34) if r else ""}{" color=" + chr(34) + c + chr(34) if c else ""}>{esc(t)}</span>' for t, r, c in spans)
-        doc.assets.append(f'<text id="{aid}" style="{st}" size="{size}" width="{width}" height="{height}" align="{align}" color="{color}"{extra}>{inner}</text>')
+        asset = sdk.new(S.Assets, "text", id=aid, style=st, size=size, width=width, height=height, align=align, color=color,
+                        tracking=tracking or None, wrap=wrap or None)
+        for t, r, c in spans:
+            asset.add(sdk.new(asset, "span", role=r or None, color=c or None)).content = t
     else:
-        doc.assets.append(f'<text id="{aid}" text="{esc(text)}" style="{st}" size="{size}" width="{width}" height="{height}" align="{align}" color="{color}"{extra}/>')
+        asset = sdk.new(S.Assets, "text", id=aid, text=text, style=st, size=size, width=width, height=height, align=align,
+                        color=color, tracking=tracking or None, wrap=wrap or None)
+    doc.assets.append(sdk.Xml.of(asset))
     doc.texts[key] = (aid, width, height)
     return aid, width, height
 
@@ -54,7 +59,7 @@ def label(doc, text, x, y, a, b, size=40, color=CREAM, style="text", anchor="cen
     aid, w, h = text_asset(doc, text, size, color, style, width=width, align={"center": "center", "left": "start", "right": "end"}[anchor],
                            tracking=tracking, wrap=wrap, height=height, spans=spans)
     ax = {"center": w / 2, "left": 0, "right": w}[anchor]
-    anim = f'<textAnimator preset="{preset}" presetStart="{f(a)}" presetDuration="{f(pdur)}"/>' if preset else ""
+    anim = sdk.new(S.Layer, "textAnimator", preset=preset, presetStart=a, presetDuration=pdur) if preset else None
     if b is not None:
         op = opacity(a, b, fin, fout, peak)
     elif fin > 0:
@@ -63,4 +68,7 @@ def label(doc, text, x, y, a, b, size=40, color=CREAM, style="text", anchor="cen
         op = keys('opacity', [(0, 0, 'hold'), (a, peak, 'hold')])
     else:
         op = keys('opacity', [(a, peak, 'hold')])
-    return f'<layer id="{lid or doc.uid("l-" + aid)}" asset="{aid}" x="{f(x)}" y="{f(y)}" anchorX="{f(float(ax))}" anchorY="{f(h / 2)}"{attrs}>{anim}{op}{extra}</layer>'
+    layer = sdk.new(S.Composition, "layer", id=lid or doc.uid("l-" + aid), asset=aid, x=x, y=y, anchorX=float(ax), anchorY=h / 2,
+                    **sdk.attrs_of(attrs))
+    sdk.adopt(layer, anim, op, extra)
+    return sdk.Xml.of(layer)

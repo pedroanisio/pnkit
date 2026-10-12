@@ -94,12 +94,12 @@ class Draw(unittest.TestCase):
 
     def test_rect_anchor_and_shapes(self):
         doc = pnkit.Doc()
-        self.assertIn('anchorX="50" anchorY="20"', draw.rect(doc, 0, 0, 100, 40, "#000", 0, 1))
-        self.assertIn('anchorX="0" anchorY="0"', draw.rect(doc, 0, 0, 100, 40, "#000", 0, 1, anchor="top-left"))
-        self.assertIn('width="20" height="20"', draw.disc(doc, 5, 5, 10, "#fff", 0, 1))
+        self.assertIn('anchorX="50" anchorY="20"', draw.rect(doc, 0, 0, 100, 40, "#000000", 0, 1))
+        self.assertIn('anchorX="0" anchorY="0"', draw.rect(doc, 0, 0, 100, 40, "#000000", 0, 1, anchor="top-left"))
+        self.assertIn('width="20" height="20"', draw.disc(doc, 5, 5, 10, "#FFFFFF", 0, 1))
         self.assertTrue(draw.round_rect_d(0, 0, 100, 50, 10).startswith("M10 0 L90 0 A10 10 0 0 1 100 10"))
         self.assertTrue(draw.arrow_d(0, 0, 100, 0).startswith("M0 0 L100 0 M"))
-        g = draw.group(doc, ["<a/>", "", None, "<b/>"], a=0, b=2)
+        g = draw.group(doc, ["<group id=\"a\"/>", "", None, "<group id=\"b\"/>"], a=0, b=2)
         self.assertEqual(g.count("\n"), 3)
 
     def test_bind(self):

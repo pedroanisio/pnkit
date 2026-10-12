@@ -16,7 +16,8 @@ does), then timings() and slot(nn) answer from it.
 """
 import math, json, re
 from pathlib import Path
-import xml.etree.ElementTree as ET
+from .. import sdk
+from ..sdk import S
 
 from .geometry import Geometry
 from .scene_art import P, FONT, r, poly, line, ellipse, lettering, plank, crate, barrel, worker, cog
@@ -92,10 +93,20 @@ def fmt(v):
     return str(v)
 
 
+def _set(el, name, v):
+    """one attribute: the value as the SDK's type takes it (a number as a number, else its `fmt` text)"""
+    sdk.set_exact(el, name, v, fmt)
+
+
 def E(p, tag, **attrs):
     if attrs.get('start') is not None and attrs['start'] > 0:      # every window opens SHOT_EPS early: fmt() rounds to 6 decimals, which can land a start after its own frame time
         attrs['start'] = attrs['start'] - SHOT_EPS
-    return ET.SubElement(p, tag, {k: fmt(v) for k, v in attrs.items() if v is not None})
+    el = sdk.new(p, tag)
+    for k, v in attrs.items():
+        if v is not None:
+            _set(el, k, v)
+    p.add(el)
+    return el
 
 
 def frame_condition(i, n, rate, a=None, b=None, loop=True):
@@ -132,7 +143,7 @@ class Ctx:
 
     def __init__(self, unit=UNIT, seed=1945):
         self.unit = unit
-        self.root = ET.Element('scene', version='1.1')
+        self.root = S.Scene(version='1.1')
         self.proj = E(self.root, 'project', width=W * unit, height=H * unit, fps=FPS, duration=1, seed=seed,
                       background=P['black'], quality='final')
         self.comp = E(self.root, 'composition')
@@ -466,9 +477,9 @@ class Ctx:
     # ----------------------------------------------------------------- finishing and checks
     def finish(self):
         end = max(s['end'] for s in self.shots)
-        self.proj.set('duration', fmt(end))
+        _set(self.proj, 'duration', end)
         for par, g in self._plate_groups:       # z-order: a plate is always drawn last in its shot (a set or zoom group added later must not cover it)
-            par.remove(g); par.append(g)
+            par.remove(g); par.add(g)
         self.check()
         return self
 
@@ -488,9 +499,13 @@ class Ctx:
                     if oc['start'] < pl['end'] and pl['start'] < oc['end'] and rects_overlap(pl['rect'], oc['rect']):
                         raise PlanError(f'plate {pl["text"]!r} overlaps a {oc["kind"]} figure in {sh["name"]}')
 
+    def check_scene(self, **kw):
+        """`sr_core.scene.check` findings of the built document (level 1; schema=True adds level 2)"""
+        return S.check(self.root, **kw)
+
     def tostring(self):
-        ET.indent(self.root, space=' ')
-        return ET.tostring(self.root, encoding='utf-8', xml_declaration=True)
+        sdk.indent(self.root, ' ')
+        return S.to_bytes(self.root)
 
     def shots_json(self):
         out = []
@@ -600,8 +615,8 @@ def _crowd_symbol(self, v, n, rate):
     x0, y0, x1, y1 = min(xs), min(ys), max(xs) + 1, max(ys) + 1
     bw, bh = x1 - x0, y1 - y0
     syms = self.__dict__.get('_crowd_symbols_el')
-    if syms is None or syms not in list(self.root):
-        syms = ET.Element('symbols'); self.root.insert(list(self.root).index(self.comp), syms)
+    if syms is None or syms.owner is not self.root:
+        syms = sdk.new(S.Scene, 'symbols'); self.root.add(syms)               # the content model puts it before <composition>
         self._crowd_symbols_el = syms
     sid = self.ID('c')
     sym = E(syms, 'symbol', id=sid, width=bw * self.ue, height=bh * self.ue)

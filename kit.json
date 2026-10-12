@@ -1,9 +1,9 @@
 {
  "id": "pnkit",
  "name": "PALS's Notes component kit",
- "version": "0.8.0",
- "summary": "Python generators for PALS's Notes scenes (scene-render 1.1/1.2): helpers and components that write inline XML, vendored into each project with a lock file.",
- "requires": {"python": ">=3.8", "dependencies": [], "brand_kit": "palsnotes-brand.xml (passed in by the project; the source of truth for tokens and styles)"},
+ "version": "1.0.0",
+ "summary": "Python components for PALS's Notes scenes, built on sr_core.scene (the Python scene SDK; scene-render 1.4 documents): every element and attribute is checked when it is made, Doc.build() returns a Scene whose level-1 check must be clean. Vendored into each project with a lock file.",
+ "requires": {"python": ">=3.8", "dependencies": [{"name": "sr-core", "version": ">=1.7.0", "provides": "sr_core.scene", "install": "pip install from the sr-core repository (github.com/pedroanisio/sr-core), not from PyPI"}], "brand_kit": "palsnotes-brand.xml (passed in by the project; the source of truth for tokens and styles)"},
  "source": "~/videos/lib",
  "changelog": "CHANGELOG.md",
  "extracted_from": "v013-jev-decisions (film/lib.py, brand.py, captions.py, shorts.py, emblems.py), byte-identical golden: tests/golden/. mesh and figure generalized from v014-bayonet-charge-2011 (film/trees.py's tube-mesh engine, film/figures.py's articulated rig) — not byte-identical, no golden: v014's own figures.py keeps its rifle-soldier look and is unchanged by this.. audio generalized from v015-short-pack (film/core.py's cue guard, tools/foley.py, qa/tail.py): its twenty scene documents' audio assets and tracks are reproduced byte for byte, and its foley files and ending figures identically",
@@ -11,6 +11,10 @@
  "components": [
   {"name": "Doc", "module": "pnkit.doc", "summary": "The document under construction: frame size, text-role styles, id set and the registries that become sections (assets, paints, materials, fields, bodies).",
    "params": ["width=1920", "height=1080", "styles={role: textStyle id}"], "rules": ["one id set per document: every helper's ids are unique"]},
+  {"name": "Doc.build / Doc.check / Doc.write", "module": "pnkit.doc", "summary": "The document as an sr_core.scene Scene: project frame, the sections a project hands in and the registries; check() returns sr_core.scene.check findings; build() and write() raise pnkit.sdk.BuildError on level-1 errors.",
+   "params": ["build(project, composition, *parts, version=auto, check=True, physics=None, **sections)", "check(scene=None, schema=False)", "write(path, layout=preserve)"], "rules": ["a document with a level-1 error is never written"]},
+  {"name": "Xml / new / adopt / put / BuildError", "module": "pnkit.sdk", "summary": "The one place pnkit meets sr_core.scene. Components return Xml, a str of the XML that also holds the SDK elements (.element, .elements, .nodes); adopt() takes elements, Xml and plain XML strings and parses a string against its parent.",
+   "params": ["Xml.of(*items, sep)", "new(parent, name, *children, **attrs)", "adopt(parent, *items)", "put(el, name, value)"], "rules": ["numbers keep pnkit's 3-decimal form", "an element or attribute the schema does not allow raises at construction"]},
   {"name": "bind", "module": "pnkit", "summary": "The helpers with a Doc filled in (uid, text_asset, label, draw, rect, disc, group, pill, Cam, Brand) plus the pure ones.",
    "params": ["doc"], "rules": []},
   {"name": "f / esc / keys / opacity / path_d / hash01 / fmt / Ids", "module": "pnkit.xml", "summary": "Number formatting (3 decimals, no trailing zeros), attribute escaping, unique ids, opacity windows with fades, keyframe <animate>s, polyline path data, a stable hash shared with expressions (HASH_EXPR).",

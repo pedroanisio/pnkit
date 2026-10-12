@@ -15,8 +15,11 @@ colours stay exact (guide §14). Their text assets go to Brand.assets; every tex
 The kit file is passed in by the project (a pinned copy, e.g. film/kit/palsnotes-brand.xml); pnkit reads no fixed
 path.
 """
-import hashlib, re
-from .xml import f, esc
+import hashlib
+
+from . import sdk
+from .sdk import S
+from .xml import animate, f
 
 __all__ = ["MOTION_IN", "MOTION_OUT", "NOTCH", "SIZES", "COLOURS", "prologue", "extend", "kit_sha256", "fade", "Brand"]
 
@@ -28,33 +31,51 @@ COLOURS = {"pn-label": "var(--pn-cream-muted)", "pn-display": "var(--pn-cream)",
 NEXT = "NEXT ON PALS'S NOTES"               # the kit's pn-next default (English)
 
 
-def _block(src, tag):
-    m = re.search(rf"\n  <{tag}[ >].*?\n  </{tag}>", src, re.S)
-    return m.group(0).strip("\n") if m else ""
+def _section(el):
+    """a kit section as it stood in the file: indented two spaces, then the element"""
+    return sdk.Xml.of(S.Text("  "), el.copy(), sep="")
 
 
 def prologue(kit_path, params):
-    """the kit's sections, verbatim except the parameter defaults in `params` ({param id: value}; each must exist
-    exactly once). -> {parameters, styles, layouts, safeAreas, symbols: section XML; font: the font asset;
-    texts: [the kit's text assets]; accessibility: the kit's accessibility element}"""
-    src = open(kit_path, encoding="utf-8").read()
-    pars = _block(src, "parameters")
+    """the kit's sections, read with the SDK and kept as they are (comments, white space, attribute text) except the
+    parameter defaults in `params` ({param id: value}; each must exist exactly once, with a default).
+    -> {parameters, styles, layouts, safeAreas, symbols: section `Xml`; font: the font asset; texts: [the kit's text
+    assets]; accessibility: the kit's accessibility element}"""
+    kit = S.read(kit_path)
+    pars = kit.find("parameters")
     for pid, val in params.items():
-        pars, n = re.subn(rf'(<param id="{pid}"[^>]*?default=")[^"]*(")', lambda m: m.group(1) + esc(val) + m.group(2), pars)
-        if n != 1:
-            raise KeyError(f"kit parameter {pid!r} found {n} times in {kit_path}")
-    assets = _block(src, "assets")
-    font = re.search(r'<font id="pn-archivo".*?/>', assets, re.S).group(0)
-    texts = re.findall(r'<text id="pn-t-[^"]+".*?(?:/>|</text>)', assets, re.S)
-    access = re.search(r"<accessibility [^>]*/>", src).group(0)
-    return {"parameters": pars, "styles": _block(src, "styles"), "layouts": _block(src, "layouts"),
-            "safeAreas": _block(src, "safeAreas"), "symbols": _block(src, "symbols"), "font": font, "texts": texts,
-            "accessibility": access}
+        hits = [p for p in (pars.find_all("param") if pars is not None else []) if p.id == pid and "default" in p.attributes()]
+        if len(hits) != 1:
+            raise KeyError(f"kit parameter {pid!r} found {len(hits)} times in {kit_path}")
+        hits[0].default = val
+    assets = kit.find("assets")
+    font = next(e for e in assets.find_all("font") if e.id == "pn-archivo")
+    texts = [e for e in assets.find_all("text") if (e.id or "").startswith("pn-t-")]
+    out = {k: (_section(kit.find(k)) if kit.find(k) is not None else sdk.Xml("")) for k in ("parameters", "styles", "layouts", "safeAreas", "symbols")}
+    out.update(font=sdk.Xml.of(font.copy()), texts=[sdk.Xml.of(t.copy()) for t in texts], accessibility=sdk.Xml.of(kit.find("metadata").find("accessibility").copy()))
+    return out
 
 
 def extend(block, tag, xml):
-    """a prologue section with `xml` added before its closing tag (e.g. the episode's own text styles)"""
-    return block.replace(f"  </{tag}>", xml + f"  </{tag}>")
+    """a prologue section with `xml` added before its closing tag (e.g. the episode's own text styles); a new section,
+    the one given is left as it was"""
+    if isinstance(block, sdk.Xml) and block.elements:
+        el = block.elements[0]
+        pre = [S.Text(n.text) for n in block.nodes[:block.nodes.index(el)]]
+        el = el.copy()
+    else:
+        text = str(block)
+        pre = [S.Text(text[:len(text) - len(text.lstrip())])] if text[:1].isspace() else []
+        el = sdk.parse_sections(text)[0]
+    last = el.nodes[-1] if el.nodes and isinstance(el.nodes[-1], S.Text) else None
+    indent = ""
+    if last is not None:                                  # the closing tag's indentation stays last
+        indent = last.text[len(last.text.rstrip(" ")):]
+        last.text = last.text[:len(last.text) - len(indent)]
+    sdk.adopt(el, xml)
+    if indent:
+        el.nodes.append(S.Text(indent))
+    return sdk.Xml.of(*pre, el, sep="")
 
 
 def kit_sha256(kit_path):
@@ -65,8 +86,7 @@ def kit_sha256(kit_path):
 def fade(a, b, fin=MOTION_IN, fout=MOTION_OUT):
     """the kit's opacity motion: in over fin (cubic-out), out over fout (cubic-in); b is pushed out so both fit"""
     b = max(b, a + fin + fout)
-    return (f'<animate property="opacity"><key time="{f(a)}" value="0" interpolation="cubic-out"/><key time="{f(a + fin)}" value="1"/>'
-            f'<key time="{f(b - fout)}" value="1" interpolation="cubic-in"/><key time="{f(b)}" value="0"/></animate>')
+    return animate("opacity", [(a, "0", "cubic-out"), (a + fin, "1", None), (b - fout, "1", "cubic-in"), (b, "0", None)])
 
 
 class Brand:
@@ -79,22 +99,28 @@ class Brand:
 
     # ---------------------------------------------------------------- pieces
     def text(self, txt, style, width, height, extra=""):
-        """a brand text asset at the kit's size for `style`, coloured explicitly -> asset id"""
+        """a brand text asset at the kit's size for `style`, coloured explicitly -> asset id. extra: more attributes,
+        as text (` wrap="balance" maxLines="3"`)"""
         aid = self.doc.uid("bt")
-        if "color=" not in extra:
-            extra = f' color="{COLOURS[style]}"' + extra
-        self.assets.append(f'<text id="{aid}" text="{esc(txt)}" width="{width}" height="{height}" size="{SIZES[style]}" style="{style}"{extra}/>')
+        more = sdk.attrs_of(extra)
+        if "color" not in more:
+            more = {"color": COLOURS[style], **more}
+        self.assets.append(sdk.Xml.of(sdk.new(S.Assets, "text", id=aid, text=txt, width=width, height=height, size=SIZES[style], style=style, **more)))
         return aid
 
     def notch(self, a, b, x=0, y=None):
         """the brand mark (orange right triangle), bottom-left by default"""
         y = self.doc.height - NOTCH if y is None else y
-        return (f'<shape id="{self.doc.uid("notch")}" shape="path" x="{x}" y="{y}" width="{NOTCH}" height="{NOTCH}" path="M0 0 L0 {NOTCH} L{NOTCH} {NOTCH} Z" '
-                f'fill="var(--pn-orange)" tags="logo">{fade(a, b)}</shape>')
+        sh = sdk.new(S.Composition, "shape", id=self.doc.uid("notch"), shape="path", x=x, y=y, width=NOTCH, height=NOTCH,
+                     path=f"M0 0 L0 {NOTCH} L{NOTCH} {NOTCH} Z", fill="var(--pn-orange)", tags="logo")
+        sdk.adopt(sh, fade(a, b))
+        return sdk.Xml.of(sh)
 
     def ink(self, a, b, fin=0.5, fout=0.6):
         """a full-frame ink field"""
-        return f'<shape id="{self.doc.uid("ink")}" shape="rect" width="{self.doc.width}" height="{self.doc.height}" fill="var(--pn-ink)">{fade(a, b, fin, fout)}</shape>'
+        sh = sdk.new(S.Composition, "shape", id=self.doc.uid("ink"), shape="rect", width=self.doc.width, height=self.doc.height, fill="var(--pn-ink)")
+        sdk.adopt(sh, fade(a, b, fin, fout))
+        return sdk.Xml.of(sh)
 
     def emblem(self, items, a, b, dur=1.6):
         """a line-drawn subject: items [(path d, colour, width[, fill])]; each stroke draws on in turn (trimEnd), then
@@ -104,11 +130,17 @@ class Brand:
         for i, it in enumerate(items):
             d, col, w = it[:3]; fill = it[3] if len(it) > 3 else "#00000000"
             t0 = a + 0.25 + (dur - 0.6) * i / n
-            out.append(f'<shape id="{self.doc.uid("em")}" shape="path" width="{W}" height="{H}" path="{d}" fill="{fill}" stroke="{col}" strokeWidth="{w}" '
-                       f'strokeCap="round" strokeJoin="round" trimEnd="0"><animate property="trimEnd"><key time="{f(t0)}" value="0" interpolation="cubic-out"/>'
-                       f'<key time="{f(t0 + 0.7)}" value="1"/></animate>{fade(a, b, 0.2, MOTION_OUT)}</shape>')
-        drift = (f'<animate property="x"><key time="{f(a)}" value="0" interpolation="linear"/><key time="{f(b)}" value="-{f(12 * (b - a))}"/></animate>')
-        return f'<group id="{self.doc.uid("emg")}">{drift}' + "\n".join(out) + "</group>"
+            sh = sdk.new(S.Composition, "shape", id=self.doc.uid("em"), shape="path", width=W, height=H, path=d, fill=fill, stroke=col,
+                         strokeWidth=w, strokeCap="round", strokeJoin="round", trimEnd=0)
+            sdk.adopt(sh, animate("trimEnd", [(t0, "0", "cubic-out"), (t0 + 0.7, "1", None)]), fade(a, b, 0.2, MOTION_OUT))
+            out.append(sdk.Xml.of(sh))
+        drift = animate("x", [(a, "0", "linear"), (b, "-" + f(12 * (b - a)), None)])
+        g = sdk.new(S.Composition, "group", drift, id=self.doc.uid("emg"))
+        for i, sh in enumerate(out):
+            if i:
+                sdk.ws(g)
+            sdk.adopt(g, sh)
+        return sdk.Xml.of(g)
 
     # ---------------------------------------------------------------- components (XML)
     def title_card_xml(self, a, b, kicker, title, emblem=None):
@@ -116,52 +148,58 @@ class Brand:
         into 192,360, an optional emblem (items for emblem()), the notch"""
         k = self.text(kicker, "pn-label", 1200, 48); t = self.text(title, "pn-display", 1400, 360, ' wrap="balance" maxLines="3"')
         uid = self.doc.uid
-        out = [self.ink(a, b), f'<layer id="{uid("tc-k")}" asset="{k}" x="192" y="300">{fade(a, b)}</layer>',
-               f'<layer id="{uid("tc-t")}" asset="{t}" x="192" y="360">{fade(a + 0.1, b)}'
-               f'<animate property="y"><key time="{f(a + 0.1)}" value="392" interpolation="cubic-out"/><key time="{f(a + 0.5)}" value="360"/></animate></layer>']
+        out = [self.ink(a, b), sdk.Xml.of(sdk.new(S.Composition, "layer", fade(a, b), id=uid("tc-k"), asset=k, x=192, y=300)),
+               sdk.Xml.of(sdk.new(S.Composition, "layer", fade(a + 0.1, b), animate("y", [(a + 0.1, "392", "cubic-out"), (a + 0.5, "360", None)]),
+                                  id=uid("tc-t"), asset=t, x=192, y=360))]
         if emblem:
             out.append(self.emblem(emblem, a + 0.2, b, 2.0))
         out.append(self.notch(a, b))
-        return "\n".join(out)
+        return sdk.Xml.of(*out)
 
     def chapter_card_xml(self, a, b, number, title, emblem=None):
         """a chapter divider over ink: the number (pn-number, orange) at 192,340, a rule at y 520, the title
         (pn-heading, <= 2 lines) at 192,540, an optional emblem"""
         n = self.text(number, "pn-number", 400, 180); t = self.text(title, "pn-heading", 1300, 160, ' wrap="balance" maxLines="2"')
         uid = self.doc.uid
-        out = [self.ink(a, b, 0.35, 0.5), f'<layer id="{uid("cc-n")}" asset="{n}" x="192" y="340">{fade(a, b)}</layer>',
-               f'<shape id="{uid("cc-r")}" shape="rect" width="1536" height="2" x="192" y="520" fill="var(--pn-rule)">{fade(a, b)}</shape>',
-               f'<layer id="{uid("cc-t")}" asset="{t}" x="192" y="540">{fade(a + 0.15, b)}</layer>']
+        out = [self.ink(a, b, 0.35, 0.5), sdk.Xml.of(sdk.new(S.Composition, "layer", fade(a, b), id=uid("cc-n"), asset=n, x=192, y=340)),
+               sdk.Xml.of(sdk.new(S.Composition, "shape", fade(a, b), id=uid("cc-r"), shape="rect", width=1536, height=2, x=192, y=520, fill="var(--pn-rule)")),
+               sdk.Xml.of(sdk.new(S.Composition, "layer", fade(a + 0.15, b), id=uid("cc-t"), asset=t, x=192, y=540))]
         if emblem:
             out.append(self.emblem(emblem, a + 0.1, b, 1.8))
-        return "\n".join(out)
+        return sdk.Xml.of(*out)
 
     def lower_third_xml(self, a, b, name, role):
         """the kit's lower third: raised panel with an orange bar at 192,680, 900 x 152 (orange is never type here)"""
         nm = self.text(name, "pn-heading", 820, 84, ' maxLines="1"'); rl = self.text(role, "pn-label", 820, 40, ' maxLines="1"')
         gid = self.doc.uid("lt")
-        return (f'<group id="{gid}" x="192" y="680" width="900" height="152">{fade(a, b)}'
-                f'<animate property="x"><key time="{f(a)}" value="160" interpolation="cubic-out"/><key time="{f(a + 0.4)}" value="192"/></animate>'
-                f'<shape id="{gid}-p" shape="rect" width="900" height="152" fill="var(--pn-ink-raised)"/>'
-                f'<shape id="{gid}-b" shape="rect" width="8" height="152" fill="var(--pn-orange)"/>'
-                f'<layer id="{gid}-n" asset="{nm}" x="40" y="22"/><layer id="{gid}-r" asset="{rl}" x="40" y="98"/></group>')
+        g = sdk.new(S.Composition, "group", fade(a, b), animate("x", [(a, "160", "cubic-out"), (a + 0.4, "192", None)]),
+                    id=gid, x=192, y=680, width=900, height=152)
+        sdk.adopt(g, sdk.new(g, "shape", id=f"{gid}-p", shape="rect", width=900, height=152, fill="var(--pn-ink-raised)"),
+                  sdk.new(g, "shape", id=f"{gid}-b", shape="rect", width=8, height=152, fill="var(--pn-orange)"),
+                  sdk.new(g, "layer", id=f"{gid}-n", asset=nm, x=40, y=22), sdk.new(g, "layer", id=f"{gid}-r", asset=rl, x=40, y=98))
+        return sdk.Xml.of(g)
 
     def source_line_xml(self, a, b, text):
         """the citation line (pn-cite, <= 2 lines) at 192,108, top-left inside title safe"""
         s = self.text(text, "pn-cite", 1100, 64, ' maxLines="2"')
-        return f'<layer id="{self.doc.uid("sl")}" asset="{s}" x="192" y="108">{fade(a, b)}</layer>'
+        return sdk.Xml.of(sdk.new(S.Composition, "layer", fade(a, b), id=self.doc.uid("sl"), asset=s, x=192, y=108))
 
     def end_card_xml(self, a, b, credits, next_label=NEXT):
         """the end card over ink: the next-video label at 192,480 and credit lines below it, drifting up slowly;
         the right two thirds stay free for the platform's end-screen elements"""
         uid = self.doc.uid
         nx = self.text(next_label, "pn-label", 1200, 48)
-        txt = [f'<layer id="{uid("ec")}" asset="{nx}" x="192" y="480">{fade(a + 0.2, b, 0.4, 1.2)}</layer>']
+        txt = [sdk.Xml.of(sdk.new(S.Composition, "layer", fade(a + 0.2, b, 0.4, 1.2), id=uid("ec"), asset=nx, x=192, y=480))]
         for i, line in enumerate(credits):
             c = self.text(line, "pn-cite", 620, 36)
-            txt.append(f'<layer id="{uid("ec-c")}" asset="{c}" x="192" y="{560 + 34 * i}">{fade(a + 0.6 + 0.1 * i, b, 0.4, 1.2)}</layer>')
-        drift = f'<animate property="y"><key time="{f(a)}" value="12" interpolation="linear"/><key time="{f(b)}" value="-{f(5 * (b - a))}"/></animate>'
-        return "\n".join([self.ink(a, b, 0.8, 1.2), f'<group id="{uid("ecg")}">{drift}' + "\n".join(txt) + "</group>", self.notch(a, b)])
+            txt.append(sdk.Xml.of(sdk.new(S.Composition, "layer", fade(a + 0.6 + 0.1 * i, b, 0.4, 1.2), id=uid("ec-c"), asset=c, x=192, y=560 + 34 * i)))
+        drift = animate("y", [(a, "12", "linear"), (b, "-" + f(5 * (b - a)), None)])
+        g = sdk.new(S.Composition, "group", drift, id=uid("ecg"))
+        for i, t in enumerate(txt):
+            if i:
+                sdk.ws(g)
+            sdk.adopt(g, t)
+        return sdk.Xml.of(self.ink(a, b, 0.8, 1.2), sdk.Xml.of(g), self.notch(a, b))
 
     # ---------------------------------------------------------------- components (placed above the finish)
     def place(self, xml):
