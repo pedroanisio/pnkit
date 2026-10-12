@@ -91,9 +91,9 @@ class LocalStages(Base):
         self.assertIn("score regenerated bit-identical", rows["assemble"][3])
         self.assertIn("music layer: music", rows["assemble"][3])
         x = open(b.p("xml", "s02.scene.xml")).read()
-        self.assertIn('start="2.5"', x); self.assertIn('end="5"', x); self.assertIn('audio="false"', x)
+        self.assertIn('start="2.5"', x); self.assertIn('end="5.0"', x); self.assertIn('audio="false"', x)
         a = open(b.p("xml", "full-audio.scene.xml")).read()
-        self.assertIn('role="music"', a); self.assertIn('loudness="-14"', a)
+        self.assertIn('role="music"', a); self.assertIn('loudness="-14.0"', a)
         self.assertIn('normalize="none"', open(b.p("xml", "stem-music.scene.xml")).read())
         self.assertEqual(json.load(open(b.p("xml", "stems.json"))), ["full", "music"])          # no voice, no sfx: no empty stems
         self.assertFalse(os.path.exists(b.p("xml", "stem-voice.scene.xml")))

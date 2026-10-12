@@ -324,9 +324,9 @@ def cue_xml(cues, indent="      ", width=None, weak=WEAK, cps=CPS):
     for k, (c, start, end) in enumerate(timed(cues, cps)):
         text = " ".join(w[0] for w in c)
         body = "\n".join(two_lines(text, width, weak, _opens(cues, k))) if width else text
-        cue = sdk.new(S.CaptionTrack, "cue", start=round(start, 3), end=round(end, 3), text=body)
+        cue = sdk.new(S.CaptionTrack, "cue", start=f"{start:.3f}", end=f"{end:.3f}", text=body)
         for w in c:
-            sdk.add(cue, sdk.new(cue, "word", start=round(w[1], 3), end=round(w[2], 3), text=w[0]))
+            sdk.add(cue, sdk.new(cue, "word", start=f"{w[1]:.3f}", end=f"{w[2]:.3f}", text=w[0]))
         if k:
             nodes.append(S.Text("\n"))
         nodes += [S.Text(indent), cue] if indent else [cue]
@@ -362,7 +362,7 @@ def short_cues(words, spans, not_before=0.0, width=SHORT_LINE, weak=WEAK):
     xml = cue_xml(cues, indent="      ", weak=weak)
     first = xml.elements[0] if xml.elements else None
     if first is not None and float(f"{first.start:.3f}") < not_before:
-        first.start = round(not_before, 3)
+        first.start = f"{not_before:.3f}"      # the old text: three decimals
         xml = sdk.Xml.from_nodes(xml.nodes)
     return xml
 
