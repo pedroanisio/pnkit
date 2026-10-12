@@ -205,7 +205,7 @@ def attrs_of(text):
         raise ValueError(f"not a list of attributes: {text!r} ({err})") from None
 
 
-def new(parent, name, *children, **attrs):
+def new(parent, name, /, *children, **attrs):
     """a detached `<name>` element of the class the schema gives it under `parent` (an element or its class),
     with `attrs` set in the order given (None skipped) and `children` adopted. Raises if `parent` does not allow
     `<name>`."""
