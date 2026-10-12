@@ -102,6 +102,66 @@ class Components(unittest.TestCase):
         self.assertIn("a &quot;quiet&quot; &lt;room>", c.assets(30.0)[0])           # well-formed; 0.8.0 wrote it raw
 
 
+class Build(unittest.TestCase):
+    """a Doc builds a Scene; check() is clean; a level-1 error stops the build; a round trip through `read` is C14N-equal"""
+
+    def build(self, check=True):
+        doc = pnkit.Doc()
+        pro = brand.prologue(KIT, {})
+        doc.assets.append(pro["font"]); doc.assets.extend(pro["texts"])
+        lab = text.label(doc, "Hello", 960, 540, 0, 3)
+        dot = draw.disc(doc, 100, 100, 20, "#FFFFFF", 0, 3)
+        comp = sdk.new(S.Scene, "composition", lab, dot)
+        scene = doc.build({"fps": 30, "duration": 4.0, "seed": 1}, comp, pro["parameters"], pro["styles"], pro["layouts"],
+                          pro["safeAreas"], pro["symbols"], check=check)
+        return doc, scene
+
+    def test_check_is_clean(self):
+        doc, scene = self.build()
+        self.assertEqual(doc.check(), [])
+        self.assertIs(doc.scene, scene)
+        self.assertEqual([e.xml_name for e in scene.elements()][:2], ["project", "parameters"])
+
+    def test_check_level_two_is_clean_too(self):
+        try:
+            import lxml  # noqa: F401
+        except ImportError:
+            self.skipTest("level 2 needs lxml")
+        doc, _ = self.build()
+        self.assertEqual(doc.check(schema=True), [])
+
+    def test_a_level_1_error_stops_the_build(self):
+        doc = pnkit.Doc()
+        comp = sdk.new(S.Scene, "composition", sdk.new(S.Composition, "layer", id="a", asset="nope", x=1))
+        with self.assertRaises(sdk.BuildError) as cm:
+            doc.build({"fps": 30, "duration": 4, "seed": 1}, comp)
+        self.assertIn("nope", str(cm.exception))
+        self.assertTrue(cm.exception.findings)
+
+    def test_write_refuses_an_unchecked_bad_document(self):
+        import tempfile
+        doc = pnkit.Doc()
+        comp = sdk.new(S.Scene, "composition", sdk.new(S.Composition, "layer", id="a", asset="nope", x=1))
+        doc.build({"fps": 30, "duration": 4, "seed": 1}, comp, check=False)
+        with tempfile.TemporaryDirectory() as d:
+            with self.assertRaises(sdk.BuildError):
+                doc.write(os.path.join(d, "x.xml"))
+            self.assertEqual(os.listdir(d), [])
+
+    def test_round_trip_through_read(self):
+        import tempfile
+        doc, _ = self.build()
+        with tempfile.TemporaryDirectory() as d:
+            path = doc.write(os.path.join(d, "x.xml"))
+            back = S.read(path)
+            self.assertEqual(S.check(back), [])
+            self.assertEqual(c14n(S.to_bytes(back).decode()), c14n(doc.to_bytes().decode()))
+
+    def test_an_element_in_the_wrong_place_raises_at_construction(self):
+        with self.assertRaises((SchemaValueError, AttributeError, ValueError, TypeError)):
+            sdk.new(S.Scene, "layer", id="x")
+
+
 class Golden(unittest.TestCase):
     """pnkit 0.8.0's component output (tests/golden/components-0.8.0.json) against this version's, C14N 2.0 with comments"""
 
