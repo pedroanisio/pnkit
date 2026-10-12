@@ -4,6 +4,12 @@ sha256 (the proof that the extraction changed no output).
 
     python3 tools/pixelart/lula_alias.py V3_DIR TIMINGS.json SCENES        (SCENES: 01,02 or all)
     python3 tools/pixelart/lula_alias.py --original V3_DIR TIMINGS.json SCENES   the film's own framework, same output
+    python3 tools/pixelart/lula_alias.py --c14n V3_DIR TIMINGS.json SCENES       the hash of the C14N 2.0 form (with comments)
+    python3 tools/pixelart/lula_alias.py --numeric V3_DIR TIMINGS.json SCENES    the same after plain decimals are written shortest
+
+pnkit 1.0 builds the scene with sr_core.scene, which writes an xs:double in its shortest form ("855", never "855.0"),
+so its bytes differ from 0.8.0 in every scene while its C14N form is equal once those decimals are compared shortest:
+the golden of 1.0 is `c14n_numeric_sha256`. Every scene is also checked: a level-1 finding aborts the run.
 
 The Lula modules import `common`, `sets`, `scene_art`, `figures_v2`, ...; with the alias they resolve to the pnkit
 modules of the same content. Prints one JSON object {scene file: sha256}."""
@@ -20,6 +26,10 @@ def main(argv=None):
     original = "--original" in argv
     if original:
         argv.remove("--original")
+    mode = "bytes"
+    for flag, m in (("--c14n", "c14n"), ("--numeric", "numeric")):
+        if flag in argv:
+            argv.remove(flag); mode = m
     v3, timings, scenes = argv
     v3 = os.path.abspath(v3)
     if original:
@@ -41,7 +51,16 @@ def main(argv=None):
         ctx = common.Ctx(unit=6)
         importlib.import_module(f"scene_{n:02d}").build(ctx)
         ctx.finish()
-        out[f"scene_{n:02d}.xml"] = hashlib.sha256(ctx.tostring()).hexdigest()
+        data = ctx.tostring()
+        if mode != "bytes":
+            sys.path.insert(0, os.path.join(LIB, "tests"))
+            from c14n import c14n, c14n_numeric
+            data = (c14n if mode == "c14n" else c14n_numeric)(data.decode("utf-8")).encode("utf-8")
+        if not original:
+            bad = [x for x in ctx.check_scene() if x.severity == "error"]
+            if bad:
+                raise SystemExit(f"scene_{n:02d}: {len(bad)} level-1 error(s): {bad[0].path}: {bad[0].message}")
+        out[f"scene_{n:02d}.xml"] = hashlib.sha256(data).hexdigest()
     print(json.dumps(out))
 
 

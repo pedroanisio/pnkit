@@ -35,7 +35,7 @@ from sr_core.scene import SchemaValueError
 
 from ._num import f
 
-__all__ = ["Xml", "BuildError", "num", "put", "new", "adopt", "parse_fragment", "parse_sections", "parse_num", "xml_of", "frag", "text_of", "ws", "add",
+__all__ = ["Xml", "BuildError", "num", "put", "new", "adopt", "parse_fragment", "parse_sections", "parse_num", "xml_of", "frag", "text_of", "ws", "add", "indent",
            "attrs_of", "errors", "S", "SchemaValueError"]
 
 MIN_SDK = "1.7.0"
@@ -310,6 +310,24 @@ def add(parent, child):
             nodes[k:k] = prev
             nodes.extend(trailing)
     return child
+
+
+def indent(root, space=" ", level=0):
+    """indent `root` in place as `xml.etree.ElementTree.indent` does: an element that has only element children gets a
+    new line and `space` * depth before each child and before its end tag. An element with text is left alone."""
+    kids = [n for n in root.nodes if isinstance(n, S.Element)]
+    if not kids or any(isinstance(n, S.Text) and n.text.strip() for n in root.nodes):
+        return root
+    pad = "\n" + space * (level + 1)
+    nodes = []
+    for n in root.nodes:
+        if isinstance(n, S.Element):
+            nodes += [S.Text(pad), n]
+    nodes.append(S.Text("\n" + space * level))
+    root.nodes[:] = nodes
+    for k in kids:
+        indent(k, space, level + 1)
+    return root
 
 
 def adopt(parent, *items):
