@@ -7,6 +7,9 @@ document being built matches, the block points at the cache; otherwise the engin
 """
 import hashlib, json, os, re
 
+from . import sdk
+from .sdk import S
+
 __all__ = ["signature", "block"]
 
 
@@ -22,10 +25,15 @@ def block(bodies, fields, sig=None, cache_path=None, meta_path=None, cache_ref=N
     JSON record on disk; cache_ref: the cache's path as the document names it (relative to the document)."""
     if not bodies and not fields:
         return ""
-    cache = ""
+    cache = {}
     if sig and cache_path and meta_path and os.path.exists(cache_path) and os.path.exists(meta_path):
         meta = json.load(open(meta_path))
         if meta.get("signature") == sig:
-            cache = f' cache="{cache_ref}" cacheSha256="{meta["sha256"]}"'
-    return (f'  <physics gravityY="{gravity_y}" pixelsPerMeter="{ppm}" bounds="none"{cache}>\n'
-            + "\n".join("    " + x for x in fields) + "\n  </physics>")
+            cache = dict(cache=cache_ref, cacheSha256=meta["sha256"])
+    ph = sdk.new(S.Scene, "physics", gravityY=0, pixelsPerMeter=ppm, bounds="none", **cache)
+    ph.gravityY = gravity_y                      # as given: put() would round it to pnkit's 3 decimals
+    for x in fields:
+        sdk.ws(ph, "\n    ")
+        sdk.adopt(ph, sdk.xml_of(x, S.Physics))
+    sdk.ws(ph, "\n  ")
+    return sdk.Xml.of(S.Text("  "), ph, sep="")

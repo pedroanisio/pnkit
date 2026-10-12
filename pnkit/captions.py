@@ -22,8 +22,11 @@ CaptionAlignError when they do not align), and check_text() holds the finished c
 Words carry their written punctuation ("decisions," "odds."); times are seconds on whatever clock the caller uses
 (film time for a sidecar, output time for a Short). Nothing here reads files or timelines.
 """
-import difflib, html, itertools, math, re, unicodedata
+import difflib, itertools, math, re, unicodedata
 from dataclasses import dataclass
+
+from . import sdk
+from .sdk import S
 
 __all__ = ["LINE", "SHORT_LINE", "CPS", "MAX_CPS", "MIN_SHOW", "LEAD", "FIRST_LEAD", "HOLD", "PAUSE", "WEAK", "NUMBERS", "NUM_TAIL", "is_number",
            "no_break", "line_break", "split_units", "split_cues", "two_lines", "timed", "cue_xml", "sidecar",
@@ -315,28 +318,39 @@ def timed(cues, cps=CPS, min_show=MIN_SHOW):
 
 
 def cue_xml(cues, indent="      ", width=None, weak=WEAK, cps=CPS):
-    """<cue> elements with their <word>s; width: break each cue's text into two lines (sidecar), None: one line
-    (a burned track lays out its own lines)"""
-    xml = []
+    """<cue> elements with their <word>s, one per line; width: break each cue's text into two lines (sidecar), None: one line
+    (a burned track lays out its own lines). -> `Xml` (the cues are in `.elements`)"""
+    nodes = []
     for k, (c, start, end) in enumerate(timed(cues, cps)):
         text = " ".join(w[0] for w in c)
         body = "\n".join(two_lines(text, width, weak, _opens(cues, k))) if width else text
-        ws = "".join(f'<word start="{w[1]:.3f}" end="{w[2]:.3f}" text="{html.escape(w[0], quote=True)}"/>' for w in c)
-        xml.append(f'{indent}<cue start="{start:.3f}" end="{end:.3f}" text="{html.escape(body, quote=True).replace(chr(10), "&#10;")}">{ws}</cue>')
-    return "\n".join(xml)
+        cue = sdk.new(S.CaptionTrack, "cue", start=round(start, 3), end=round(end, 3), text=body)
+        for w in c:
+            sdk.add(cue, sdk.new(cue, "word", start=round(w[1], 3), end=round(w[2], 3), text=w[0]))
+        if k:
+            nodes.append(S.Text("\n"))
+        nodes += [S.Text(indent), cue] if indent else [cue]
+    return sdk.Xml.from_nodes(nodes)
 
 
 def sidecar(words, width=LINE, track_id="subs-en", language="en", label="English", weak=WEAK):
     """the <captions> section with one sidecar track (WebVTT next to the video)"""
     cues = split_cues(words, width, weak=weak)
-    return (f'  <captions>\n    <captionTrack id="{track_id}" language="{language}" kind="subtitles" label="{label}" mode="sidecar">\n'
-            + cue_xml(cues, width=width, weak=weak) + "\n    </captionTrack>\n  </captions>")
+    track = sdk.new(S.Captions, "captionTrack", id=track_id, language=language, kind="subtitles", label=label, mode="sidecar")
+    sdk.ws(track)
+    sdk.adopt(track, cue_xml(cues, width=width, weak=weak))
+    sdk.ws(track, "\n    ")
+    section = sdk.new(S.Scene, "captions")
+    sdk.ws(section, "\n    ")
+    sdk.adopt(section, track)
+    sdk.ws(section, "\n  ")
+    return sdk.Xml.of(S.Text("  "), section, sep="")
 
 
 def short_cues(words, spans, not_before=0.0, width=SHORT_LINE, weak=WEAK):
     """the cues of a Short cut from `words`: spans [(from, to, output start)] map the words wholly inside each span to
     output time. No cue shows before `not_before` (the cover card); a first cue that would only flash before the
-    cover lifts joins the next one when both fit. -> cue XML in output time"""
+    cover lifts joins the next one when both fit. -> the cues, in output time, as `Xml`"""
     ws = []
     for a, b, o in spans:
         for w, s, e in words:
@@ -346,9 +360,10 @@ def short_cues(words, spans, not_before=0.0, width=SHORT_LINE, weak=WEAK):
     if len(cues) > 1 and cues[0][-1][2] - not_before < 0.7 and len(" ".join(w[0] for w in cues[0] + cues[1])) <= 2 * width:
         cues = [cues[0] + cues[1]] + cues[2:]
     xml = cue_xml(cues, indent="      ", weak=weak)
-    first = re.search(r'<cue start="([\d.]+)"', xml)
-    if first and float(first.group(1)) < not_before:
-        xml = xml.replace(first.group(0), f'<cue start="{not_before:.3f}"', 1)
+    first = xml.elements[0] if xml.elements else None
+    if first is not None and float(f"{first.start:.3f}") < not_before:
+        first.start = round(not_before, 3)
+        xml = sdk.Xml.from_nodes(xml.nodes)
     return xml
 
 

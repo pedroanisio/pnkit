@@ -38,7 +38,7 @@ def corpus(kit_path, lib=LIB):
     doc = pnkit.Doc(styles=S)
     put("text.label", text.label(doc, "Label one", 960, 300, 1, 4))
     put("text.label.left", text.label(doc, "LEFT & more", 200, 400, 1, 4, anchor="left", size=20, style="caps", tracking=40))
-    put("text.label.right", text.label(doc, "Right", 1700, 400, 1, 4, anchor="right", preset="fade-up", pdur=0.5))
+    put("text.label.right", text.label(doc, "Right", 1700, 400, 1, 4, anchor="right", preset="slide-up", pdur=0.5))
     put("text.label.open", text.label(doc, "Open", 200, 300, 2, None, fin=0.4, peak=0.6))
     put("text.label.step", text.label(doc, "Step", 200, 300, 2, None, fin=0))
     put("text.label.now", text.label(doc, "Now", 200, 300, 0, None, fin=0, peak=0.7))
@@ -110,7 +110,7 @@ def corpus(kit_path, lib=LIB):
     put("shorts.build.registries", doc.paints + doc.assets)
 
     # ---- physics
-    put("physics.block", physics.block(["a"], ['<forceField id="ff" type="gravity"/>']) or "")
+    put("physics.block", physics.block(["a"], ['<forceField id="ff" type="drag"/>']) or "")
     put("physics.block.empty", physics.block([], []) or "<none/>")
 
     # ---- figure
