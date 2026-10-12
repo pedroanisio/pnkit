@@ -6,7 +6,7 @@ sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
 import pnkit
 from pnkit import sdk, text, draw, xml, camera, brand, shorts, captions, physics, figure, audio
 from pnkit.sdk import Xml, S, SchemaValueError
-from c14n import c14n, c14n_numeric, wrap
+from c14n import c14n, wrap
 
 KIT = os.environ.get("PNKIT_KIT") or os.path.join(os.path.dirname(os.path.dirname(os.path.abspath(__file__))), "docs", "palsnotes-brand.xml")
 STYLES = {"text": "pn-body", "caps": "pn-label", "num": "pn-data", "head": "pn-heading", "note": "pn-body", "big": "pn-display"}
@@ -17,6 +17,23 @@ class Values(unittest.TestCase):
         self.assertEqual([sdk.num(0.1 + 0.2), sdk.num(5.0), sdk.num(-0.0001), sdk.num(2.5), sdk.num(7)], [0.3, 5, 0, 2.5, 7])
         el = sdk.new(S.Composition, "layer", id="a", asset="x", x=0.1 + 0.2, y=5.0, anchorX=1 / 3)
         self.assertEqual(str(Xml.of(el)), '<layer id="a" asset="x" x="0.3" y="5" anchorX="0.333"/>')
+
+    def test_a_text_for_a_number_is_written_as_given(self):
+        el = sdk.new(S.Composition, "layer", id="a", asset="x", x="1.000", y="5.0", opacity="0.50")
+        self.assertEqual(str(Xml.of(el)), '<layer id="a" asset="x" x="1.000" y="5.0" opacity="0.50"/>')
+        e2 = sdk.new(S.Composition, "layer", id="a", asset="x")
+        sdk.set_exact(e2, "x", 855.0, repr); sdk.set_exact(e2, "y", 0.5, lambda v: f"{v:.3f}")
+        self.assertEqual(str(Xml.of(e2)), '<layer id="a" asset="x" x="855.0" y="0.500"/>')
+
+    def test_a_name_the_class_shares_is_chosen_through_the_public_api(self):
+        out = sdk.new(S.Scene, "output", id="o", path="o.mp4", codec="h264")
+        thumb = sdk.new(out, "thumbnail", path="t.png")
+        self.assertEqual(thumb.xml_name, "thumbnail")
+        self.assertEqual(sdk.new(out, "poster", path="p.png").xml_name, "poster")
+        sdk.adopt(out, thumb, '<thumbnail path="u.png"/>')
+        self.assertEqual([e.xml_name for e in out.elements()], ["thumbnail", "thumbnail"])
+        import re
+        self.assertIsNone(re.search(r"\._name\b", open(sdk.__file__, encoding="utf-8").read()))   # no private slot
 
     def test_text_attributes_take_the_text(self):
         p = sdk.new(S.Scene, "project", width=1920, height=1080, fps=30, duration=4.0, seed=1)   # fps is xs:string
@@ -177,30 +194,16 @@ class Golden(unittest.TestCase):
     def test_same_entries(self):
         self.assertEqual(sorted(self.new), sorted(self.old))
 
-    # entries that carry an xs:double the old code wrote as "1.000": the SDK writes the shortest form ("1"), so these
-    # compare with c14n_numeric (attribute values -?\d+\.\d+ in shortest form on both sides); every other entry is strict.
-    NUMERIC = {"captions.cue_xml", "captions.cue_xml.width", "captions.sidecar", "captions.sidecar.opts", "captions.short_cues",
-               "shorts.output", "shorts.build.outputs",
-               "assemble.segment", "assemble.segment.pages", "assemble.audio", "assemble.audio.bare", "assemble.audio.stem-full",
-               "assemble.audio.stem-voice", "assemble.audio.stem-music", "assemble.audio.stem-sfx"}
-
     def test_every_entry_is_c14n_equal(self):
+        """strict C14N 2.0 with comments, no allow-list: the numbers read as the old code wrote them ("1.000", "5.0")"""
         bad = []
         for k in sorted(self.old):
             if k.endswith(".ids"):
                 if self.old[k] != self.new[k]:
                     bad.append(k)
-            elif k in self.NUMERIC:
-                if c14n_numeric(wrap(self.old[k])) != c14n_numeric(wrap(self.new[k])):
-                    bad.append(k)
             elif c14n(wrap(self.old[k])) != c14n(wrap(self.new[k])):
                 bad.append(k)
         self.assertEqual(bad, [])
-
-    def test_the_numeric_allow_list_is_needed(self):
-        """an entry leaves the allow-list as soon as it is strictly equal"""
-        for k in self.NUMERIC:
-            self.assertNotEqual(c14n(wrap(self.old[k])), c14n(wrap(self.new[k])), k)
 
     def test_every_assembled_document_checks_clean_and_round_trips(self):
         """the documents the engine renders: level 1 clean, and `read` then `to_bytes` is C14N-equal"""
@@ -214,7 +217,7 @@ class Golden(unittest.TestCase):
     def test_strings_keep_the_old_attribute_order(self):
         """byte identity of the fragments, except where the SDK escapes less (a '>' in an attribute) or more"""
         same = [k for k in self.old if self.old[k] == self.new[k]]
-        self.assertGreater(len(same), len(self.old) * 0.6, sorted(set(self.old) - set(same)))
+        self.assertGreaterEqual(len(same), 58, sorted(set(self.old) - set(same)))
 
 
 if __name__ == "__main__":

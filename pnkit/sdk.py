@@ -1,4 +1,4 @@
-"""pnkit.sdk — the one place where pnkit meets `sr_core.scene`, the Python scene SDK (sr-core >= 1.7.0).
+"""pnkit.sdk — the one place where pnkit meets `sr_core.scene`, the Python scene SDK (sr-core >= 1.8.0).
 
 Every pnkit component that writes scene XML builds `sr_core.scene` elements through this module: the SDK enforces
 the element's parent, its attributes, enumeration values and the order of a document's sections when the element
@@ -20,11 +20,10 @@ attribute the parent does not allow raises `SchemaValueError` / `AttributeError`
 
 Numbers
 -------
-pnkit writes floats to three decimals without trailing zeros (`pnkit.xml.f`). `put()` hands the SDK the value that
-form reads back as (an int when it is whole, else a float), so the SDK writes the same digits. An attribute
-whose type is xs:string (`fps`, a key's `value`) gets the text. A text given for a numeric attribute is kept as given
-where the type is a decimal, and read as a number where it is an xs:double (the SDK writes a double in its shortest
-form: `855.0` is written `855`, it cannot be written otherwise).
+pnkit writes floats to three decimals without trailing zeros (`pnkit.xml.f`). `put()` hands the SDK that text, and the
+SDK keeps a valid lexical form of a number as given (sr-core 1.8.0), so the document carries the digits pnkit 0.8.0
+wrote, `855.0` and `1.000` too where a caller formats them (`set_exact`, the caption times). The SDK checks the
+text against the attribute's type and facets. An attribute whose type is xs:string (`fps`, a key's `value`) gets the text.
 """
 import keyword
 import re
@@ -38,14 +37,23 @@ from ._num import f
 __all__ = ["Xml", "BuildError", "num", "put", "new", "adopt", "parse_fragment", "parse_sections", "parse_num", "xml_of", "frag", "text_of", "ws", "add", "indent", "set_exact",
            "attrs_of", "errors", "S", "SchemaValueError"]
 
-MIN_SDK = "1.7.0"
+MIN_SDK = "1.8.0"
 
 
 def _need(version):
-    got = tuple(int(x) for x in re.findall(r"\d+", getattr(S, "__version__", None) or __import__("sr_core").__version__)[:3])
-    if got < tuple(int(x) for x in version.split(".")):
-        raise ImportError(f"pnkit needs sr-core >= {version} (sr_core.scene), found {'.'.join(map(str, got))}: "
-                          f"install it from the sr-core repository")
+    """pnkit needs two features of the SDK, both listed under sr-core's Unreleased changelog until `version` is
+    tagged: a number attribute takes a valid lexical `str` and writes it as given, and a class that covers several
+    element names takes the constructor keyword `xml_name`. They are tested, not inferred from the version number,
+    so that a checkout of sr-core that has them works before the tag exists."""
+    try:
+        ok = (S.Still(xml_name="thumbnail", path="a.png").xml_name == "thumbnail"
+              and b'shutterPhase="0.3000"' in S.to_bytes(S.Project(shutterPhase="0.3000")))
+    except (TypeError, AttributeError, SchemaValueError):
+        ok = False
+    if not ok:
+        found = getattr(S, "__version__", None) or getattr(__import__("sr_core"), "__version__", "?")
+        raise ImportError(f"pnkit needs sr-core >= {version} (sr_core.scene: lexical str values and the xml_name "
+                          f"constructor keyword), found {found}: install it from the sr-core repository")
 
 
 _need(MIN_SDK)
@@ -136,7 +144,6 @@ def frag(elements, sep="\n"):
 
 _WHOLE = re.compile(r"-?\d+")
 _NUMBER = re.compile(r"-?\d+(?:\.\d+)?")
-_learned = {}                       # (class, attribute) -> True when the attribute takes text, not a number
 
 
 def parse_num(s, default=None):
@@ -175,21 +182,7 @@ def put(el, name, value):
                 raise err from None
         return
     if isinstance(value, (int, float)):
-        key = (type(el), py)
-        err = None
-        if not _learned.get(key):
-            try:
-                setattr(el, py, num(value))
-                return
-            except SchemaValueError as e:
-                err = e
-        try:
-            setattr(el, py, f(value))
-            _learned[key] = True
-        except SchemaValueError:
-            if err is not None:
-                raise err from None
-            raise
+        setattr(el, py, f(value))    # the text of pnkit's form; the SDK keeps a valid lexical form as given
         return
     if isinstance(value, str):
         try:
@@ -206,19 +199,10 @@ def put(el, name, value):
 
 
 def set_exact(el, name, value, fmt):
-    """set one attribute to a value written exactly as `fmt(value)`: a number goes to the SDK as the number when the
-    attribute is a number (an xs:double is written in its shortest form), else as the `fmt` text. For callers whose
-    numbers are not pnkit's 3-decimal form (the pixel-art builder rounds to 6)."""
-    if isinstance(value, (int, float)) and not isinstance(value, bool):
-        try:
-            setattr(el, _py(name), round(value, 6) if isinstance(value, float) else value)
-            return
-        except SchemaValueError:
-            pass
-    if isinstance(value, bool):
-        put(el, name, value)
-        return
-    put(el, name, fmt(value))
+    """set one attribute to the text `fmt(value)`, as given: the SDK keeps a valid lexical form verbatim (sr-core
+    1.8.0), so a number is written as the formatter of the old code wrote it (`855.0`, `-14.0`, the pixel-art builder's
+    6 decimals). A bool goes through `put`."""
+    put(el, name, value if isinstance(value, bool) else fmt(value))
 
 
 def attrs_of(text):
@@ -236,9 +220,7 @@ def new(parent, name, /, *children, **attrs):
     with `attrs` set in the order given (None skipped) and `children` adopted. Raises if `parent` does not allow
     `<name>`."""
     cls = _class(parent, name)
-    el = cls()
-    if name != el.xml_name and name in cls._element_names:
-        el._name = name          # an alias (<thumbnail> for <poster>): the SDK's public API cannot choose it, see README
+    el = cls(xml_name=name)      # a class that covers several names (<poster>, <thumbnail>) takes the one asked for
     for k, v in attrs.items():
         put(el, k, v)
     if children:
@@ -264,9 +246,7 @@ def _space(text):
 
 def _build(parent, node):
     cls = _class(parent, node.tag)
-    el = cls()
-    if node.tag != el.xml_name and node.tag in cls._element_names:
-        el._name = node.tag
+    el = cls(xml_name=node.tag)
     for k, v in node.attrib.items():
         put(el, k, v)
     children = list(node)

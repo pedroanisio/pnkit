@@ -11,7 +11,7 @@ text layers with the 36 px floor, self-drawing paths, pills, the 2D camera with 
 the brand kit's prologue and components, captions, the Shorts overlay and spans, the physics block, baked
 tapered-tube meshes for 3D geometry no native primitive covers, and an articulated 3D figure built from them.
 
-Since 1.0 pnkit builds its scenes with **`sr_core.scene`**, the Python scene SDK of sr-core (>= 1.7.0, installed from the
+Since 1.0 pnkit builds its scenes with **`sr_core.scene`**, the Python scene SDK of sr-core (>= 1.8.0, installed from the
 sr-core repository; `kit.json` records it under `requires.dependencies`). Nothing writes angle brackets by hand: a
 component creates SDK elements, so an element in the wrong parent, an undeclared attribute, a bad enumeration value or a
 colour that is not `#RRGGBB` raises when the element is made, not in a render.
@@ -28,11 +28,12 @@ colour that is not `#RRGGBB` raises when the element is made, not in a render.
   a level-1 error, and `write()` writes nothing then. `pnkit.pixelart.ctx.Ctx` and `pnkit.filmbuild.assemble` build
   `Scene`s the same way (`Ctx.check_scene()`). `filmbuild`'s other modules, and `tools/gate.py`, `caption_gate.py`,
   `instance_clock.py`, only orchestrate or read documents, and are unchanged.
-- **Numbers.** pnkit's 3-decimal form (`pnkit.xml.f`) is kept: the SDK is given the value that form reads back as. One
-  limit of the SDK: it writes an `xs:double` in its shortest form (`855`, never `855.0`; a text `"855.0"` is refused), so a
-  document that 0.8 wrote with `time="855.0"` or `start="1.000"` is now written `855` / `1`. It is the same value
-  (CHANGELOG 1.0.0 lists the goldens this touches and how they are compared).
-- **Output equality.** `tests/golden/` compares C14N 2.0 with comments (`tests/c14n.py`), not bytes.
+- **Numbers.** pnkit's 3-decimal form (`pnkit.xml.f`) is kept: the SDK is given that text, and sr-core 1.8.0 writes a valid
+  lexical form of a number as given. Where 0.8 wrote another form (`time="855.0"`, `start="1.000"`, `gain="-13.0"`) the
+  component formats the number as 0.8 did and hands the SDK that text (`sdk.set_exact`, the caption times), so the document
+  carries the same digits.
+- **Output equality.** `tests/golden/` compares C14N 2.0 with comments (`tests/c14n.py`), with no normalisation. The bytes
+  differ from 0.8's only where the SDK serialises differently from ElementTree (see `tests/golden/README.md`).
 
 It is a Python package. It writes inline XML (through the SDK). It does not use
 `<include>` or symbol instances, because neither can carry per-use text: an included document resolves with its
@@ -47,7 +48,7 @@ to 0.8 on the component corpus and on all 32 Lula scenes (see `tests/golden/` an
 
 ```
 pnkit/            the package; vendored into projects as film/vendor/pnkit/
-  sdk.py          the one place pnkit meets sr_core.scene: Xml, new, adopt, put, add, BuildError (needs sr-core >= 1.7.0)
+  sdk.py          the one place pnkit meets sr_core.scene: Xml, new, adopt, put, add, BuildError (needs sr-core >= 1.8.0)
   _num.py         f (3-decimal numbers) and esc, shared by xml.py and sdk.py
   xml.py          f, esc, Ids, animate, opacity, keys, path_d, hash01, HASH_EXPR, fmt
   doc.py          Doc: frame, text-role styles, ids, registries (assets, paints, materials, fields, bodies); build, check, to_bytes, write

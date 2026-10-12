@@ -1,8 +1,9 @@
 # Golden tests
 
 A golden test rebuilds a delivered project with the vendored pnkit and compares the scene it writes with the
-delivered one. From 1.0 the comparison is C14N 2.0 with comments (`tests/c14n.py`), because the scene SDK writes
-numbers in their shortest form; the goldens frozen from pnkit 0.8.0 (below) are the reference for 1.0. A release of
+delivered one. From 1.0 the comparison is C14N 2.0 with comments (`tests/c14n.py`), strict, with no normalisation of numbers: the scene
+SDK (sr-core >= 1.8.0) writes a number as the text it is given, and pnkit gives the text 0.8.0 wrote. The goldens frozen from
+pnkit 0.8.0 (below) are the reference for 1.0. A release of
 pnkit must pass every golden test listed here. If a change is meant to alter output, it must say so in the CHANGELOG
 and bump the version as a breaking change.
 
@@ -11,11 +12,13 @@ and bump the version as a breaking change.
 - `components-0.8.0.json` + `components_corpus.py`: what 0.8.0 wrote for 78 fixed calls of every component that writes scene XML
   (xml, text, draw, camera, brand, captions, shorts, physics, figure, audio, filmbuild.assemble). Regenerate the reference
   from an old checkout with `python3 components_corpus.py KIT OLD_LIB > components-0.8.0.json`. Checked in
-  `tests/test_sdk.py` (`Golden`): 63 entries are strictly C14N-equal; the entries in `Golden.NUMERIC` carry an
-  xs:double the old code wrote as `1.000` / `5.0` and are compared with `c14n_numeric`.
-- `pixelart/lula-3.0.0.json`: per scene `sha256` (0.8.0 bytes, record only), `c14n_sha256` and `c14n_numeric_sha256`.
-  1.0 matches `c14n_numeric_sha256` for all 32 scenes (`PNKIT_LULA_ALL=1`, about 45 s; 3 scenes by default) and its
-  scenes are level-1 clean (`tools/pixelart/lula_alias.py --numeric`).
+  `tests/test_sdk.py` (`Golden`): all 78 entries are strictly C14N-equal (or have equal id lists), 58 also byte-identical as strings.
+- `pixelart/lula-3.0.0.json`: per scene `sha256` (0.8.0 bytes, record only) and `c14n_sha256`.
+  1.0 matches `c14n_sha256` for all 32 scenes (`PNKIT_LULA_ALL=1`, about 45 s; 3 scenes by default) and its
+  scenes are level-1 clean (`tools/pixelart/lula_alias.py --c14n`). The bytes differ from `sha256` in every scene, only by
+  what the SDK serialises differently from ElementTree: `<?xml version="1.0" encoding="UTF-8"?>` (ET wrote single quotes
+  and `utf-8`), `/>` (ET wrote ` />`), a literal `>` in an attribute value (ET wrote `&gt;`), and a final newline. With those
+  four undone on the new bytes, all 32 hash to `sha256`.
 
 ## The v013 project goldens (byte for byte, 0.1.0 to 0.8.0)
 

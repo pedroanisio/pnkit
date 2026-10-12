@@ -7,20 +7,21 @@ to hide it. Each release names the golden projects it was checked against.
 
 ## 1.0.0 — 2026-10-12 — rebuilt on `sr_core.scene` (major)
 
-Major: pnkit no longer writes XML text. Every component builds `sr_core.scene` elements (sr-core >= 1.7.0, installed from the
+Major: pnkit no longer writes XML text. Every component builds `sr_core.scene` elements (sr-core >= 1.8.0, installed from the
 sr-core repository; `kit.json` `requires.dependencies`), part 3 of sr-core SREP 0000 (D10, open issue 6.3). The public
 functions and their signatures are unchanged; what they return is now `pnkit.sdk.Xml`, a `str` of the same XML that also holds
 the SDK elements, so existing callers work unchanged (the least disruptive design: no `*_xml` twins).
 
-Why a major: output is no longer byte-identical to 0.8. The SDK writes an `xs:double` in its shortest form and cannot write
-`855.0`. Every golden below is therefore compared as C14N 2.0 with comments (`tests/c14n.py`); where the old text has a plain
-decimal such as `1.000` or `5.0`, the comparison also rewrites plain decimals to their shortest form (`c14n_numeric`), nothing
-else. Goldens checked against the 0.8.0 reference (ac380b2):
-- component corpus, 78 entries (`tests/golden/components-0.8.0.json`): 63 strictly C14N-equal (or equal id lists), the 15 that carry a double the
-  old code wrote with trailing zeros equal under `c14n_numeric` (captions, Shorts outputs, filmbuild documents); 53 are
+Why a major: output is no longer byte-identical to 0.8 (the SDK serialises the XML declaration, empty elements, `>` in an
+attribute and the final newline differently from ElementTree), and it requires the SDK. Every golden below is compared as
+C14N 2.0 with comments (`tests/c14n.py`), strictly: no number is normalised. sr-core 1.8.0 writes a valid lexical form of a
+number as given, so a component that 0.8 wrote with `1.000`, `5.0` or `-13.0` hands the SDK that text. Goldens checked
+against the 0.8.0 reference (ac380b2):
+- component corpus, 78 entries (`tests/golden/components-0.8.0.json`): 78 strictly C14N-equal (or equal id lists); 58 are
   also byte-identical as strings.
-- all 32 Lula 3.0.0 scenes (`tests/golden/pixelart/lula-3.0.0.json`): equal under `c14n_numeric` (every scene differs
-  under strict C14N: `time`/`end`/`clipIn` such as `855.0`), and level-1 clean (`PNKIT_LULA_ALL=1`).
+- all 32 Lula 3.0.0 scenes (`tests/golden/pixelart/lula-3.0.0.json`): 32 strictly C14N-equal and level-1 clean
+  (`PNKIT_LULA_ALL=1`). None is byte-identical: after the four serialisation differences above are undone on the SDK's
+  bytes, all 32 match 0.8.0's `sha256`, so nothing else differs.
 - the v013 project goldens of 0.1.0 to 0.8.0 were byte-for-byte, not C14N, and are not re-run by this suite (they need that
   project on disk); they are superseded by the corpus above for the components they exercise.
 
@@ -28,13 +29,13 @@ Added
 - `pnkit.sdk`: `Xml`, `new`, `adopt`, `put`, `add`, `indent`, `set_exact`, `parse_fragment`, `BuildError`.
 - `Doc.build`, `Doc.check` (the `sr_core.scene.check` findings), `Doc.to_bytes`, `Doc.write`; `build()` and `write()` raise
   `BuildError` on level-1 errors. `Ctx.check_scene()`. `xml.animate()`. `Cam.group()` (the element form of `open()` + `CLOSE`).
-- `tools/pixelart/lula_alias.py --c14n | --numeric`, and a level-1 check of each scene.
+- `tools/pixelart/lula_alias.py --c14n`, and a level-1 check of each scene.
 
 Changed
 - Ported: xml, text, draw, camera, brand, captions, shorts, physics, figure, audio, pixelart.ctx, filmbuild.assemble.
   Unchanged (orchestrate or read only): the other filmbuild modules, mesh, vo, files, timings, pixel, palette, tools/.
 - `Brand.prologue` reads the kit with `sr_core.scene.read` (a parameter default must exist exactly once, else `KeyError`).
-- An `xs:double` is written shortest (`855`, `1`, `0.75`): the same value as before, a different text.
+- A number is written as the text pnkit gives the SDK (sr-core 1.8.0 keeps a valid lexical form as given): the digits of 0.8.
 - `text`, `draw` and `Brand` arguments `extra=`/`content=`/group items accept an element, an `Xml` or an XML string; a string is
   parsed against its parent.
 
@@ -45,11 +46,13 @@ Found by the SDK (each was a latent invalid output or input in 0.8; none changed
 - `physics.block` with `<forceField type="gravity"/>` (the corpus call): `gravity` is not a force-field type; the corpus uses `drag`.
 - `tests/test_core.py` drew with `#fff` / `#000` (3-digit colours are not `#RRGGBB`) and grouped `<a/>` / `<b/>` (not scene
   elements); now `#FFFFFF`, `#000000` and `<group/>`. The 0.8 code wrote these without complaint.
-- Real SDK limits, with reproducers in the 1.0.0 report: an `xs:double` cannot be written as `2.0` (`g.start = 2.0` writes
-  `2`, `g.start = "2.0"` is refused, although `read` keeps `2.0`); `Still(...)` is always written `<poster>`, never `<thumbnail>`
-  (pnkit sets the element name to keep 0.8's `<thumbnail>`, a private slot).
+- Two limits of the SDK 1.7.0, both lifted in sr-core 1.8.0 (which pnkit therefore requires): an `xs:double` could not be
+  written as `2.0` (`g.start = "2.0"` was refused, although `read` kept `2.0`), and `Still(...)` was always written
+  `<poster>`, never `<thumbnail>` (pnkit set the private name slot). Now a valid lexical `str` is kept as given and
+  `Still(xml_name="thumbnail")` is public (`sdk.new` and the string parser use it). `sdk.py` tests for both features
+  instead of reading the version, so a checkout of sr-core that has them works before 1.8.0 is tagged.
 
-Tests: 310 passed / 6 skipped before; 338 passed / 5 skipped after (default run, by file), 2 more with `PNKIT_LULA_ALL=1`.
+Tests: 310 passed / 6 skipped before; 339 passed / 5 skipped after (default run, by file, `PNKIT_KIT` set; the 4 skips need numpy and scipy), 340 passed with `PNKIT_LULA_ALL=1`.
 
 ## 0.8.0 — 2026-10-10 — the film kit: the pixel-art picture framework and film_build
 
