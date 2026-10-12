@@ -128,6 +128,28 @@ def corpus(kit_path, lib=LIB):
     c.sfx(12.5, "clunk", 0.26); c.sfx(0.65, "paper"); c.sfx(3.0, "clunk")
     put("audio.assets", c.assets(30.0, tag="s06", digest=lambda n: "ab" * 32))
     put("audio.tracks", c.tracks(30.0))
+
+    # ---- filmbuild.assemble: the documents the engine renders (bytes; the XML declaration differs by writer, C14N does not see it)
+    from pnkit.filmbuild import assemble, config
+    scene = (b'<scene version="1.1"><project width="1920" height="1080" fps="24" duration="1" seed="1945" background="#13191e" quality="final"/>'
+             b'<symbols><symbol id="c1" width="12" height="12"><group id="c1g" x="0" y="0" condition="time&lt;1"/></symbol></symbols>'
+             b'<composition><group id="s02_g1" start="2.5" end="5" name="s02a_rua"><group id="s02_g2" x="0" y="0"/>'
+             b'<group id="s02_g3" start="2.505" end="4"/><group id="s02_g4" start="3" end="4"/></group>'
+             b'<group id="s02_g5" start="5" end="6"/></composition></scene>')
+    slot = {"n": 2, "id": "s02", "slot_start": 2.5, "slot_end": 5.0}
+    dec = lambda b: b.decode("utf-8").split("?>", 1)[1].strip()
+    put("assemble.segment", dec(assemble.segment_xml(scene, slot, 5.0, "seg/s02.mp4", title="Mini film")))
+    put("assemble.segment.pages", dec(assemble.segment_xml(scene, slot, 5.0, "seg/s02.mp4", title="Mini film",
+                                                              pages=[(["HELLO", "WORLD"], 2.5, 3.5), (["ONE LINE"], 3.5, 5.0)])))
+    mix = config.DEFAULTS["audio"]
+    proj = {"width": 1920, "height": 1080, "fps": 24}
+    assets = {"score": ("audio/score.wav", "0" * 64), "v1": ("audio/v1.wav", "1" * 64), "fx": ("audio/fx.wav", "2" * 64)}
+    voices = [("v1", 0.5), ("v1", 3.25)]
+    put("assemble.audio", dec(assemble.audio_xml(proj, 5.0, assets, voices, "score", "fx", mix)))
+    put("assemble.audio.bare", dec(assemble.audio_xml(proj, 5.0, {}, [], None, None, mix)))
+    for stem in ("full", "voice", "music", "sfx"):
+        put(f"assemble.audio.stem-{stem}", dec(assemble.audio_xml(proj, 5.0, assets, voices, "score", "fx", mix, stem=stem)))
+    put("assemble.music_layer", assemble.music_layer(assemble.audio_xml(proj, 5.0, assets, voices, "score", "fx", mix)))
     return out
 
 

@@ -180,7 +180,9 @@ class Golden(unittest.TestCase):
     # entries that carry an xs:double the old code wrote as "1.000": the SDK writes the shortest form ("1"), so these
     # compare with c14n_numeric (attribute values -?\d+\.\d+ in shortest form on both sides); every other entry is strict.
     NUMERIC = {"captions.cue_xml", "captions.cue_xml.width", "captions.sidecar", "captions.sidecar.opts", "captions.short_cues",
-               "shorts.output", "shorts.build.outputs"}
+               "shorts.output", "shorts.build.outputs",
+               "assemble.segment", "assemble.segment.pages", "assemble.audio", "assemble.audio.bare", "assemble.audio.stem-full",
+               "assemble.audio.stem-voice", "assemble.audio.stem-music", "assemble.audio.stem-sfx"}
 
     def test_every_entry_is_c14n_equal(self):
         bad = []
@@ -199,6 +201,15 @@ class Golden(unittest.TestCase):
         """an entry leaves the allow-list as soon as it is strictly equal"""
         for k in self.NUMERIC:
             self.assertNotEqual(c14n(wrap(self.old[k])), c14n(wrap(self.new[k])), k)
+
+    def test_every_assembled_document_checks_clean_and_round_trips(self):
+        """the documents the engine renders: level 1 clean, and `read` then `to_bytes` is C14N-equal"""
+        docs = [k for k in self.new if k.startswith("assemble.") and k != "assemble.music_layer"]
+        self.assertEqual(len(docs), 8)
+        for k in docs:
+            scene = S.read(self.new[k].encode("utf-8"))
+            self.assertEqual([x for x in S.check(scene) if x.severity == "error"], [], k)
+            self.assertEqual(c14n(S.to_bytes(scene).decode("utf-8")), c14n(self.new[k]), k)
 
     def test_strings_keep_the_old_attribute_order(self):
         """byte identity of the fragments, except where the SDK escapes less (a '>' in an attribute) or more"""

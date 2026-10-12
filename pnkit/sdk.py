@@ -35,7 +35,7 @@ from sr_core.scene import SchemaValueError
 
 from ._num import f
 
-__all__ = ["Xml", "BuildError", "num", "put", "new", "adopt", "parse_fragment", "parse_sections", "parse_num", "xml_of", "frag", "text_of", "ws", "add", "indent",
+__all__ = ["Xml", "BuildError", "num", "put", "new", "adopt", "parse_fragment", "parse_sections", "parse_num", "xml_of", "frag", "text_of", "ws", "add", "indent", "set_exact",
            "attrs_of", "errors", "S", "SchemaValueError"]
 
 MIN_SDK = "1.7.0"
@@ -193,6 +193,22 @@ def put(el, name, value):
                 raise err from None
         return
     setattr(el, py, value)
+
+
+def set_exact(el, name, value, fmt):
+    """set one attribute to a value written exactly as `fmt(value)`: a number goes to the SDK as the number when the
+    attribute is a number (an xs:double is written in its shortest form), else as the `fmt` text. For callers whose
+    numbers are not pnkit's 3-decimal form (the pixel-art builder rounds to 6)."""
+    if isinstance(value, (int, float)) and not isinstance(value, bool):
+        try:
+            setattr(el, _py(name), round(value, 6) if isinstance(value, float) else value)
+            return
+        except SchemaValueError:
+            pass
+    if isinstance(value, bool):
+        put(el, name, value)
+        return
+    put(el, name, fmt(value))
 
 
 def attrs_of(text):

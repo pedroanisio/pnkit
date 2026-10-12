@@ -95,13 +95,7 @@ def fmt(v):
 
 def _set(el, name, v):
     """one attribute: the value as the SDK's type takes it (a number as a number, else its `fmt` text)"""
-    if isinstance(v, (int, float)) and not isinstance(v, bool):
-        try:
-            setattr(el, sdk._py(name), round(v, 6) if isinstance(v, float) else v)
-            return
-        except sdk.SchemaValueError:
-            pass
-    sdk.put(el, name, fmt(v))
+    sdk.set_exact(el, name, v, fmt)
 
 
 def E(p, tag, **attrs):
