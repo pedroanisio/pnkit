@@ -12,7 +12,9 @@ the brand kit's prologue and components, captions, the Shorts overlay and spans,
 tapered-tube meshes for 3D geometry no native primitive covers, and an articulated 3D figure built from them.
 
 Since 1.0 pnkit builds its scenes with **`sr_core.scene`**, the Python scene SDK of sr-core (>= 1.8.0, installed from the
-sr-core repository; `kit.json` records it under `requires.dependencies`). Nothing writes angle brackets by hand: a
+sr-core repository; `kit.json` records it under `requires.dependencies`). 1.8.0 is not tagged yet: until it is, a main
+checkout with the two 1.8.0 SDK features pnkit needs works, because `pnkit.sdk` tests for the features, not the version
+(the CHANGELOG's 1.0.0 entry names them). Nothing writes angle brackets by hand: a
 component creates SDK elements, so an element in the wrong parent, an undeclared attribute, a bad enumeration value or a
 colour that is not `#RRGGBB` raises when the element is made, not in a render.
 
@@ -38,7 +40,7 @@ colour that is not `#RRGGBB` raises when the element is made, not in a render.
 It is a Python package. It writes inline XML (through the SDK). It does not use
 `<include>` or symbol instances, because neither can carry per-use text: an included document resolves with its
 own parameter defaults, and `encode` drops `<override>` on instances after the first frame (guide §6, Avoid 1).
-The brand kit, `docs/palsnotes-brand.xml` in this repository (also reachable as `~/videos/docs/palsnotes-brand.xml`, a symlink kept for older projects), stays the source of truth for tokens and styles. `docs/` also holds the thumbnail and cover guide (`thumbnail.md`) and the kit's fonts with their licence. pnkit reads
+The brand kit, `docs/palsnotes-brand.xml` in this repository (also reachable as `~/videos/docs/palsnotes-brand.xml` on the production machine, a symlink kept for older projects), stays the source of truth for tokens and styles. `docs/` also holds the thumbnail and cover guide (`thumbnail.md`) and the kit's fonts with their licence. pnkit reads
 the copy each project pins, and `pnkit.palette.check()` compares pnkit's hex constants with the kit.
 
 Version 0.1.0 was extracted from v013 "How Jev works" and rebuilt its `film.scene.xml` byte for byte; 1.0 is C14N-equal
@@ -88,11 +90,15 @@ timings.py        load and diff word-timings files
 kit.json          the catalog: every component, its parameters and the guide rules it satisfies
 tools/sync.py     vendor pnkit into a project and write its lock
 tools/check_lock.py   verify a project's vendored copy against its lock
-tools/gate.py     validate --deny-warnings, eval at probe times (E05/E06), flash-check state
+tools/gate.py     validate --deny-warnings, eval at probe times (E05/E06), flash-check state; reads the
+                  scene-render-cli/1 JSON envelope (scene-render >= 0.6.0), falls back to the human format
 tools/vo_probe.py how Kokoro reads a line, heard back by Whisper, with internal pauses (voice venv)
 tools/foley.py    synthesise the palette's own sounds into sfx/custom (struck bodies, filtered noise; voice venv)
 tools/tail_check.py   measure an encoded film's ending: cues, held pure tone, glide, decay (voice venv)
 tools/flat_field.py   flat or empty picture on rendered frames of a pixel-art film (Pillow; thresholds judged by eye)
+tools/scopes_check.py levels of rendered frames or an encoded film through `scene-render scopes` (>= 0.6.0): illegal
+                  codes, out-of-gamut and oversaturated samples fail past a threshold (default 0); clipping is
+                  reported, gated only with --max-clipped; run on the render host
 tools/instance_clock.py   an <instance> with no `start` whose symbol reads `time` in a condition (also run by gate.py)
 tools/cue_drift.py    word-tied score markers against the film's current word timings; exit 1 over --tol (0.10 s)
 tools/vm_preflight.py  before a batch: reachability, free disk, who holds ~/heavy.lock, CPU model, cross-VM frame hashes
@@ -106,7 +112,8 @@ tests/            unit tests (python3 -m unittest discover -s tests) and the gol
 
 ## Using it in a project
 
-1. Vendor it: `python3 ~/videos/lib/tools/sync.py PROJECT_DIR`. This copies the package and `kit.json` to
+1. Vendor it: `python3 LIB/tools/sync.py PROJECT_DIR`, where `LIB` is this library's checkout (on the production
+   machine, `~/videos/lib`, a symlink; the commands below write `LIB` the same way). This copies the package and `kit.json` to
    `PROJECT_DIR/film/vendor/pnkit/`, creates `film/vendor/__init__.py`, and writes `film/vendor/pnkit.lock`
    with the version, the library commit and the SHA-256 of each file. The copy travels with the project, so a
    `.vpkg.zip` builds on another machine. pnkit has no `~` or absolute paths, and it passes the vpkg
@@ -137,10 +144,10 @@ tests/            unit tests (python3 -m unittest discover -s tests) and the gol
    `BRAND.assets` with the assets and `BRAND.overlays` after the finish adjustment. Captions:
    `pnkit.captions.sidecar(words)`. Shorts: `pnkit.shorts.build(DOC, SHORTS, segs_of, cues_of, overlay_of, ...)`,
    where `overlay_of` calls `pnkit.shorts.overlay(..., subject=<the episode's drawing>, hook_title=...)`.
-   `~/videos/done/v013-jev-decisions/film/` is the worked example once `tests/golden/v013-to-pnkit.diff` is applied.
+   `~/videos/done/v013-jev-decisions/film/` (the production machine's archive of finished projects) is the worked example once `tests/golden/v013-to-pnkit.diff` is applied.
    Narration: `from vendor.pnkit import vo`, then `say = vo.speak(text, "en")` (numbers in words by the project),
    `vo.hazards(say, "en")` before synthesis, and `vo.asr_normalise` on both sides of the Whisper check. Test a new term
-   with `~/.venvs/voice/bin/python ~/videos/lib/tools/vo_probe.py --lang en "bare." "respelled."` and add it to
+   with `~/.venvs/voice/bin/python LIB/tools/vo_probe.py --lang en "bare." "respelled."` and add it to
    `pnkit/data/vo_lexicon.json` with its source (guide §12 step 3).
    Written-form captions (a film whose voice says "doze vírgula quatro por cento" and whose screen says "12,4%"): never
    rebuild captions from the spoken text. Keep the approved written text, synthesise from
@@ -149,10 +156,10 @@ tests/            unit tests (python3 -m unittest discover -s tests) and the gol
    engine="elevenlabs")` gives `[(word, start, end)]` with "12,4%" carrying the start of "doze" and the end of "cento",
    ready for `captions.sidecar(words)`. The map comes from `vo.speak_map`, so a text that differs from what was spoken
    raises `captions.CaptionAlignError` naming the token, instead of a guess. Before delivery run the text gate on the
-   finished cues, `python3 ~/videos/lib/tools/caption_gate.py film.scene.xml --approved approved.txt --lang pt-br`
+   finished cues, `python3 LIB/tools/caption_gate.py film.scene.xml --approved approved.txt --lang pt-br`
    (or `captions.check_text(cues, approved, "pt-br")`): it fails on a clause that was cut and is still shown, a stale
    copy of the text, and spelled-out "vírgula" / "por cento" / number words where the approved text has digits. When a
-   narration is re-voiced, `python3 ~/videos/lib/tools/timings_diff.py old.json new.json` lists what moved (the simple
+   narration is re-voiced, `python3 LIB/tools/timings_diff.py old.json new.json` lists what moved (the simple
    format is `[{"sentence": id, "text": ..., "words": [[word, start, end], ...]}]`; the Lula `timings-v2.json` shape is
    read as it is). Letter-name respellings (ABC -> "á bê cê") are approved by ear: Whisper cannot verify them.
    Sound: `from vendor.pnkit import audio`, then `CUES = audio.Cues()`, `CUES.sfx(t, "clunk", 0.26)` and
@@ -160,17 +167,20 @@ tests/            unit tests (python3 -m unittest discover -s tests) and the gol
    an unknown name raises `audio.AudioDesignError`. Before writing the document call `CUES.check(voice_end, duration)`:
    after the last word only soft struck foley may start. Write `CUES.assets(duration, tag, digest)` with the assets and
    `CUES.tracks(duration)` in the audio mix, and call `CUES.bake_beds(ROOT, duration, tag)` so each bed ends with the
-   film. Make the palette's own files once per project with `~/.venvs/voice/bin/python ~/videos/lib/tools/foley.py`
+   film. Make the palette's own files once per project with `~/.venvs/voice/bin/python LIB/tools/foley.py`
    (run in the project directory). After the encode, `tools/tail_check.py out/film.mp4 --voice-end T --scene
-   film.scene.xml` measures the ending itself. `~/videos/done/v015-short-pack` is where the rule and the palette come from.
+   film.scene.xml` measures the ending itself. `~/videos/done/v015-short-pack` (in that archive) is where the rule and the palette come from.
 3. Keep episode code in the project: the timeline, acts, subjects and emblems, effects and sound. Pass them in
    where pnkit takes a callable or a parameter.
-4. Before delivery, run `python3 ~/videos/lib/tools/check_lock.py PROJECT_DIR`, which checks that the copy is
-   untouched and pinned. Then run `python3 ~/videos/lib/tools/gate.py PROJECT_DIR/film.scene.xml`, which runs
+4. Before delivery, run `python3 LIB/tools/check_lock.py PROJECT_DIR`, which checks that the copy is
+   untouched and pinned. Then run `python3 LIB/tools/gate.py PROJECT_DIR/film.scene.xml`, which runs
    validate with warnings as errors, then eval at 0 s (`--probe` and `--markers` add times) and once per layout
    and variant. It
    reports override and target errors (E05, E06), which validate does not see. It also reports whether the
-   flash check is on. A scene can validate clean and still fail the gate.
+   flash check is on. A scene can validate clean and still fail the gate. After the encode, on the render host,
+   `python3 LIB/tools/scopes_check.py out/film.mp4 --step 24` fails the film on illegal codes, out-of-gamut or
+   oversaturated samples (`scene-render scopes`, >= 0.6.0); clipping is reported, and gated only when the project
+   sets `--max-clipped` (clipped white can be a legitimate specular).
 
 ### Pixel-art films
 
@@ -185,7 +195,7 @@ the checks at two points:
   orphaned from its label) and `scale_off_grid` (a scale that is not a whole number). Fail the build on a finding, or
   waive it in the project with a reason. pnkit takes numbers, not the project's context, so the project calls these
   where it places a zoom, an actor or a plate.
-- **On the first rendered frame of each shot** (a still is enough): `python3 ~/videos/lib/tools/flat_field.py --bg
+- **On the first rendered frame of each shot** (a still is enough): `python3 LIB/tools/flat_field.py --bg
   '#rrggbb' frame.png ...` reports an empty background or a flat field with the frame path. Its thresholds were judged
   by eye on about 12 frames of one film; they are parameters, not a measured precision. A pass is not proof.
 
@@ -214,7 +224,7 @@ Three habits from the Lula 3.0.0 film, each with a tool or helper here.
 ## Library first: rule text for the production guide (draft)
 
 > **Library first (Default).** Before writing a helper or a brand component in an episode's generators, look it
-> up in `~/videos/lib/kit.json`. If pnkit has it, vendor pnkit (`tools/sync.py`) and use it. Do not copy its code
+> up in the library's `kit.json` (`LIB/kit.json`). If pnkit has it, vendor pnkit (`tools/sync.py`) and use it. Do not copy its code
 > into the project. Don't fork it there either.
 >
 > - **When pnkit needs to change.** If you need a parameter, a default or a component it lacks, change the
@@ -249,5 +259,6 @@ The duplication across v900, v012 and v013 sat in the Python generators, not in 
 four drifting copies of `brand.py` and of the helpers. An XML library would need `<include>` to take per-use
 parameters and text. Today it cannot: the engine templates an included document with its own defaults
 (`sr-eval/src/program.rs`, `include()`). SREP draft:
-`~/.local/share/scene-render/sr-core/srep-drafts/include-params.md`. If that SREP is accepted, pnkit's brand
+`~/.local/share/scene-render/sr-core/srep-drafts/include-params.md` (a working draft on the production machine,
+not yet in the sr-core repository's `srep/`). If that SREP is accepted, pnkit's brand
 components could become includes of the kit's symbols, and pnkit would keep the rest.

@@ -19,7 +19,7 @@ import functools, types
 from .doc import Doc
 from . import sdk, xml, palette, text, draw, camera, brand, captions, shorts, physics, mesh, figure, vo, audio, files, timings
 
-__version__ = "1.0.0"
+__version__ = "1.1.0"
 __all__ = ["Doc", "bind", "__version__", "sdk", "xml", "palette", "text", "draw", "camera", "brand", "captions", "shorts",
            "physics", "mesh", "figure", "vo", "audio"]
 

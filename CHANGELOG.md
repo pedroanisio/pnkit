@@ -5,6 +5,37 @@ release adds components or parameters and keeps every existing default's output 
 C14N-equal from 1.0; the golden tests prove it); a change to an existing default's output is a major release until 1.0, and a minor one is never allowed
 to hide it. Each release names the golden projects it was checked against.
 
+## 1.1.0 — 2026-10-17 — the scene-render 0.6.0 CLI: JSON envelope in gate.py, scopes_check.py
+
+Additive: no component changed, so every default's output is unchanged (the golden suites re-run: component corpus 78/78
+strictly C14N-equal, all 32 Lula scenes with `PNKIT_LULA_ALL=1`). Tools only.
+
+Added
+- `tools/gate.py` reads the engine's `scene-render-cli/1` JSON envelope (`--format json`, scene-render >= 0.6.0): typed
+  diagnostics with file:line:column, the node count from `result.nodes`. An engine that prints no envelope (before 0.6.0)
+  falls back to the human-format parser, unchanged; the gate's own report and exit codes are the same either way, and its
+  `--json` report names which format was read (`engine_format`).
+- `tools/scopes_check.py`: levels of rendered frames or an encoded film through `scene-render scopes` (>= 0.6.0), the
+  check the engine added for clipping, illegal codes, gamut and oversaturation. Illegal, out-of-gamut and oversaturated
+  fail past a threshold (default 0); illegal is gated only where the source has a legal range; clipping is reported and
+  gated only with `--max-clipped` (clipped white can be a legitimate specular). The thresholds are parameters, not a
+  measured precision: a pass is not proof. Exit 2 when the engine has no scopes envelope. Run on the render host.
+- Tests: the envelope parsers and the fallback against fake engines (JSON and pre-0.6.0), `scopes_check.judge`, and the
+  tool end to end against a fake engine; both tools also exercised by hand against the real v0.6.0 binary on a corpus
+  scene and a synthetic PNG (one clipped pixel in 64: reported, and gated only with `--max-clipped`).
+
+Fixed
+- `gate.py` with no engine found exited 1 (`sys.exit(str)`) where its docstring promises 2; now 2.
+- `tests/test_filmbuild.py` `test_psnr_and_margins` imported numpy without the skip guard the other DSP tests have, so
+  the default run errored where numpy is not installed; now skipped like them.
+
+Docs
+- `kit.json` `requires` records that sr-core 1.8.0 is not tagged yet and that `pnkit.sdk` tests for the two SDK features
+  it needs rather than the version (as the 1.0.0 entry describes); the README says the same where it names 1.8.0.
+- README command examples use `LIB` (this library's checkout) instead of the production machine's `~/videos/lib`
+  symlink; the `~/videos/done/...` worked examples and the include-params SREP draft are marked as paths on that
+  machine, not this repository.
+
 ## 1.0.0 — 2026-10-12 — rebuilt on `sr_core.scene` (major)
 
 Major: pnkit no longer writes XML text. Every component builds `sr_core.scene` elements (sr-core >= 1.8.0, installed from the

@@ -10,6 +10,12 @@ from pnkit.filmbuild.config import Film, FilmError
 
 FIX = os.path.join(LIB, "tests", "fixtures", "filmbuild")
 
+try:
+    import numpy  # noqa: F401
+    HAVE_NP = True
+except ImportError:
+    HAVE_NP = False
+
 
 class Base(unittest.TestCase):
     def setUp(self):
@@ -254,6 +260,7 @@ class Gates(unittest.TestCase):
         self.assertEqual(gates.parse_ebur128(self.EBUR), {"I": -14.1, "LRA": 3.2, "true_peak": -1.6})
         self.assertEqual(len(gates.parse_blackdetect("black_start:0 black_end:0.5 black_duration:0.5\nx")), 1)
 
+    @unittest.skipUnless(HAVE_NP, "gates.psnr and gates.voice_margins need numpy (run the tests in the voice venv to include it)")
     def test_psnr_and_margins(self):
         import numpy as np
         a = np.zeros((4, 4, 3), np.uint8); b = a.copy(); b[0, 0, 0] = 10

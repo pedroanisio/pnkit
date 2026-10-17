@@ -17,7 +17,12 @@
 A further check runs only to report a fault: an <instance> with no `start` whose symbol reads `time` in a `condition`
 (tools/instance_clock.py), which shows an arbitrary first frame. Clean scenes print nothing for it.
 
+The engine's output is read as the `scene-render-cli/1` JSON envelope (`--format json`, scene-render >= 0.6.0);
+an engine that prints no envelope falls back to the human format, parsed as before. The gate's own report is the
+same either way (`engine_format` in --json names which was read).
+
 Exit status 0 when all three pass, 1 otherwise, 2 when the engine cannot be run. Nothing here uses the GPU.
+Levels of the *rendered* frames (clipping, legal range, gamut) are the render host's check: tools/scopes_check.py.
 """
 import argparse, json, os, re, shutil, subprocess, sys, xml.etree.ElementTree as ET
 from concurrent.futures import ThreadPoolExecutor
@@ -44,7 +49,8 @@ def engine(path=None):
     for c in (path, os.environ.get("SCENE_RENDER"), shutil.which("scene-render"), DEFAULT_ENGINE):
         if c and os.path.exists(c):
             return c
-    sys.exit("gate: no scene-render engine (pass --engine or set SCENE_RENDER)")
+    print("gate: no scene-render engine (pass --engine or set SCENE_RENDER)", file=sys.stderr)
+    sys.exit(2)  # the docstring's contract: 2 when the engine cannot be run (sys.exit(str) would be 1)
 
 
 def diagnostics(text):
@@ -60,7 +66,52 @@ def diagnostics(text):
 
 def run(cmd):
     r = subprocess.run(cmd, capture_output=True, text=True)
-    return r.returncode, r.stdout + r.stderr
+    return r.returncode, r.stdout, r.stderr
+
+
+def envelope(stdout):
+    """the scene-render-cli/1 envelope in stdout, or None (an engine before 0.6.0 prints none)"""
+    try:
+        env = json.loads(stdout)
+    except ValueError:
+        return None
+    return env if isinstance(env, dict) and env.get("format") == "scene-render-cli/1" else None
+
+
+def envelope_diagnostics(env, scene):
+    """diagnostics() tuples from an envelope: validate keeps a file's findings in its result, eval's sit at the
+    top; info findings are left out, as the text parser leaves them"""
+    result = env.get("result")
+    found = list(env.get("diagnostics") or [])
+    for f in (result.get("files") or []) if isinstance(result, dict) else []:
+        found += f.get("diagnostics") or []
+    out = []
+    for d in found:
+        if d.get("severity") not in ("error", "warning"):
+            continue
+        loc = d.get("loc") or {}
+        where = d.get("file", scene)
+        if loc.get("line") is not None:
+            where = f"{where}:{loc['line']}:{loc.get('column')}"
+        out.append((d["severity"], d["code"], d.get("message", ""), where))
+    return out
+
+
+MODE = {"json": True}  # flipped off at the first run whose stdout holds no envelope; settled by validate,
+                       # which runs before the eval pool starts
+
+
+def engine_run(cmd, scene):
+    """(exit, diagnostics, envelope-or-None, raw text) — the JSON envelope when the engine has it, else the
+    human format"""
+    if MODE["json"]:
+        rc, out, err = run(cmd + ["--format", "json"])
+        env = envelope(out)
+        if env is not None:
+            return rc, envelope_diagnostics(env, scene), env, out + err
+        MODE["json"] = False
+    rc, out, err = run(cmd)
+    return rc, diagnostics(out + err), None, out + err
 
 
 def scene_facts(path):
@@ -99,10 +150,9 @@ def main():
     sr = engine(args.engine)
     na = ["--no-assets"] if args.no_assets else []
 
-    rc, out = run([sr, "validate", "--deny-warnings", "--color", "never", *na, args.scene])
+    rc, v_diags, _, raw = engine_run([sr, "validate", "--deny-warnings", "--color", "never", *na, args.scene], args.scene)
     if rc == 2:
-        print(out); sys.exit(2)
-    v_diags = diagnostics(out)
+        print(raw); sys.exit(2)
     v_ok = rc == 0
 
     markers, layouts, variants, acc = scene_facts(args.scene)
@@ -116,10 +166,15 @@ def main():
     def ev(job):
         kind, what, extra = job
         t = what if kind == "t" else probes[0]
-        rc_, out_ = run([sr, "eval", args.scene, "--time", repr(t), "--color", "never", *na, *extra])
-        nodes = re.search(r"(\d+) nodes", out_)
-        return {"kind": kind, "what": what, "time": t, "exit": rc_, "nodes": int(nodes.group(1)) if nodes else None,
-                "diagnostics": diagnostics(out_)}
+        rc_, diags_, env_, raw_ = engine_run([sr, "eval", args.scene, "--time", repr(t), "--color", "never", *na, *extra],
+                                             args.scene)
+        if env_ is not None and isinstance(env_.get("result"), dict):
+            n = env_["result"].get("nodes")
+            nodes = len(n) if isinstance(n, list) else None
+        else:
+            m = re.search(r"(\d+) nodes", raw_)
+            nodes = int(m.group(1)) if m else None
+        return {"kind": kind, "what": what, "time": t, "exit": rc_, "nodes": nodes, "diagnostics": diags_}
 
     with ThreadPoolExecutor(max(1, args.jobs)) as pool:
         evals = list(pool.map(ev, jobs))
@@ -131,7 +186,8 @@ def main():
     ok = v_ok and e_ok and f_on and not clock
 
     if args.json:
-        print(json.dumps({"scene": args.scene, "ok": ok, "validate": {"ok": v_ok, "diagnostics": v_diags},
+        print(json.dumps({"scene": args.scene, "ok": ok, "engine_format": "json" if MODE["json"] else "text",
+                          "validate": {"ok": v_ok, "diagnostics": v_diags},
                           "eval": evals, "override_errors": len(overrides), "flashCheck": {"on": f_on, "state": f_desc,
                           "accessibility": acc}, **({"instance_clock": clock} if clock else {})}, indent=1))
     else:
